@@ -35,34 +35,39 @@ const limiter = rateLimit({
   message: '请求过于频繁，请稍后再试'
 });
 
-app.use('/api/', limiter);
+app.use('/livablecities/api/', limiter);
 
 // 解析JSON和URL编码数据
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 静态文件服务
-app.use(express.static(path.join(__dirname, 'public')));
+// 静态文件服务 - 在 /livablecities 路径下提供服务
+app.use('/livablecities', express.static(path.join(__dirname, 'public')));
 
 // API路由
-app.use('/api/auth', require('./server/routes/auth'));
-app.use('/api/cities', require('./server/routes/cities'));
-app.use('/api/reviews', require('./server/routes/reviews'));
-app.use('/api/admin', require('./server/routes/admin'));
+app.use('/livablecities/api/auth', require('./server/routes/auth'));
+app.use('/livablecities/api/cities', require('./server/routes/cities'));
+app.use('/livablecities/api/reviews', require('./server/routes/reviews'));
+app.use('/livablecities/api/admin', require('./server/routes/admin'));
 
 // 健康检查
-app.get('/api/health', (req, res) => {
+app.get('/livablecities/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // 404处理
-app.use('/api/*', (req, res) => {
+app.use('/livablecities/api/*', (req, res) => {
   res.status(404).json({ error: '接口不存在' });
 });
 
-// 所有其他路由返回index.html（用于前端路由）
-app.get('*', (req, res) => {
+// /livablecities 路径的前端路由支持
+app.get('/livablecities*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// 根路径重定向到 /livablecities
+app.get('/', (req, res) => {
+  res.redirect('/livablecities/');
 });
 
 // 错误处理中间件

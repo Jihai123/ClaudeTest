@@ -1,7 +1,7 @@
 // API客户端
 class API {
   constructor() {
-    this.baseURL = '/api';
+    this.baseURL = '/livablecities/api';
     this.token = localStorage.getItem('token');
   }
 
