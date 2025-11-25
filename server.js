@@ -65,9 +65,10 @@ app.get('/livablecities*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 根路径重定向到 /livablecities
+// 根路径 - 当通过 Nginx 代理访问时，/ 会被映射到 /livablecities/
+// 直接返回 index.html 而不是重定向，避免重定向循环
 app.get('/', (req, res) => {
-  res.redirect('/livablecities/');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // 错误处理中间件
