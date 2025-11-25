@@ -41,7 +41,11 @@ app.use('/livablecities/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 静态文件服务 - 在 /livablecities 路径下提供服务
+// 静态文件服务 - 支持代理后的根路径访问
+// Nginx 代理会将 /livablecities/css/style.css 转换为 /css/style.css
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 同时也支持带 /livablecities 前缀的直接访问
 app.use('/livablecities', express.static(path.join(__dirname, 'public')));
 
 // API路由
