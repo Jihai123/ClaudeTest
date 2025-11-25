@@ -1,7 +1,10 @@
 // API客户端
 class API {
   constructor() {
-    this.baseURL = '/livablecities/api';
+    // 自动检测基础路径 - 支持 nginx 代理环境
+    const currentPath = window.location.pathname;
+    const pathPrefix = currentPath.startsWith('/livablecities') ? '/livablecities' : '';
+    this.baseURL = `${pathPrefix}/api`;
     this.token = localStorage.getItem('token');
   }
 
