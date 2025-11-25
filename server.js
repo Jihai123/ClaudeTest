@@ -61,7 +61,12 @@ app.use('/livablecities/api/*', (req, res) => {
 });
 
 // /livablecities 路径的前端路由支持
-app.get('/livablecities*', (req, res) => {
+// 只匹配没有文件扩展名的路径（排除静态文件请求）
+app.get('/livablecities*', (req, res, next) => {
+  // 如果请求路径包含文件扩展名，跳过此路由（让静态文件中间件或404处理）
+  if (path.extname(req.path)) {
+    return next();
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
