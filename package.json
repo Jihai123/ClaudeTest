@@ -7,6 +7,11 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node server/utils/initDatabase.js",
+    "seed-cities": "node server/utils/seedCitiesData.js",
+    "import-json": "node server/utils/importCitiesData.js import-json",
+    "import-csv": "node server/utils/importCitiesData.js import-csv",
+    "export-json": "node server/utils/importCitiesData.js export-json",
+    "export-csv": "node server/utils/importCitiesData.js export-csv",
     "test": "jest"
   },
   "keywords": [
