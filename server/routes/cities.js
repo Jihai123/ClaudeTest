@@ -32,6 +32,11 @@ router.get('/', optionalAuth, async (req, res) => {
         cd.employment,
         cd.safety,
         cd.elderly_care,
+        cd.medical,
+        cd.transportation,
+        cd.internet,
+        cd.education,
+        cd.actual_level,
         COUNT(DISTINCT r.id) as review_count,
         AVG(r.rating) as avg_rating
       FROM cities c
@@ -74,7 +79,12 @@ router.get('/:id', validateId, async (req, res) => {
         cd.medical_facilities,
         cd.employment,
         cd.safety,
-        cd.elderly_care
+        cd.elderly_care,
+        cd.medical,
+        cd.transportation,
+        cd.internet,
+        cd.education,
+        cd.actual_level
       FROM cities c
       LEFT JOIN city_dimensions cd ON c.id = cd.city_id
       WHERE c.id = ?`,
@@ -109,7 +119,11 @@ router.get('/:id', validateId, async (req, res) => {
 router.post('/', verifyToken, validateCity, async (req, res) => {
   try {
     const cityData = sanitizeObject(req.body);
-    const { name, province, population, gdp, area, dimensions } = cityData;
+    const {
+      name, province, city_name, district, standard_location,
+      city_level, grade_level, location_intro, population, gdp, area,
+      link, key_points, climate, evaluation, notes, dimensions
+    } = cityData;
 
     // 检查城市是否已存在
     const existingCity = await db.get('SELECT * FROM cities WHERE name = ?', [name]);
@@ -132,9 +146,14 @@ router.post('/', verifyToken, validateCity, async (req, res) => {
 
     // 创建城市
     const result = await db.run(
-      `INSERT INTO cities (name, province, population, gdp, area, overall_score, user_id, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [name, province || null, population || null, gdp || null, area || null,
+      `INSERT INTO cities (name, province, city_name, district, standard_location,
+       city_level, grade_level, location_intro, population, gdp, area, link,
+       key_points, climate, evaluation, notes, overall_score, user_id, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [name, province || null, city_name || null, district || null, standard_location || null,
+       city_level || null, grade_level || null, location_intro || null,
+       population || null, gdp || null, area || null, link || null,
+       key_points || null, climate || null, evaluation || null, notes || null,
        overallScore.toFixed(2), req.user.id, 'pending']
     );
 
@@ -142,10 +161,13 @@ router.post('/', verifyToken, validateCity, async (req, res) => {
     if (dimensions) {
       await db.run(
         `INSERT INTO city_dimensions (city_id, living_cost, air_quality, medical_facilities,
-         employment, safety, elderly_care) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+         employment, safety, elderly_care, medical, transportation, internet, education, actual_level)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [result.id, dimensions.living_cost || 0, dimensions.air_quality || 0,
          dimensions.medical_facilities || 0, dimensions.employment || 0,
-         dimensions.safety || 0, dimensions.elderly_care || 0]
+         dimensions.safety || 0, dimensions.elderly_care || 0,
+         dimensions.medical || null, dimensions.transportation || null,
+         dimensions.internet || null, dimensions.education || null, dimensions.actual_level || null]
       );
     }
 
@@ -179,10 +201,15 @@ router.put('/:id/dimensions', verifyToken, validateId, validateDimensions, async
     await db.run(
       `UPDATE city_dimensions
        SET living_cost = ?, air_quality = ?, medical_facilities = ?,
-           employment = ?, safety = ?, elderly_care = ?, updated_at = CURRENT_TIMESTAMP
+           employment = ?, safety = ?, elderly_care = ?, medical = ?,
+           transportation = ?, internet = ?, education = ?, actual_level = ?,
+           updated_at = CURRENT_TIMESTAMP
        WHERE city_id = ?`,
       [dimensions.living_cost, dimensions.air_quality, dimensions.medical_facilities,
-       dimensions.employment, dimensions.safety, dimensions.elderly_care, req.params.id]
+       dimensions.employment, dimensions.safety, dimensions.elderly_care,
+       dimensions.medical || null, dimensions.transportation || null,
+       dimensions.internet || null, dimensions.education || null,
+       dimensions.actual_level || null, req.params.id]
     );
 
     // 更新综合评分
@@ -225,7 +252,12 @@ router.post('/compare', async (req, res) => {
         cd.medical_facilities,
         cd.employment,
         cd.safety,
-        cd.elderly_care
+        cd.elderly_care,
+        cd.medical,
+        cd.transportation,
+        cd.internet,
+        cd.education,
+        cd.actual_level
       FROM cities c
       LEFT JOIN city_dimensions cd ON c.id = cd.city_id
       WHERE c.id IN (${placeholders}) AND c.status = 'approved'`,
