@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>城市详情 - 躺平榜</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --bg-light: #f7fafc;
+            --bg-white: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: var(--bg-white);
+            padding: 15px 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* 城市头部 */
+        .city-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .city-title {
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .city-subtitle {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .city-meta {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1em;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .city-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tag {
+            background: var(--bg-light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.95em;
+            color: var(--text-secondary);
+        }
+
+        /* 内容分区 */
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 图片墙 */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+            aspect-ratio: 4/3;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-light), var(--border-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: var(--text-secondary);
+        }
+
+        .upload-prompt {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            border: 2px dashed var(--border-color);
+        }
+
+        .upload-prompt h3 {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* 雷达图 */
+        #radarChart {
+            height: 500px;
+            margin: 20px 0;
+        }
+
+        /* 评价区 */
+        .reviews-section {
+            background: var(--bg-light);
+            padding: 30px;
+            border-radius: var(--radius-md);
+        }
+
+        .review-form {
+            background: var(--bg-white);
+            padding: 25px;
+            border-radius: var(--radius-md);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 10px;
+            font-size: 2em;
+        }
+
+        .rating-star {
+            cursor: pointer;
+            color: var(--border-color);
+            transition: color 0.3s;
+        }
+
+        .rating-star.active,
+        .rating-star:hover {
+            color: #fbbf24;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 评价列表 */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .review-item {
+            background: var(--bg-white);
+            padding: 25px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .review-author {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .review-rating {
+            color: #fbbf24;
+            font-size: 1.2em;
+        }
+
+        .review-date {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .review-content {
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        .review-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+        }
+
+        .review-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: color 0.3s;
+        }
+
+        .review-action-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .city-title {
+                font-size: 2em;
+            }
+
+            .city-subtitle {
+                font-size: 1.1em;
+            }
+
+            .city-meta {
+                gap: 15px;
+            }
+
+            .section-title {
+                font-size: 1.5em;
+            }
+
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+
+            #radarChart {
+                height: 400px;
+            }
+        }
+
+        /* 通知 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid #f56565;
+        }
+
+        /* 图片灯箱 */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .lightbox.show {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: var(--radius-md);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="logo" onclick="window.location.href='index.html'">🏖️ 躺平榜</div>
+        <div>
+            <a href="index.html" class="btn btn-outline">← 返回列表</a>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 加载状态 -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>加载中...</p>
+        </div>
+
+        <!-- 城市内容 -->
+        <div id="cityContent" style="display: none;">
+            <!-- 城市头部 -->
+            <div class="city-header">
+                <h1 class="city-title" id="cityName"></h1>
+                <p class="city-subtitle" id="citySlogan"></p>
+                <div class="city-meta" id="cityMeta"></div>
+                <div class="score-badge">
+                    ⭐ <span id="cityScore">0.0</span> 分
+                </div>
+                <div class="city-tags" id="cityTags"></div>
+            </div>
+
+            <!-- 图片墙 -->
+            <section class="section">
+                <h2 class="section-title">📷 城市印象</h2>
+                <div id="imageGallery" class="image-gallery"></div>
+                <div id="uploadPrompt" class="upload-prompt" style="display: none;">
+                    <div class="empty-state-icon">📷</div>
+                    <h3>暂无图片</h3>
+                    <p>成为第一个上传这座城市图片的人</p>
+                    <a href="upload-images.html" class="btn btn-primary" style="margin-top: 20px;">上传图片</a>
+                </div>
+            </section>
+
+            <!-- 雷达图 -->
+            <section class="section">
+                <h2 class="section-title">📊 城市维度分析</h2>
+                <div id="radarChart"></div>
+            </section>
+
+            <!-- 评价区 -->
+            <section class="section">
+                <h2 class="section-title">💬 用户评价</h2>
+                <div class="reviews-section">
+                    <!-- 评价表单 -->
+                    <div class="review-form">
+                        <h3 style="margin-bottom: 20px;">发表评价</h3>
+                        <form id="reviewForm">
+                            <div class="form-group">
+                                <label class="form-label">评分</label>
+                                <div class="rating-input" id="ratingInput">
+                                    <span class="rating-star" data-rating="1">★</span>
+                                    <span class="rating-star" data-rating="2">★</span>
+                                    <span class="rating-star" data-rating="3">★</span>
+                                    <span class="rating-star" data-rating="4">★</span>
+                                    <span class="rating-star" data-rating="5">★</span>
+                                </div>
+                                <input type="hidden" id="ratingValue" value="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">评价内容</label>
+                                <textarea
+                                    id="reviewComment"
+                                    class="form-textarea"
+                                    placeholder="分享你在这座城市的生活体验..."
+                                    required
+                                ></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">提交评价</button>
+                        </form>
+                    </div>
+
+                    <!-- 评价列表 -->
+                    <div id="reviewsList" class="reviews-list"></div>
+                    <div id="emptyReviews" class="empty-state" style="display: none;">
+                        <div class="empty-state-icon">💬</div>
+                        <h3>暂无评价</h3>
+                        <p>成为第一个评价这座城市的人</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- 图片灯箱 -->
+    <div id="lightbox" class="lightbox">
+        <img id="lightboxImage" src="" alt="">
+    </div>
+
+    <!-- 通知 -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // 全局变量
+        let cityId = null;
+        let cityData = null;
+        let currentRating = 5;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取城市ID
+            const urlParams = new URLSearchParams(window.location.search);
+            cityId = urlParams.get('id');
+
+            if (!cityId) {
+                showNotification('城市ID无效', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return;
+            }
+
+            // 加载城市数据
+            loadCityData();
+
+            // 初始化评分组件
+            initRatingInput();
+
+            // 初始化评价表单
+            initReviewForm();
+
+            // 初始化图片灯箱
+            initLightbox();
+        });
+
+        // 加载城市数据
+        async function loadCityData() {
+            try {
+                const response = await fetch(`/api/cities/${cityId}`);
+                if (!response.ok) throw new Error('城市不存在');
+
+                cityData = await response.json();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('cityContent').style.display = 'block';
+
+                renderCityHeader();
+                renderImageGallery();
+                renderRadarChart();
+                loadReviews();
+            } catch (error) {
+                console.error('加载失败:', error);
+                showNotification('加载城市信息失败', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+            }
+        }
+
+        // 渲染城市头部
+        function renderCityHeader() {
+            document.getElementById('cityName').textContent = cityData.name;
+            document.getElementById('citySlogan').textContent = cityData.slogan || cityData.location_intro || '宜居之城';
+
+            const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
+            document.getElementById('cityScore').textContent = score.toFixed(1);
+
+            // 城市元信息
+            const meta = document.getElementById('cityMeta');
+            meta.innerHTML = `
+                <div class="meta-item">📍 ${cityData.province || '中国'}</div>
+                <div class="meta-item">👥 ${formatNumber(cityData.population)}</div>
+                ${cityData.avg_rent ? `<div class="meta-item">💰 ¥${cityData.avg_rent}/月</div>` : ''}
+                ${cityData.avg_temp ? `<div class="meta-item">🌡️ ${cityData.avg_temp}°C</div>` : ''}
+            `;
+
+            // 城市标签
+            if (cityData.tags && cityData.tags.length > 0) {
+                const tagsHtml = cityData.tags.map(tag =>
+                    `<span class="tag">${tag.tag_icon || ''} ${tag.tag_name || ''}</span>`
+                ).join('');
+                document.getElementById('cityTags').innerHTML = tagsHtml;
+            }
+        }
+
+        // 渲染图片墙
+        function renderImageGallery() {
+            const gallery = document.getElementById('imageGallery');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+
+            if (cityData.images && cityData.images.length > 0) {
+                gallery.innerHTML = cityData.images.map(image => `
+                    <div class="gallery-item" onclick="openLightbox('${image.image_url}')">
+                        <img src="${image.thumbnail_url || image.image_url}" alt="${image.alt_text || cityData.name}">
+                    </div>
+                `).join('');
+            } else {
+                uploadPrompt.style.display = 'block';
+            }
+        }
+
+        // 渲染雷达图
+        function renderRadarChart() {
+            const chart = echarts.init(document.getElementById('radarChart'));
+
+            const dimensions = [
+                { name: '生活成本', key: 'living_cost', max: 10 },
+                { name: '空气质量', key: 'air_quality', max: 10 },
+                { name: '医疗设施', key: 'medical_facilities', max: 10 },
+                { name: '就业机会', key: 'employment', max: 10 },
+                { name: '安全指数', key: 'safety', max: 10 },
+                { name: '适合养老', key: 'elderly_care', max: 10 }
+            ];
+
+            const values = dimensions.map(d => cityData[d.key] || 5);
+
+            const option = {
+                title: {
+                    text: '城市综合评估',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 20,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                radar: {
+                    indicator: dimensions.map(d => ({ name: d.name, max: d.max })),
+                    radius: '65%',
+                    axisName: {
+                        color: '#718096',
+                        fontSize: 14
+                    },
+                    splitArea: {
+                        areaStyle: {
+                            color: ['rgba(102, 126, 234, 0.05)', 'rgba(102, 126, 234, 0.1)']
+                        }
+                    }
+                },
+                series: [{
+                    name: cityData.name,
+                    type: 'radar',
+                    data: [{
+                        value: values,
+                        name: cityData.name,
+                        areaStyle: {
+                            color: 'rgba(102, 126, 234, 0.3)'
+                        },
+                        lineStyle: {
+                            color: '#667eea',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    }]
+                }]
+            };
+
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 加载评价列表
+        async function loadReviews() {
+            try {
+                const response = await fetch(`/api/reviews/city/${cityId}?limit=20`);
+                const data = await response.json();
+
+                const reviewsList = document.getElementById('reviewsList');
+                const emptyReviews = document.getElementById('emptyReviews');
+
+                if (data.reviews && data.reviews.length > 0) {
+                    reviewsList.innerHTML = data.reviews.map(review => `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div>
+                                    <div class="review-author">${review.username || '匿名用户'}</div>
+                                    <div class="review-date">${formatDate(review.created_at)}</div>
+                                </div>
+                                <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                            </div>
+                            <div class="review-content">${review.comment || '暂无评价内容'}</div>
+                            <div class="review-actions">
+                                <button class="review-action-btn" onclick="likeReview(${review.id})">
+                                    👍 ${review.likes || 0}
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    emptyReviews.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('加载评价失败:', error);
+            }
+        }
+
+        // 初始化评分输入
+        function initRatingInput() {
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    currentRating = parseInt(this.dataset.rating);
+                    document.getElementById('ratingValue').value = currentRating;
+                    updateStars();
+                });
+
+                star.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    stars.forEach((s, index) => {
+                        s.classList.toggle('active', index < rating);
+                    });
+                });
+            });
+
+            document.getElementById('ratingInput').addEventListener('mouseleave', updateStars);
+            updateStars();
+        }
+
+        function updateStars() {
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach((star, index) => {
+                star.classList.toggle('active', index < currentRating);
+            });
+        }
+
+        // 初始化评价表单
+        function initReviewForm() {
+            document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const comment = document.getElementById('reviewComment').value;
+                const rating = parseInt(document.getElementById('ratingValue').value);
+
+                try {
+                    const response = await fetch('/api/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            city_id: cityId,
+                            rating: rating,
+                            comment: comment
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || '提交失败');
+                    }
+
+                    showNotification('评价提交成功！', 'success');
+                    document.getElementById('reviewComment').value = '';
+                    setTimeout(() => loadReviews(), 1000);
+                } catch (error) {
+                    showNotification(error.message || '提交失败，请先登录', 'error');
+                }
+            });
+        }
+
+        // 初始化图片灯箱
+        function initLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.addEventListener('click', closeLightbox);
+        }
+
+        function openLightbox(imageUrl) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            lightboxImage.src = imageUrl;
+            lightbox.classList.add('show');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('show');
+        }
+
+        // 点赞评价
+        async function likeReview(reviewId) {
+            try {
+                const response = await fetch(`/api/reviews/${reviewId}/like`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) throw new Error('操作失败');
+
+                showNotification('操作成功', 'success');
+                loadReviews();
+            } catch (error) {
+                showNotification('请先登录', 'error');
+            }
+        }
+
+        // 工具函数
+        function formatNumber(num) {
+            if (!num) return '暂无';
+            if (num >= 10000000) return (num / 10000000).toFixed(0) + '千万';
+            if (num >= 10000) return (num / 10000).toFixed(0) + '万';
+            return num.toString();
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
