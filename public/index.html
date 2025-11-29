@@ -770,11 +770,20 @@
     <script>
         // API配置 - 自动适应部署环境
         const API_CONFIG = {
-            // 优先使用环境变量，否则使用当前域名
-            baseURL: window.API_BASE_URL || window.location.origin,
+            // 优先使用环境变量，否则自动检测路径
+            baseURL: window.API_BASE_URL || (() => {
+                const pathname = window.location.pathname;
+                // 检测是否在子路径下（如 /livablecities/）
+                if (pathname.startsWith('/livablecities/')) {
+                    return window.location.origin + '/livablecities';
+                }
+                return window.location.origin;
+            })(),
             // 开发模式检测
             isDev: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         };
+
+        console.log('🚀 API配置:', API_CONFIG);
 
         // 全局状态
         let currentListType = 'china_layflat';

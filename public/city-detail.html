@@ -633,7 +633,11 @@
         // 加载城市数据
         async function loadCityData() {
             try {
-                const apiBase = window.location.origin;
+                // 自动检测API基础路径
+                const apiBase = window.location.pathname.startsWith('/livablecities/')
+                    ? window.location.origin + '/livablecities'
+                    : window.location.origin;
+                console.log('🔍 API Base:', apiBase);
                 const response = await fetch(`${apiBase}/api/cities/${cityId}`);
                 if (!response.ok) throw new Error('城市不存在');
 
@@ -762,7 +766,9 @@
         // 加载评价列表
         async function loadReviews() {
             try {
-                const apiBase = window.location.origin;
+                const apiBase = window.location.pathname.startsWith('/livablecities/')
+                    ? window.location.origin + '/livablecities'
+                    : window.location.origin;
                 const response = await fetch(`${apiBase}/api/reviews/city/${cityId}?limit=20`);
                 const data = await response.json();
 
@@ -833,7 +839,9 @@
                 const rating = parseInt(document.getElementById('ratingValue').value);
 
                 try {
-                    const apiBase = window.location.origin;
+                    const apiBase = window.location.pathname.startsWith('/livablecities/')
+                        ? window.location.origin + '/livablecities'
+                        : window.location.origin;
                     const response = await fetch(`${apiBase}/api/reviews`, {
                         method: 'POST',
                         headers: {
@@ -880,7 +888,9 @@
         // 点赞评价
         async function likeReview(reviewId) {
             try {
-                const apiBase = window.location.origin;
+                const apiBase = window.location.pathname.startsWith('/livablecities/')
+                    ? window.location.origin + '/livablecities'
+                    : window.location.origin;
                 const response = await fetch(`${apiBase}/api/reviews/${reviewId}/like`, {
                     method: 'POST'
                 });

@@ -480,7 +480,10 @@
         // 加载城市列表
         async function loadCities() {
             try {
-                const apiBase = window.location.origin;
+                const apiBase = window.location.pathname.startsWith('/livablecities/')
+                    ? window.location.origin + '/livablecities'
+                    : window.location.origin;
+                console.log('🔍 API Base:', apiBase);
                 const response = await fetch(`${apiBase}/api/cities?limit=1000&status=approved`);
                 const data = await response.json();
 
@@ -683,7 +686,9 @@
 
         // 保存图片记录
         async function saveImageRecord(cityId, imageUrl, description, season) {
-            const apiBase = window.location.origin;
+            const apiBase = window.location.pathname.startsWith('/livablecities/')
+                ? window.location.origin + '/livablecities'
+                : window.location.origin;
             const response = await fetch(`${apiBase}/api/images/upload`, {
                 method: 'POST',
                 headers: {
