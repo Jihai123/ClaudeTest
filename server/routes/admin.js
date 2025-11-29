@@ -22,6 +22,11 @@ router.get('/cities/pending', async (req, res) => {
         cd.employment,
         cd.safety,
         cd.elderly_care,
+        cd.medical,
+        cd.transportation,
+        cd.internet,
+        cd.education,
+        cd.actual_level,
         u.username as submitted_by
       FROM cities c
       LEFT JOIN city_dimensions cd ON c.id = cd.city_id
