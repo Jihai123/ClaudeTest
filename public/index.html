@@ -768,10 +768,43 @@
     <div id="notification" class="notification"></div>
 
     <script>
+        // API配置 - 自动适应部署环境
+        const API_CONFIG = {
+            // 优先使用环境变量，否则使用当前域名
+            baseURL: window.API_BASE_URL || window.location.origin,
+            // 开发模式检测
+            isDev: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        };
+
         // 全局状态
         let currentListType = 'china_layflat';
         let activeFilters = {};
         let cities = [];
+
+        // API请求辅助函数
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_CONFIG.baseURL}${endpoint}`;
+            console.log('API Request:', url); // 调试日志
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
@@ -837,14 +870,8 @@
 
             try {
                 const filterParams = JSON.stringify(activeFilters);
-                const url = `/api/cities?list_type=${currentListType}&limit=50&filters=${encodeURIComponent(filterParams)}`;
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error('加载失败');
-                }
-
-                const data = await response.json();
+                const endpoint = `/api/cities?list_type=${currentListType}&limit=50&filters=${encodeURIComponent(filterParams)}`;
+                const data = await apiRequest(endpoint);
                 loading.style.display = 'none';
 
                 if (data.cities && data.cities.length > 0) {
