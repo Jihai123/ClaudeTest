@@ -5,22 +5,107 @@ const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateCity, validateDimensions, validateId } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
 
-// 获取城市列表（支持搜索、排序、分页）
+// 获取城市列表（支持搜索、排序、分页、榜单筛选、高级筛选）
 router.get('/', optionalAuth, async (req, res) => {
   try {
-    const { search, sort = 'overall_score', order = 'DESC', page = 1, limit = 20, status = 'approved' } = req.query;
+    const {
+      search,
+      sort = 'overall_score',
+      order = 'DESC',
+      page = 1,
+      limit = 20,
+      status = 'approved',
+      list_type, // 榜单类型: world, china_general, china_layflat
+      filters // JSON字符串的筛选条件
+    } = req.query;
+
     const offset = (page - 1) * limit;
 
     let whereClause = 'WHERE c.status = ?';
     let params = [status];
 
+    // 榜单类型筛选
+    if (list_type) {
+      whereClause += ' AND c.list_type = ?';
+      params.push(list_type);
+    }
+
+    // 搜索
     if (search) {
       whereClause += ' AND (c.name LIKE ? OR c.province LIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
     }
 
-    const validSortFields = ['name', 'overall_score', 'population', 'created_at'];
-    const sortField = validSortFields.includes(sort) ? sort : 'overall_score';
+    // 高级筛选
+    if (filters) {
+      try {
+        const filterObj = JSON.parse(filters);
+
+        // 海边城市
+        if (filterObj.seaside) {
+          whereClause += ' AND c.distance_to_sea < 10';
+        }
+
+        // 低房租
+        if (filterObj.low_rent) {
+          whereClause += ' AND c.avg_rent < 1000';
+        }
+
+        // 超低房租
+        if (filterObj.super_low_rent) {
+          whereClause += ' AND c.avg_rent < 500';
+        }
+
+        // 四季如春
+        if (filterObj.spring_climate) {
+          whereClause += ' AND c.avg_temp BETWEEN 15 AND 25';
+        }
+
+        // 安静(人口少)
+        if (filterObj.quiet) {
+          whereClause += ' AND c.population < 500000';
+        }
+
+        // 医疗完善
+        if (filterObj.medical) {
+          whereClause += ' AND cd.medical_access >= 7';
+        }
+
+        // 数字游民友好
+        if (filterObj.digital_nomad) {
+          whereClause += ' AND c.digital_nomad_score >= 7';
+        }
+
+        // 适合养老
+        if (filterObj.elderly) {
+          whereClause += ' AND cd.elderly_care >= 8';
+        }
+
+        // 临湖
+        if (filterObj.lake) {
+          whereClause += ' AND c.has_lake = 1';
+        }
+
+        // 山居
+        if (filterObj.mountain) {
+          whereClause += ' AND c.altitude BETWEEN 800 AND 2000';
+        }
+      } catch (e) {
+        console.warn('筛选条件解析失败:', e);
+      }
+    }
+
+    // 根据榜单类型决定排序字段
+    const validSortFields = ['name', 'overall_score', 'layflat_score', 'world_score', 'population', 'created_at'];
+    let sortField = validSortFields.includes(sort) ? sort : 'overall_score';
+
+    // 如果指定了榜单类型，使用对应的评分字段
+    if (list_type === 'china_layflat' && sort === 'overall_score') {
+      sortField = 'layflat_score';
+    } else if (list_type === 'world' && sort === 'overall_score') {
+      sortField = 'world_score';
+    }
+
     const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const query = `
@@ -32,6 +117,14 @@ router.get('/', optionalAuth, async (req, res) => {
         cd.employment,
         cd.safety,
         cd.elderly_care,
+        cd.rent_cost,
+        cd.climate,
+        cd.slow_pace,
+        cd.medical_access,
+        cd.nature,
+        cd.population_density,
+        cd.price_index,
+        cd.digital_facilities,
         cd.medical,
         cd.transportation,
         cd.internet,
@@ -50,7 +143,16 @@ router.get('/', optionalAuth, async (req, res) => {
 
     const cities = await db.query(query, [...params, parseInt(limit), parseInt(offset)]);
 
-    const countQuery = `SELECT COUNT(*) as total FROM cities c ${whereClause}`;
+    // 获取城市标签
+    for (let city of cities) {
+      const tags = await db.query(
+        'SELECT * FROM city_tags WHERE city_id = ? AND is_primary = 1',
+        [city.id]
+      );
+      city.tags = tags;
+    }
+
+    const countQuery = `SELECT COUNT(*) as total FROM cities c LEFT JOIN city_dimensions cd ON c.id = cd.city_id ${whereClause}`;
     const { total } = await db.get(countQuery, params);
 
     res.json({
@@ -74,17 +176,7 @@ router.get('/:id', validateId, async (req, res) => {
     const city = await db.get(
       `SELECT
         c.*,
-        cd.living_cost,
-        cd.air_quality,
-        cd.medical_facilities,
-        cd.employment,
-        cd.safety,
-        cd.elderly_care,
-        cd.medical,
-        cd.transportation,
-        cd.internet,
-        cd.education,
-        cd.actual_level
+        cd.*
       FROM cities c
       LEFT JOIN city_dimensions cd ON c.id = cd.city_id
       WHERE c.id = ?`,
@@ -105,9 +197,41 @@ router.get('/:id', validateId, async (req, res) => {
       [req.params.id]
     );
 
+    // 获取城市标签
+    const tags = await db.query(
+      'SELECT * FROM city_tags WHERE city_id = ? ORDER BY is_primary DESC',
+      [req.params.id]
+    );
+
+    // 获取城市图片
+    const images = await db.query(
+      `SELECT * FROM city_images
+       WHERE city_id = ? AND status = 'approved'
+       ORDER BY weight DESC, likes_count DESC
+       LIMIT 10`,
+      [req.params.id]
+    );
+
+    // 获取封面图
+    const coverImage = await db.get(
+      `SELECT * FROM city_images
+       WHERE city_id = ? AND is_cover = 1 AND status = 'approved'
+       LIMIT 1`,
+      [req.params.id]
+    );
+
+    // 增加浏览次数
+    await db.run(
+      'UPDATE cities SET views_count = views_count + 1 WHERE id = ?',
+      [req.params.id]
+    );
+
     res.json({
       ...city,
-      review_stats: reviewStats
+      review_stats: reviewStats,
+      tags,
+      images,
+      cover_image: coverImage
     });
   } catch (error) {
     console.error('获取城市详情失败:', error);

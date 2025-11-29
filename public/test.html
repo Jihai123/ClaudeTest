@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>躺平榜单MVP测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab:hover {
+            color: #667eea;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        .filter-group label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .filter-tag {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .filter-tag:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .filter-tag.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .city-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .city-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .city-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .city-slogan {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        .city-score {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .city-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .tag {
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+        .city-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏙️ 宜居城市排行榜 MVP</h1>
+        <p class="subtitle">找到你的理想栖居地</p>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalCities">0</div>
+                <div class="stat-label">精选城市</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="avgScore">0.0</div>
+                <div class="stat-label">平均评分</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="minRent">¥0</div>
+                <div class="stat-label">最低房租</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab" onclick="switchTab('world')">🌍 世界榜</button>
+            <button class="tab" onclick="switchTab('china_general')">🏙️ 中国综合榜</button>
+            <button class="tab active" onclick="switchTab('china_layflat')">🏖️ 躺平榜</button>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>🎯 快速筛选</label>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter="seaside">🏖️ 看海</div>
+                    <div class="filter-tag" data-filter="low_rent">💰 低房租</div>
+                    <div class="filter-tag" data-filter="spring_climate">🌡️ 气候好</div>
+                    <div class="filter-tag" data-filter="quiet">🤫 安静</div>
+                    <div class="filter-tag" data-filter="medical">🏥 医疗好</div>
+                    <div class="filter-tag" data-filter="digital_nomad">💻 数字游民</div>
+                    <div class="filter-tag" data-filter="mountain">🏔️ 山居</div>
+                    <div class="filter-tag" data-filter="lake">🌊 临湖</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">加载中...</div>
+        <div id="citiesGrid" class="cities-grid"></div>
+    </div>
+
+    <script>
+        let currentListType = 'china_layflat';
+        let activeFilters = {};
+
+        async function loadCities() {
+            const loading = document.getElementById('loading');
+            const grid = document.getElementById('citiesGrid');
+
+            loading.style.display = 'block';
+            grid.innerHTML = '';
+
+            try {
+                const filterParams = JSON.stringify(activeFilters);
+                const url = `/api/cities?list_type=${currentListType}&limit=50&filters=${encodeURIComponent(filterParams)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                loading.style.display = 'none';
+
+                if (data.cities && data.cities.length > 0) {
+                    updateStats(data.cities);
+                    data.cities.forEach(city => {
+                        const card = createCityCard(city);
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<p class="loading">没有找到符合条件的城市</p>';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                grid.innerHTML = '<p class="loading">加载失败，请稍后重试</p>';
+                console.error('加载失败:', error);
+            }
+        }
+
+        function createCityCard(city) {
+            const card = document.createElement('div');
+            card.className = 'city-card';
+
+            const score = city.layflat_score || city.overall_score || 0;
+            const tags = city.tags || [];
+
+            card.innerHTML = `
+                <div class="city-name">${city.name}</div>
+                <div class="city-slogan">${city.slogan || '宜居小城'}</div>
+                <div class="city-score">⭐ ${score.toFixed(1)}</div>
+                <div class="city-tags">
+                    ${tags.map(tag => `<span class="tag">${tag.tag_name || tag.tag_icon}</span>`).join('')}
+                </div>
+                <div class="city-info">
+                    <div class="info-item">💰 ¥${city.avg_rent || '-'}/月</div>
+                    <div class="info-item">🌡️ ${city.avg_temp || '-'}°C</div>
+                    <div class="info-item">👥 ${formatNumber(city.population)}人</div>
+                    <div class="info-item">📍 ${city.province}</div>
+                </div>
+            `;
+
+            card.onclick = () => {
+                window.location.href = `/city/${city.id}`;
+            };
+
+            return card;
+        }
+
+        function updateStats(cities) {
+            const totalCities = cities.length;
+            const avgScore = cities.reduce((sum, c) => sum + (c.layflat_score || c.overall_score || 0), 0) / totalCities;
+            const minRent = Math.min(...cities.filter(c => c.avg_rent).map(c => c.avg_rent));
+
+            document.getElementById('totalCities').textContent = totalCities;
+            document.getElementById('avgScore').textContent = avgScore.toFixed(1);
+            document.getElementById('minRent').textContent = minRent ? `¥${minRent}` : '-';
+        }
+
+        function formatNumber(num) {
+            if (!num) return '-';
+            if (num >= 10000000) return (num / 10000000).toFixed(0) + '千万';
+            if (num >= 10000) return (num / 10000).toFixed(0) + '万';
+            return num.toString();
+        }
+
+        function switchTab(listType) {
+            currentListType = listType;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            loadCities();
+        }
+
+        // 筛选器事件
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const filter = this.dataset.filter;
+                this.classList.toggle('active');
+
+                if (this.classList.contains('active')) {
+                    activeFilters[filter] = true;
+                } else {
+                    delete activeFilters[filter];
+                }
+
+                loadCities();
+            });
+        });
+
+        // 初始加载
+        loadCities();
+    </script>
+</body>
+</html>

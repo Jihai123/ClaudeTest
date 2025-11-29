@@ -52,6 +52,9 @@ app.use(`${BASE_PATH}/api/auth`, require('./server/routes/auth'));
 app.use(`${BASE_PATH}/api/cities`, require('./server/routes/cities'));
 app.use(`${BASE_PATH}/api/reviews`, require('./server/routes/reviews'));
 app.use(`${BASE_PATH}/api/admin`, require('./server/routes/admin'));
+app.use(`${BASE_PATH}/api/images`, require('./server/routes/images'));
+app.use(`${BASE_PATH}/api/tags`, require('./server/routes/tags'));
+app.use(`${BASE_PATH}/api/rankings`, require('./server/routes/rankings'));
 
 // 健康检查
 app.get(`${BASE_PATH}/api/health`, (req, res) => {
