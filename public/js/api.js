@@ -2,8 +2,9 @@
 class API {
   constructor() {
     // 自动检测基础路径 - 支持 nginx 代理环境
-    const currentPath = window.location.pathname;
-    const pathPrefix = currentPath.startsWith('/livablecities') ? '/livablecities' : '';
+    const pathname = window.location.pathname;
+    const href = window.location.href;
+    const pathPrefix = (pathname.includes('/livablecities') || href.includes('/livablecities')) ? '/livablecities' : '';
     this.baseURL = `${pathPrefix}/api`;
     this.token = localStorage.getItem('token');
   }
