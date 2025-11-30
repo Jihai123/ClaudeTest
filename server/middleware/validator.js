@@ -4,7 +4,13 @@ const { body, param, query, validationResult } = require('express-validator');
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    // 提取第一个错误信息，返回统一格式
+    const firstError = errors.array()[0];
+    return res.status(400).json({
+      error: firstError.msg,
+      field: firstError.path,
+      errors: errors.array() // 保留完整错误信息用于调试
+    });
   }
   next();
 };

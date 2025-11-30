@@ -846,19 +846,31 @@
             <form id="registerForm">
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; margin-bottom: 0.5rem;">用户名</label>
-                    <input type="text" id="registerUsername" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                    <input type="text" id="registerUsername" required
+                           minlength="3" maxlength="50"
+                           pattern="[a-zA-Z0-9_\u4e00-\u9fa5]+"
+                           title="用户名长度3-50字符，只能包含字母、数字、下划线和中文"
+                           style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
                 </div>
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; margin-bottom: 0.5rem;">邮箱</label>
-                    <input type="email" id="registerEmail" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                    <input type="email" id="registerEmail" required
+                           title="请输入有效的邮箱地址"
+                           style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
                 </div>
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; margin-bottom: 0.5rem;">密码</label>
-                    <input type="password" id="registerPassword" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                    <input type="password" id="registerPassword" required
+                           minlength="6"
+                           title="密码长度至少为6个字符"
+                           style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
                 </div>
                 <div style="margin-bottom: 1.5rem;">
                     <label style="display: block; margin-bottom: 0.5rem;">确认密码</label>
-                    <input type="password" id="registerPasswordConfirm" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                    <input type="password" id="registerPasswordConfirm" required
+                           minlength="6"
+                           title="请再次输入密码"
+                           style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">注册</button>
             </form>
@@ -1234,8 +1246,19 @@
         // 登录表单提交
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('loginUsername').value;
+            const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
+
+            // 前端验证
+            if (!username) {
+                showNotification('请输入用户名', 'error');
+                return;
+            }
+
+            if (!password) {
+                showNotification('请输入密码', 'error');
+                return;
+            }
 
             try {
                 const response = await apiRequest('/api/auth/login', {
@@ -1266,10 +1289,31 @@
         // 注册表单提交
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('registerUsername').value;
-            const email = document.getElementById('registerEmail').value;
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
             const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            // 前端验证
+            if (username.length < 3 || username.length > 50) {
+                showNotification('用户名长度必须在3-50个字符之间', 'error');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(username)) {
+                showNotification('用户名只能包含字母、数字、下划线和中文', 'error');
+                return;
+            }
+
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showNotification('请提供有效的邮箱地址', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showNotification('密码长度至少为6个字符', 'error');
+                return;
+            }
 
             if (password !== passwordConfirm) {
                 showNotification('两次密码输入不一致', 'error');
