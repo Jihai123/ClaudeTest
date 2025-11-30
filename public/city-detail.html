@@ -660,19 +660,45 @@
         // 渲染城市头部
         function renderCityHeader() {
             document.getElementById('cityName').textContent = cityData.name;
-            document.getElementById('citySlogan').textContent = cityData.slogan || cityData.location_intro || '宜居之城';
+            document.getElementById('citySlogan').textContent = cityData.slogan || cityData.location_intro || cityData.evaluation || '宜居之城';
 
             const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
             document.getElementById('cityScore').textContent = score.toFixed(1);
 
-            // 城市元信息
+            // 城市元信息 - 展示所有字段
             const meta = document.getElementById('cityMeta');
-            meta.innerHTML = `
-                <div class="meta-item">📍 ${cityData.province || '中国'}</div>
-                <div class="meta-item">👥 ${formatNumber(cityData.population)}</div>
-                ${cityData.avg_rent ? `<div class="meta-item">💰 ¥${cityData.avg_rent}/月</div>` : ''}
-                ${cityData.avg_temp ? `<div class="meta-item">🌡️ ${cityData.avg_temp}°C</div>` : ''}
-            `;
+            const metaItems = [];
+
+            if (cityData.rank) metaItems.push(`🏆 排名: 第${cityData.rank}名`);
+            if (cityData.province) metaItems.push(`📍 省份: ${cityData.province}`);
+            if (cityData.district) metaItems.push(`🏘️ 区域: ${cityData.district}`);
+            if (cityData.location) metaItems.push(`🗺️ 位置: ${cityData.location}`);
+            if (cityData.city_tier) metaItems.push(`🏙️ 城市等级: ${cityData.city_tier}`);
+            if (cityData.house_price) metaItems.push(`🏠 房价: ¥${cityData.house_price}万/套`);
+            if (cityData.avg_rent) metaItems.push(`💰 租金: ¥${cityData.avg_rent}/月`);
+            if (cityData.climate_desc) metaItems.push(`🌡️ 气候: ${cityData.climate_desc}`);
+            if (cityData.layflat_level) metaItems.push(`😌 躺平等级: ${cityData.layflat_level}`);
+            if (cityData.medical) metaItems.push(`🏥 医疗: ${cityData.medical}`);
+            if (cityData.suitable_for) metaItems.push(`👥 适合人群: ${cityData.suitable_for}`);
+            if (cityData.population) metaItems.push(`👥 人口: ${formatNumber(cityData.population)}`);
+            if (cityData.avg_temp) metaItems.push(`🌡️ 平均气温: ${cityData.avg_temp}°C`);
+
+            meta.innerHTML = metaItems.map(item => `<div class="meta-item">${item}</div>`).join('');
+
+            // 添加城市评价和备注信息
+            const cityHeader = document.querySelector('.city-header');
+            if (cityData.evaluation || cityData.notes) {
+                const extraInfo = document.createElement('div');
+                extraInfo.style.marginTop = '20px';
+                extraInfo.style.padding = '15px';
+                extraInfo.style.background = 'var(--bg-light)';
+                extraInfo.style.borderRadius = 'var(--radius-md)';
+                extraInfo.innerHTML = `
+                    ${cityData.evaluation ? `<p style="margin-bottom: 10px;"><strong>🎯 城市评价：</strong>${cityData.evaluation}</p>` : ''}
+                    ${cityData.notes ? `<p><strong>📝 备注：</strong>${cityData.notes}</p>` : ''}
+                `;
+                cityHeader.appendChild(extraInfo);
+            }
 
             // 城市标签
             if (cityData.tags && cityData.tags.length > 0) {

@@ -625,6 +625,58 @@
         .fade-in {
             animation: fadeIn 0.6s ease-out;
         }
+
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            color: var(--gray);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: var(--dark);
+        }
     </style>
 </head>
 <body>
@@ -641,9 +693,9 @@
                 <li><a href="upload-images.html" class="nav-link">上传图片</a></li>
                 <li><a href="#about" class="nav-link">关于</a></li>
             </ul>
-            <div>
-                <button class="btn btn-outline" style="margin-right: 0.5rem;">登录</button>
-                <button class="btn btn-primary">注册</button>
+            <div id="authButtons">
+                <button id="loginBtn" class="btn btn-outline" style="margin-right: 0.5rem;">登录</button>
+                <button id="registerBtn" class="btn btn-primary">注册</button>
             </div>
         </div>
     </nav>
@@ -766,6 +818,52 @@
 
     <!-- 通知 -->
     <div id="notification" class="notification"></div>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="closeLoginModal">&times;</span>
+            <h2 style="margin-bottom: 1.5rem;">登录</h2>
+            <form id="loginForm">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">用户名</label>
+                    <input type="text" id="loginUsername" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">密码</label>
+                    <input type="password" id="loginPassword" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div id="registerModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="closeRegisterModal">&times;</span>
+            <h2 style="margin-bottom: 1.5rem;">注册</h2>
+            <form id="registerForm">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">用户名</label>
+                    <input type="text" id="registerUsername" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">邮箱</label>
+                    <input type="email" id="registerEmail" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">密码</label>
+                    <input type="password" id="registerPassword" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">确认密码</label>
+                    <input type="password" id="registerPasswordConfirm" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray); border-radius: 4px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">注册</button>
+            </form>
+        </div>
+    </div>
 
     <script>
         // API配置 - 自动适应部署环境
@@ -948,20 +1046,20 @@
                     </div>
                     <div class="city-info">
                         <div class="info-item">
+                            <span class="info-icon">📍</span>
+                            <span>${city.province || '未知省份'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🏠</span>
+                            <span>房价: ${city.house_price ? '¥' + city.house_price + '万/套' : '暂无'}</span>
+                        </div>
+                        <div class="info-item">
                             <span class="info-icon">💰</span>
-                            <span>${city.avg_rent ? '¥' + city.avg_rent + '/月' : '暂无'}</span>
+                            <span>租金: ${city.avg_rent ? '¥' + city.avg_rent + '/月' : '暂无'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-icon">🌡️</span>
-                            <span>${city.avg_temp ? city.avg_temp + '°C' : '暂无'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">👥</span>
-                            <span>${formatNumber(city.population)}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">📍</span>
-                            <span>${city.province || '中国'}</span>
+                            <span>气候: ${city.climate_desc || '暂无'}</span>
                         </div>
                     </div>
                 </div>
@@ -1019,6 +1117,109 @@
                     });
                 }
             });
+        });
+
+        // 登录和注册模态框功能
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        // 打开登录模态框
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+
+        // 打开注册模态框
+        registerBtn.addEventListener('click', () => {
+            registerModal.style.display = 'flex';
+        });
+
+        // 关闭登录模态框
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        // 关闭注册模态框
+        closeRegisterModal.addEventListener('click', () => {
+            registerModal.style.display = 'none';
+        });
+
+        // 点击模态框背景关闭
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+        });
+
+        registerModal.addEventListener('click', (e) => {
+            if (e.target === registerModal) {
+                registerModal.style.display = 'none';
+            }
+        });
+
+        // 登录表单提交
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await apiRequest('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.success) {
+                    showNotification('登录成功！', 'success');
+                    loginModal.style.display = 'none';
+                    loginForm.reset();
+                    // 可以在这里更新UI，例如显示用户信息
+                } else {
+                    showNotification(response.error || '登录失败', 'error');
+                }
+            } catch (error) {
+                showNotification('登录失败：' + error.message, 'error');
+            }
+        });
+
+        // 注册表单提交
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            if (password !== passwordConfirm) {
+                showNotification('两次密码输入不一致', 'error');
+                return;
+            }
+
+            try {
+                const response = await apiRequest('/api/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                if (response.success) {
+                    showNotification('注册成功！请登录', 'success');
+                    registerModal.style.display = 'none';
+                    registerForm.reset();
+                    // 自动打开登录模态框
+                    setTimeout(() => {
+                        loginModal.style.display = 'flex';
+                    }, 500);
+                } else {
+                    showNotification(response.error || '注册失败', 'error');
+                }
+            } catch (error) {
+                showNotification('注册失败：' + error.message, 'error');
+            }
         });
     </script>
 </body>
