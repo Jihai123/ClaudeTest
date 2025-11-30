@@ -48,7 +48,23 @@ class API {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || '请求失败');
+        // 处理后端返回的错误信息
+        let errorMessage = '请求失败';
+
+        // 处理 errors 数组格式（如验证错误）
+        if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+          errorMessage = data.errors.map(err => err.msg || err.message).join('; ');
+        }
+        // 处理 error 字符串格式
+        else if (data.error) {
+          errorMessage = data.error;
+        }
+        // 处理 message 字段
+        else if (data.message) {
+          errorMessage = data.message;
+        }
+
+        throw new Error(errorMessage);
       }
 
       return data;
