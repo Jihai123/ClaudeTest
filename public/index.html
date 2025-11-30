@@ -872,17 +872,26 @@
             baseURL: window.API_BASE_URL || (() => {
                 const pathname = window.location.pathname;
                 const href = window.location.href;
+                console.log('🔍 路径检测:', {
+                    pathname,
+                    href,
+                    'pathname包含livablecities': pathname.includes('/livablecities'),
+                    'href包含livablecities': href.includes('/livablecities')
+                });
                 // 检测是否在子路径下（如 /livablecities/ 或 /livablecities）
                 if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
-                    return window.location.origin + '/livablecities';
+                    const base = window.location.origin + '/livablecities';
+                    console.log('✅ 检测到 /livablecities/ 路径，使用 baseURL:', base);
+                    return base;
                 }
+                console.log('ℹ️ 使用根路径 baseURL:', window.location.origin);
                 return window.location.origin;
             })(),
             // 开发模式检测
             isDev: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         };
 
-        console.log('🚀 API配置:', API_CONFIG);
+        console.log('🚀 最终 API 配置:', API_CONFIG);
 
         // 全局状态
         let currentListType = 'china_layflat';
