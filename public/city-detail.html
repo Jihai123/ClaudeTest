@@ -868,10 +868,18 @@
                     const apiBase = window.location.pathname.startsWith('/livablecities/')
                         ? window.location.origin + '/livablecities'
                         : window.location.origin;
+
+                    // 获取token
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        throw new Error('请先登录');
+                    }
+
                     const response = await fetch(`${apiBase}/api/reviews`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
                         },
                         body: JSON.stringify({
                             city_id: cityId,
@@ -917,8 +925,18 @@
                 const apiBase = window.location.pathname.startsWith('/livablecities/')
                     ? window.location.origin + '/livablecities'
                     : window.location.origin;
+
+                // 获取token
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('请先登录');
+                }
+
                 const response = await fetch(`${apiBase}/api/reviews/${reviewId}/like`, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (!response.ok) throw new Error('操作失败');
@@ -926,7 +944,7 @@
                 showNotification('操作成功', 'success');
                 loadReviews();
             } catch (error) {
-                showNotification('请先登录', 'error');
+                showNotification(error.message || '请先登录', 'error');
             }
         }
 
