@@ -922,6 +922,7 @@
             initTabs();
             initFilters();
             loadCities();
+            updateAuthUI(); // 检查登录状态并更新UI
         });
 
         // 导航栏滚动效果
@@ -1122,6 +1123,52 @@
             });
         });
 
+        // 更新认证UI
+        function updateAuthUI() {
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            const authButtons = document.getElementById('authButtons');
+
+            if (token && userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    // 隐藏登录/注册按钮
+                    authButtons.innerHTML = `
+                        <span style="margin-right: 1rem; color: var(--dark); font-weight: 500;">欢迎，${user.username}</span>
+                        <button id="logoutBtn" class="btn btn-outline">退出</button>
+                    `;
+
+                    // 绑定退出按钮事件
+                    document.getElementById('logoutBtn').addEventListener('click', logout);
+                } catch (error) {
+                    console.error('解析用户信息失败:', error);
+                    logout();
+                }
+            } else {
+                // 显示登录/注册按钮
+                authButtons.innerHTML = `
+                    <button id="loginBtn" class="btn btn-outline" style="margin-right: 0.5rem;">登录</button>
+                    <button id="registerBtn" class="btn btn-primary">注册</button>
+                `;
+
+                // 重新绑定事件
+                document.getElementById('loginBtn').addEventListener('click', () => {
+                    document.getElementById('loginModal').style.display = 'flex';
+                });
+                document.getElementById('registerBtn').addEventListener('click', () => {
+                    document.getElementById('registerModal').style.display = 'flex';
+                });
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            showNotification('已退出登录', 'success');
+            updateAuthUI();
+        }
+
         // 登录和注册模态框功能
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
@@ -1205,10 +1252,8 @@
                     loginModal.style.display = 'none';
                     loginForm.reset();
 
-                    // 刷新页面以更新UI
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 500);
+                    // 更新UI
+                    updateAuthUI();
                 } else {
                     showNotification(response.error || '登录失败', 'error');
                 }
@@ -1246,10 +1291,8 @@
                     registerModal.style.display = 'none';
                     registerForm.reset();
 
-                    // 刷新页面以更新UI
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 500);
+                    // 更新UI
+                    updateAuthUI();
                 } else {
                     showNotification(response.error || '注册失败', 'error');
                 }

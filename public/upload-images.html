@@ -689,10 +689,18 @@
             const apiBase = window.location.pathname.startsWith('/livablecities/')
                 ? window.location.origin + '/livablecities'
                 : window.location.origin;
+
+            // 获取token
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('请先登录');
+            }
+
             const response = await fetch(`${apiBase}/api/images/upload`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     city_id: cityId,
