@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "init-db": "node server/utils/initDatabase.js",
     "migrate-db": "node server/utils/migrateDatabase.js",
+    "add-missing-fields": "node server/utils/add-missing-fields.js",
     "seed-cities": "node server/utils/seedCitiesData.js",
     "seed-layflat": "node server/utils/seedLayflatCities.js",
     "import-json": "node server/utils/importCitiesData.js import-json",
