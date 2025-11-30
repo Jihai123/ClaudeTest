@@ -9,6 +9,9 @@ const db = require('./server/models/database');
 // 创建Express应用
 const app = express();
 
+// 信任代理配置 - 用于正确获取客户端 IP 地址
+app.set('trust proxy', '127.0.0.1');
+
 // 安全中间件
 app.use(helmet({
   contentSecurityPolicy: {
