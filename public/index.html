@@ -902,11 +902,14 @@
                     }
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    // 如果响应不OK，抛出错误信息
+                    throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                return await response.json();
+                return data;
             } catch (error) {
                 console.error('API Error:', error);
                 throw error;
@@ -1149,17 +1152,35 @@
             registerModal.style.display = 'none';
         });
 
-        // 点击模态框背景关闭
-        loginModal.addEventListener('click', (e) => {
+        // 点击模态框背景关闭（防止拖拽文本时误触发）
+        loginModal.addEventListener('mousedown', (e) => {
             if (e.target === loginModal) {
+                // 记录mousedown发生的位置
+                loginModal.dataset.clickTarget = 'background';
+            }
+        });
+
+        loginModal.addEventListener('click', (e) => {
+            // 只有在同一个元素上mousedown和click才关闭模态框
+            if (e.target === loginModal && loginModal.dataset.clickTarget === 'background') {
                 loginModal.style.display = 'none';
+            }
+            delete loginModal.dataset.clickTarget;
+        });
+
+        registerModal.addEventListener('mousedown', (e) => {
+            if (e.target === registerModal) {
+                // 记录mousedown发生的位置
+                registerModal.dataset.clickTarget = 'background';
             }
         });
 
         registerModal.addEventListener('click', (e) => {
-            if (e.target === registerModal) {
+            // 只有在同一个元素上mousedown和click才关闭模态框
+            if (e.target === registerModal && registerModal.dataset.clickTarget === 'background') {
                 registerModal.style.display = 'none';
             }
+            delete registerModal.dataset.clickTarget;
         });
 
         // 登录表单提交
@@ -1174,16 +1195,25 @@
                     body: JSON.stringify({ username, password })
                 });
 
-                if (response.success) {
-                    showNotification('登录成功！', 'success');
+                // 检查是否有token和user字段，表示登录成功
+                if (response.token && response.user) {
+                    // 保存token和用户信息
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('user', JSON.stringify(response.user));
+
+                    showNotification(response.message || '登录成功！', 'success');
                     loginModal.style.display = 'none';
                     loginForm.reset();
-                    // 可以在这里更新UI，例如显示用户信息
+
+                    // 刷新页面以更新UI
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
                 } else {
                     showNotification(response.error || '登录失败', 'error');
                 }
             } catch (error) {
-                showNotification('登录失败：' + error.message, 'error');
+                showNotification(error.message || '登录失败', 'error');
             }
         });
 
@@ -1206,19 +1236,25 @@
                     body: JSON.stringify({ username, email, password })
                 });
 
-                if (response.success) {
-                    showNotification('注册成功！请登录', 'success');
+                // 检查是否有token和user字段，表示注册成功
+                if (response.token && response.user) {
+                    // 保存token和用户信息
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('user', JSON.stringify(response.user));
+
+                    showNotification(response.message || '注册成功！', 'success');
                     registerModal.style.display = 'none';
                     registerForm.reset();
-                    // 自动打开登录模态框
+
+                    // 刷新页面以更新UI
                     setTimeout(() => {
-                        loginModal.style.display = 'flex';
+                        window.location.reload();
                     }, 500);
                 } else {
                     showNotification(response.error || '注册失败', 'error');
                 }
             } catch (error) {
-                showNotification('注册失败：' + error.message, 'error');
+                showNotification(error.message || '注册失败', 'error');
             }
         });
     </script>
