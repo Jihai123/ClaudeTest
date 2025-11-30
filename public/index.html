@@ -871,8 +871,9 @@
             // 优先使用环境变量，否则自动检测路径
             baseURL: window.API_BASE_URL || (() => {
                 const pathname = window.location.pathname;
-                // 检测是否在子路径下（如 /livablecities/）
-                if (pathname.startsWith('/livablecities/')) {
+                const href = window.location.href;
+                // 检测是否在子路径下（如 /livablecities/ 或 /livablecities）
+                if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
                     return window.location.origin + '/livablecities';
                 }
                 return window.location.origin;

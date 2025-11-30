@@ -634,7 +634,9 @@
         async function loadCityData() {
             try {
                 // 自动检测API基础路径
-                const apiBase = window.location.pathname.startsWith('/livablecities/')
+                const pathname = window.location.pathname;
+                const href = window.location.href;
+                const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
                     ? window.location.origin + '/livablecities'
                     : window.location.origin;
                 console.log('🔍 API Base:', apiBase);
@@ -792,7 +794,9 @@
         // 加载评价列表
         async function loadReviews() {
             try {
-                const apiBase = window.location.pathname.startsWith('/livablecities/')
+                const pathname = window.location.pathname;
+                const href = window.location.href;
+                const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
                     ? window.location.origin + '/livablecities'
                     : window.location.origin;
                 const response = await fetch(`${apiBase}/api/reviews/city/${cityId}?limit=20`);
@@ -865,7 +869,9 @@
                 const rating = parseInt(document.getElementById('ratingValue').value);
 
                 try {
-                    const apiBase = window.location.pathname.startsWith('/livablecities/')
+                    const pathname = window.location.pathname;
+                    const href = window.location.href;
+                    const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
                         ? window.location.origin + '/livablecities'
                         : window.location.origin;
 
@@ -922,7 +928,9 @@
         // 点赞评价
         async function likeReview(reviewId) {
             try {
-                const apiBase = window.location.pathname.startsWith('/livablecities/')
+                const pathname = window.location.pathname;
+                const href = window.location.href;
+                const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
                     ? window.location.origin + '/livablecities'
                     : window.location.origin;
 
