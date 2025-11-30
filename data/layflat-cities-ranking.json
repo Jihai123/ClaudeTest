@@ -3308,6 +3308,20 @@
     "city_tier": "tier2"
   },
   {
+    "rank": 64,
+    "name": "元江哈尼族彝族傣族自治县",
+    "province": "云南",
+    "district": "元江县",
+    "location": "元江河谷北宝滇中腹地自治县",
+    "avg_rent": null,
+    "house_price": null,
+    "layflat_level": "郊游避暑好区",
+    "medical": "一般",
+    "suitable_for": "喜欢民族文化",
+    "climate_desc": "四季分明",
+    "evaluation": "包容，元江县少数民族，文化多元，冬季温暖，空气好又适居",
+    "notes": "民族文化丰富",
+    "city_tier": "small"
     "rank": 202,
     "name": "漳州市",
     "province": "福建",
