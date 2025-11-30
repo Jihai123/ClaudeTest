@@ -191,14 +191,15 @@ async function importData() {
 
         for (const cityData of citiesData) {
             try {
-                // 检查城市是否已存在
+                // 检查城市是否已存在（同一城市不同区域也要导入）
+                // 使用 name + province + district 来区分
                 const existing = await db.get(
-                    'SELECT id FROM cities WHERE name = ? AND province = ?',
-                    [cityData.name, cityData.province]
+                    'SELECT id FROM cities WHERE name = ? AND province = ? AND district = ?',
+                    [cityData.name, cityData.province, cityData.district || '']
                 );
 
                 if (existing) {
-                    console.log(`⊘ 跳过已存在的城市: ${cityData.name} (${cityData.province})`);
+                    console.log(`⊘ 跳过已存在的城市: ${cityData.name} (${cityData.province}) - ${cityData.district || '无区域'}`);
                     skipCount++;
                     continue;
                 }
@@ -217,11 +218,11 @@ async function importData() {
                 const cityResult = await db.run(
                     `INSERT INTO cities (
                         name, province, city_name, district, standard_location,
-                        slogan, population, avg_rent, climate,
+                        slogan, population, avg_rent, climate, climate_desc, house_price,
                         overall_score, layflat_score, list_type, city_tier,
                         evaluation, notes, key_points,
                         status, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
                     [
                         cityData.name,
                         cityData.province,
@@ -232,6 +233,8 @@ async function importData() {
                         null, // population
                         cityData.avg_rent || null,
                         cityData.climate_desc || '温和',
+                        cityData.climate_desc || '',
+                        cityData.house_price || null,
                         layflat_score,
                         layflat_score,
                         'china_layflat',
