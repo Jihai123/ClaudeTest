@@ -41,6 +41,12 @@ router.get('/', optionalAuth, async (req, res) => {
       try {
         const filterObj = JSON.parse(filters);
 
+        // 省份筛选
+        if (filterObj.province) {
+          whereClause += ' AND c.province = ?';
+          params.push(filterObj.province);
+        }
+
         // 海边城市
         if (filterObj.seaside) {
           whereClause += ' AND c.distance_to_sea < 10';
@@ -98,24 +104,28 @@ router.get('/', optionalAuth, async (req, res) => {
     // 根据榜单类型决定排序字段
     const validSortFields = ['name', 'overall_score', 'layflat_score', 'world_score', 'population', 'created_at'];
     let sortField = validSortFields.includes(sort) ? sort : 'overall_score';
+    let orderByClause = '';
 
-    // 如果指定了榜单类型，使用对应的评分字段
-    if (list_type === 'china_layflat' && sort === 'overall_score') {
-      sortField = 'layflat_score';
-    } else if (list_type === 'world' && sort === 'overall_score') {
-      sortField = 'world_score';
+    // 躺平榜使用随机排序（打乱排名）
+    if (list_type === 'china_layflat') {
+      orderByClause = 'ORDER BY RANDOM()';
+    } else {
+      // 如果指定了榜单类型，使用对应的评分字段
+      if (list_type === 'world' && sort === 'overall_score') {
+        sortField = 'world_score';
+      }
+      const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+      orderByClause = `ORDER BY c.${sortField} ${sortOrder}`;
     }
-
-    const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const query = `
       SELECT
         c.id, c.name, c.name_en, c.province, c.country, c.city_name, c.district,
         c.standard_location, c.city_level, c.grade_level, c.location_intro,
-        c.population, c.gdp, c.area, c.link, c.key_points, c.climate, c.climate_desc,
+        c.population, c.gdp, c.area, c.link, c.key_points, c.climate, c.climate as climate_desc,
         c.evaluation, c.notes, c.latitude, c.longitude, c.altitude,
         c.distance_to_sea, c.has_lake, c.overall_score, c.world_score, c.layflat_score,
-        c.list_type, c.city_tier, c.avg_rent, c.house_price, c.avg_temp,
+        c.list_type, c.city_tier, c.avg_rent, c.avg_temp,
         c.slow_pace_score, c.digital_nomad_score, c.slogan, c.status,
         c.user_id, c.views_count, c.favorites_count, c.created_at, c.updated_at,
         cd.living_cost, cd.air_quality, cd.medical_facilities, cd.employment,
@@ -130,7 +140,7 @@ router.get('/', optionalAuth, async (req, res) => {
       LEFT JOIN reviews r ON c.id = r.city_id AND r.status = 'approved'
       ${whereClause}
       GROUP BY c.id
-      ORDER BY c.${sortField} ${sortOrder}
+      ${orderByClause}
       LIMIT ? OFFSET ?
     `;
 
@@ -160,6 +170,23 @@ router.get('/', optionalAuth, async (req, res) => {
   } catch (error) {
     console.error('获取城市列表失败:', error);
     res.status(500).json({ error: '获取城市列表失败' });
+  }
+});
+
+// 获取省份列表（必须在/:id路由之前）
+router.get('/provinces', async (req, res) => {
+  try {
+    const provinces = await db.query(
+      `SELECT DISTINCT province
+       FROM cities
+       WHERE province IS NOT NULL AND province != '' AND country = '中国'
+       ORDER BY province`
+    );
+
+    res.json({ provinces: provinces.map(p => p.province) });
+  } catch (error) {
+    console.error('获取省份列表失败:', error);
+    res.status(500).json({ error: '获取省份列表失败' });
   }
 });
 
