@@ -1190,16 +1190,16 @@
                             <span>${city.province || '未知省份'}</span>
                         </div>
                         <div class="info-item">
+                            <span class="info-icon">🏠</span>
+                            <span>房价: ${city.house_price ? '¥' + (city.house_price / 10000).toFixed(1) + '万/套' : '暂无'}</span>
+                        </div>
+                        <div class="info-item">
                             <span class="info-icon">💰</span>
                             <span>租金: ${city.avg_rent ? '¥' + city.avg_rent + '/月' : '暂无'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-icon">🌡️</span>
                             <span>气候: ${city.climate_desc || city.climate || '暂无'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">👥</span>
-                            <span>人口: ${city.population ? (city.population / 10000).toFixed(1) + '万' : '暂无'}</span>
                         </div>
                     </div>
                 </div>

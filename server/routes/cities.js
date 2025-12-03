@@ -122,10 +122,10 @@ router.get('/', optionalAuth, async (req, res) => {
       SELECT
         c.id, c.name, c.name_en, c.province, c.country, c.city_name, c.district,
         c.standard_location, c.city_level, c.grade_level, c.location_intro,
-        c.population, c.gdp, c.area, c.link, c.key_points, c.climate, c.climate as climate_desc,
+        c.population, c.gdp, c.area, c.link, c.key_points, c.climate, c.climate_desc,
         c.evaluation, c.notes, c.latitude, c.longitude, c.altitude,
         c.distance_to_sea, c.has_lake, c.overall_score, c.world_score, c.layflat_score,
-        c.list_type, c.city_tier, c.avg_rent, c.avg_temp,
+        c.list_type, c.city_tier, c.avg_rent, c.house_price, c.avg_temp,
         c.slow_pace_score, c.digital_nomad_score, c.slogan, c.status,
         c.user_id, c.views_count, c.favorites_count, c.created_at, c.updated_at,
         cd.living_cost, cd.air_quality, cd.medical_facilities, cd.employment,
