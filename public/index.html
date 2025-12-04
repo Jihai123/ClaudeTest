@@ -602,6 +602,38 @@
             border-left-color: var(--danger);
         }
 
+        /* 【新增】汉堡菜单按钮 */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1001;
+        }
+
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
         /* 响应式 */
         @media (max-width: 768px) {
             .hero h1 {
@@ -612,8 +644,69 @@
                 font-size: 1.1rem;
             }
 
+            /* 【修改】移动端导航菜单 */
             .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1.5rem 2rem;
+                box-shadow: var(--shadow-lg);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s;
+                z-index: 999;
+                gap: 0;
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            .nav-menu li {
+                margin: 0;
+                padding: 1rem 0;
+                border-bottom: 1px solid var(--light-gray);
+            }
+
+            .nav-menu li:last-child {
+                border-bottom: none;
+            }
+
+            .nav-link {
+                display: block;
+                font-size: 1.1rem;
+            }
+
+            /* 显示汉堡菜单按钮 */
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            /* 隐藏桌面端的登录注册按钮,在移动菜单中显示 */
+            #authButtons {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem 2rem;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
                 display: none;
+                gap: 0.5rem;
+                z-index: 1000;
+            }
+
+            #authButtons.active {
+                display: flex;
+            }
+
+            #authButtons button {
+                flex: 1;
             }
 
             .cities-grid {
@@ -711,7 +804,7 @@
                 <span>🏖️</span>
                 <span>躺平榜</span>
             </div>
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="navMenu">
                 <li><a href="#" class="nav-link">首页</a></li>
                 <li><a href="#cities" class="nav-link">城市榜单</a></li>
                 <li><a href="upload-images.html" class="nav-link">上传图片</a></li>
@@ -721,6 +814,12 @@
                 <button id="loginBtn" class="btn btn-outline" style="margin-right: 0.5rem;">登录</button>
                 <button id="registerBtn" class="btn btn-primary">注册</button>
             </div>
+            <!-- 【新增】汉堡菜单按钮 -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
@@ -1006,6 +1105,38 @@
                     navbar.classList.remove('scrolled');
                 }
             });
+
+            // 【新增】移动端菜单控制
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const navMenu = document.getElementById('navMenu');
+            const authButtons = document.getElementById('authButtons');
+
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    // 切换菜单状态
+                    this.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+                    authButtons.classList.toggle('active');
+
+                    // 防止滚动穿透
+                    if (navMenu.classList.contains('active')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+
+                // 点击菜单项后关闭菜单
+                const navLinks = navMenu.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenuToggle.classList.remove('active');
+                        navMenu.classList.remove('active');
+                        authButtons.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
         }
 
         // 初始化标签页
