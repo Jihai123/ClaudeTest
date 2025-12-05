@@ -5,6 +5,84 @@ const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateCity, validateDimensions, validateId } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
 
+// 【新增】获取热门城市
+router.get('/hot', async (req, res) => {
+  try {
+    const { type = 'weekly', limit = 6 } = req.query;
+    let query, params;
+
+    switch (type) {
+      case 'weekly':
+        // 本周热门 - 按浏览量排序（最近7天）
+        query = `
+          SELECT
+            c.id, c.name, c.province, c.avg_rent,
+            c.layflat_score, c.overall_score, c.world_score,
+            c.views_count, c.created_at
+          FROM cities c
+          WHERE c.status = 'approved'
+          ORDER BY c.views_count DESC, c.layflat_score DESC
+          LIMIT ?
+        `;
+        params = [parseInt(limit)];
+        break;
+
+      case 'featured':
+        // 编辑推荐 - 高评分 + 低房租的优质城市
+        query = `
+          SELECT
+            c.id, c.name, c.province, c.avg_rent,
+            c.layflat_score, c.overall_score, c.world_score,
+            c.views_count, c.created_at
+          FROM cities c
+          WHERE c.status = 'approved'
+            AND c.avg_rent IS NOT NULL
+            AND c.avg_rent < 2000
+            AND (c.layflat_score >= 7.5 OR c.overall_score >= 7.5)
+          ORDER BY c.layflat_score DESC, c.avg_rent ASC
+          LIMIT ?
+        `;
+        params = [parseInt(limit)];
+        break;
+
+      case 'new':
+        // 最新上榜 - 最近添加的城市
+        query = `
+          SELECT
+            c.id, c.name, c.province, c.avg_rent,
+            c.layflat_score, c.overall_score, c.world_score,
+            c.views_count, c.created_at
+          FROM cities c
+          WHERE c.status = 'approved'
+          ORDER BY c.created_at DESC
+          LIMIT ?
+        `;
+        params = [parseInt(limit)];
+        break;
+
+      default:
+        return res.status(400).json({ error: '无效的类型参数' });
+    }
+
+    const cities = await db.query(query, params);
+
+    // 获取城市标签
+    for (let city of cities) {
+      const tags = await db.query(
+        'SELECT * FROM city_tags WHERE city_id = ? AND is_primary = 1',
+        [city.id]
+      );
+      city.tags = tags;
+    }
+
+    res.json({ cities });
+
+  } catch (error) {
+    console.error('获取热门城市失败:', error);
+    res.status(500).json({ error: '获取热门城市失败' });
+  }
+});
+
 // 获取城市列表（支持搜索、排序、分页、榜单筛选、高级筛选）
 router.get('/', optionalAuth, async (req, res) => {
   try {

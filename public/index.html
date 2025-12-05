@@ -326,6 +326,132 @@
             border-color: transparent;
         }
 
+        /* 【新增】热门城市模块 */
+        .hot-cities-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+        }
+
+        .hot-cities-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hot-cities-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hot-cities-subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .hot-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hot-tab {
+            padding: 0.8rem 2rem;
+            border: 2px solid var(--light-gray);
+            background: white;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .hot-tab:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .hot-tab.active {
+            background: var(--gradient-1);
+            color: white;
+            border-color: transparent;
+        }
+
+        .hot-cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .hot-city-card {
+            background: var(--light-gray);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hot-city-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            background: white;
+        }
+
+        .hot-city-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--gradient-1);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .hot-city-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .hot-city-rent {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.8rem;
+        }
+
+        .hot-city-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .hot-city-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
         /* 筛选器 */
         .filters {
             background: white;
@@ -1033,6 +1159,26 @@
             <button class="tab active" data-list-type="china_layflat">🏖️ 躺平榜</button>
         </div>
 
+        <!-- 【新增】热门城市模块 -->
+        <div class="hot-cities-section fade-in">
+            <div class="hot-cities-header">
+                <h2>🔥 热门推荐</h2>
+                <p class="hot-cities-subtitle">发现最受欢迎的躺平城市</p>
+            </div>
+
+            <!-- 热门城市标签页 -->
+            <div class="hot-tabs">
+                <button class="hot-tab active" data-hot-type="weekly">📊 本周热门</button>
+                <button class="hot-tab" data-hot-type="featured">⭐ 编辑推荐</button>
+                <button class="hot-tab" data-hot-type="new">🆕 最新上榜</button>
+            </div>
+
+            <!-- 热门城市列表 -->
+            <div class="hot-cities-grid" id="hotCitiesGrid">
+                <!-- 将通过JS动态加载 -->
+            </div>
+        </div>
+
         <!-- 【重构】增强筛选器 -->
         <div class="filters fade-in">
             <!-- 价格区间筛选 -->
@@ -1270,10 +1416,108 @@
         }
 
         // 初始化
+        // 【新增】初始化热门城市模块
+        function initHotCities() {
+            const hotTabs = document.querySelectorAll('.hot-tab');
+            let currentHotType = 'weekly';
+
+            hotTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const hotType = this.dataset.hotType;
+
+                    // 更新标签状态
+                    hotTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // 加载对应类型的热门城市
+                    currentHotType = hotType;
+                    loadHotCities(hotType);
+                });
+            });
+
+            // 初始加载本周热门
+            loadHotCities(currentHotType);
+        }
+
+        // 【新增】加载热门城市
+        async function loadHotCities(type = 'weekly') {
+            const grid = document.getElementById('hotCitiesGrid');
+
+            try {
+                const data = await apiRequest(`/api/cities/hot?type=${type}&limit=6`);
+
+                if (data.cities && data.cities.length > 0) {
+                    renderHotCities(data.cities, type);
+                } else {
+                    grid.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 2rem;">暂无热门城市数据</p>';
+                }
+            } catch (error) {
+                console.error('加载热门城市失败:', error);
+                grid.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 2rem;">加载失败,请稍后再试</p>';
+            }
+        }
+
+        // 【新增】渲染热门城市
+        function renderHotCities(cities, type) {
+            const grid = document.getElementById('hotCitiesGrid');
+            grid.innerHTML = '';
+
+            const badgeText = {
+                weekly: '热门',
+                featured: '推荐',
+                new: '新上榜'
+            };
+
+            cities.forEach((city, index) => {
+                const card = document.createElement('div');
+                card.className = 'hot-city-card';
+
+                const rent = city.avg_rent || '暂无';
+                const score = (city.layflat_score || city.overall_score || city.world_score || 0).toFixed(1);
+                const views = city.views_count || 0;
+
+                card.innerHTML = `
+                    <div class="hot-city-badge">#${index + 1} ${badgeText[type]}</div>
+                    <div class="hot-city-name">${city.name}</div>
+                    <div class="hot-city-rent">¥${rent}/月</div>
+                    <div style="color: var(--gray); margin-bottom: 0.5rem;">${city.province || ''}</div>
+                    <div class="hot-city-stats">
+                        <div class="hot-city-stat">
+                            <span>⭐</span>
+                            <span>${score}分</span>
+                        </div>
+                        <div class="hot-city-stat">
+                            <span>👁️</span>
+                            <span>${views}次浏览</span>
+                        </div>
+                    </div>
+                `;
+
+                card.onclick = () => {
+                    window.location.href = `city-detail.html?id=${city.id}`;
+                };
+
+                grid.appendChild(card);
+
+                // 添加渐入动画
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.3s';
+
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             initNavbar();
             initTabs();
             initFilters();
+            initHotCities(); // 【新增】初始化热门城市模块
             loadCities();
             updateAuthUI(); // 检查登录状态并更新UI
             loadHeroStats(); // 【新增】加载Hero区统计数据
