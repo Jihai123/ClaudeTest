@@ -58,6 +58,7 @@ app.use(`${BASE_PATH}/api/admin`, require('./server/routes/admin'));
 app.use(`${BASE_PATH}/api/images`, require('./server/routes/images'));
 app.use(`${BASE_PATH}/api/tags`, require('./server/routes/tags'));
 app.use(`${BASE_PATH}/api/rankings`, require('./server/routes/rankings'));
+app.use(`${BASE_PATH}/api`, require('./server/routes/upload')); // 图片上传
 
 // SEO路由 - Sitemap
 app.use(BASE_PATH || '/', require('./server/routes/sitemap'));

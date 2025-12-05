@@ -779,42 +779,42 @@
             transform: translateY(-2px);
         }
 
-        /* 【新增】城市对比功能 */
-        .compare-checkbox {
+        /* 【改进】城市对比功能 - 优雅交互 */
+        .compare-btn {
             position: absolute;
             top: 1rem;
             left: 1rem;
             z-index: 10;
-        }
-
-        .compare-checkbox input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .compare-checkbox label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
             background: white;
             padding: 0.5rem 1rem;
             border-radius: 9999px;
             box-shadow: var(--shadow);
             font-size: 0.85rem;
             font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s;
+            border: 2px solid var(--light-gray);
+            color: var(--dark);
+            opacity: 0;
+            transform: translateY(-10px);
         }
 
-        .compare-checkbox label:hover {
-            transform: scale(1.05);
+        .city-card:hover .compare-btn {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .compare-checkbox input[type="checkbox"]:checked + label {
+        .compare-btn:hover {
+            transform: scale(1.05) translateY(0);
+            border-color: var(--primary);
+        }
+
+        .compare-btn.active {
             background: var(--primary);
             color: white;
+            border-color: var(--primary);
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* 浮动对比栏 */
@@ -1410,15 +1410,15 @@
     <!-- 通知 -->
     <div id="notification" class="notification"></div>
 
-    <!-- 【新增】浮动对比栏 -->
+    <!-- 【改进】浮动对比栏 -->
     <div class="compare-bar" id="compareBar">
         <div class="compare-bar-content">
             <div class="compare-cities-list" id="compareCitiesList">
                 <!-- 动态生成 -->
             </div>
             <div class="compare-actions">
-                <button class="btn btn-outline" onclick="clearCompareSelection()">清空</button>
-                <button class="btn btn-primary" onclick="goToCompare()">
+                <button class="btn btn-outline" id="clearCompareBtn">清空</button>
+                <button class="btn btn-primary" id="goToCompareBtn">
                     开始对比 (<span id="compareCount">0</span>)
                 </button>
             </div>
@@ -1683,12 +1683,23 @@
             compareCount.textContent = compareCities.length;
 
             // 渲染城市标签
-            compareCitiesList.innerHTML = compareCities.map(city => `
-                <div class="compare-city-tag">
+            compareCitiesList.innerHTML = '';
+            compareCities.forEach(city => {
+                const tag = document.createElement('div');
+                tag.className = 'compare-city-tag';
+                tag.innerHTML = `
                     <span>${city.name}</span>
-                    <span class="remove" onclick="removeCityFromCompare(${city.id})">×</span>
-                </div>
-            `).join('');
+                    <span class="remove" data-city-id="${city.id}">×</span>
+                `;
+
+                // 添加移除事件
+                const removeBtn = tag.querySelector('.remove');
+                removeBtn.addEventListener('click', function() {
+                    removeCityFromCompare(city.id);
+                });
+
+                compareCitiesList.appendChild(tag);
+            });
         }
 
         function removeCityFromCompare(cityId) {
@@ -1696,9 +1707,12 @@
             compareCities = compareCities.filter(c => c.id !== cityId);
             saveCompareCities(compareCities);
 
-            // 取消勾选
-            const checkbox = document.getElementById(`compare-${cityId}`);
-            if (checkbox) checkbox.checked = false;
+            // 更新对比按钮状态
+            const compareBtn = document.querySelector(`.compare-btn[data-city-id="${cityId}"]`);
+            if (compareBtn) {
+                compareBtn.classList.remove('active');
+                compareBtn.textContent = '+ 对比';
+            }
 
             updateCompareBar();
             showNotification('已移除城市', 'success');
@@ -1709,9 +1723,10 @@
                 localStorage.removeItem('compareCities');
                 updateCompareBar();
 
-                // 取消所有勾选
-                document.querySelectorAll('.compare-checkbox input:checked').forEach(cb => {
-                    cb.checked = false;
+                // 重置所有对比按钮状态
+                document.querySelectorAll('.compare-btn.active').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.textContent = '+ 对比';
                 });
 
                 showNotification('已清空对比列表', 'success');
@@ -1736,6 +1751,10 @@
             updateAuthUI(); // 检查登录状态并更新UI
             loadHeroStats(); // 【新增】加载Hero区统计数据
             updateCompareBar(); // 【新增】初始化对比栏
+
+            // 【修复CSP】绑定对比栏按钮事件
+            document.getElementById('clearCompareBtn').addEventListener('click', clearCompareSelection);
+            document.getElementById('goToCompareBtn').addEventListener('click', goToCompare);
         });
 
         // 【新增】加载Hero区统计数据
@@ -1977,8 +1996,17 @@
             emptyState.style.display = 'none';
 
             try {
-                const filterParams = JSON.stringify(activeFilters);
-                const endpoint = `/api/cities?list_type=${currentListType}&limit=50&filters=${encodeURIComponent(filterParams)}`;
+                // 构建API端点
+                let endpoint = `/api/cities?list_type=${currentListType}&limit=50`;
+
+                // 只在有筛选条件时才添加filters参数
+                if (Object.keys(activeFilters).length > 0) {
+                    const filterParams = JSON.stringify(activeFilters);
+                    endpoint += `&filters=${encodeURIComponent(filterParams)}`;
+                }
+
+                console.log('Loading cities with filters:', activeFilters, 'Endpoint:', endpoint);
+
                 const data = await apiRequest(endpoint);
                 loading.style.display = 'none';
 
@@ -2111,17 +2139,11 @@
             const compareCities = getCompareCities();
             const isSelected = compareCities.some(c => c.id === city.id);
 
-            // 【重构】新的卡片结构 - 突出房租和评分 + 对比选择框
+            // 【改进】新的卡片结构 - 突出房租和评分 + 优雅对比按钮
             card.innerHTML = `
-                <div class="compare-checkbox">
-                    <input type="checkbox"
-                           id="compare-${city.id}"
-                           ${isSelected ? 'checked' : ''}
-                           onclick="event.stopPropagation()">
-                    <label for="compare-${city.id}" onclick="event.stopPropagation()">
-                        对比
-                    </label>
-                </div>
+                <button class="compare-btn ${isSelected ? 'active' : ''}" data-city-id="${city.id}">
+                    ${isSelected ? '✓ 已添加' : '+ 对比'}
+                </button>
                 <div class="city-rank">#${rank}</div>
                 <div class="city-card-top">
                     <div class="city-name">${city.name}</div>
@@ -2152,21 +2174,25 @@
                 <button class="city-card-cta">查看详情 →</button>
             `;
 
-            // 对比复选框事件
-            const checkbox = card.querySelector(`#compare-${city.id}`);
-            checkbox.addEventListener('change', function(e) {
+            // 对比按钮事件
+            const compareBtn = card.querySelector('.compare-btn');
+            compareBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 toggleCityCompare(city);
+                // 更新按钮状态
+                const isNowSelected = getCompareCities().some(c => c.id === city.id);
+                this.classList.toggle('active', isNowSelected);
+                this.textContent = isNowSelected ? '✓ 已添加' : '+ 对比';
             });
 
             // 卡片点击事件
-            card.onclick = (e) => {
-                // 如果点击的是复选框区域,不跳转
-                if (e.target.closest('.compare-checkbox')) {
+            card.addEventListener('click', function(e) {
+                // 如果点击的是对比按钮,不跳转
+                if (e.target.closest('.compare-btn')) {
                     return;
                 }
                 window.location.href = `city-detail.html?id=${city.id}`;
-            };
+            });
 
             return card;
         }
