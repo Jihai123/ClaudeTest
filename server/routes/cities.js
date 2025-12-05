@@ -41,55 +41,107 @@ router.get('/', optionalAuth, async (req, res) => {
       try {
         const filterObj = JSON.parse(filters);
 
+        // 【新增】租金区间筛选
+        if (filterObj.rent) {
+          if (filterObj.rent === '5000+') {
+            whereClause += ' AND c.avg_rent >= 5000';
+          } else {
+            const [min, max] = filterObj.rent.split('-').map(Number);
+            whereClause += ` AND c.avg_rent >= ${min} AND c.avg_rent <= ${max}`;
+          }
+        }
+
+        // 【新增】地区筛选
+        if (filterObj.region) {
+          const regionMapping = {
+            '华东': ['上海', '江苏', '浙江', '安徽', '福建', '江西', '山东'],
+            '华南': ['广东', '广西', '海南'],
+            '华北': ['北京', '天津', '河北', '山西', '内蒙古'],
+            '西南': ['重庆', '四川', '贵州', '云南', '西藏'],
+            '西北': ['陕西', '甘肃', '青海', '宁夏', '新疆'],
+            '东北': ['辽宁', '吉林', '黑龙江'],
+            '华中': ['河南', '湖北', '湖南']
+          };
+
+          const provinces = regionMapping[filterObj.region];
+          if (provinces) {
+            const placeholders = provinces.map(() => '?').join(',');
+            whereClause += ` AND c.province IN (${placeholders})`;
+            params.push(...provinces);
+          }
+        }
+
+        // 【新增】城市等级筛选
+        if (filterObj.tier) {
+          const tierMapping = {
+            '一线': '一线',
+            '新一线': '新一线',
+            '二线': '二线',
+            '三线': '三线'
+          };
+
+          const tierValue = tierMapping[filterObj.tier];
+          if (tierValue) {
+            if (tierValue === '三线') {
+              whereClause += ` AND (c.city_tier = ? OR c.city_tier IS NULL OR c.city_tier NOT IN ('一线', '新一线', '二线'))`;
+              params.push(tierValue);
+            } else {
+              whereClause += ' AND c.city_tier = ?';
+              params.push(tierValue);
+            }
+          }
+        }
+
+        // 【重构】特色标签筛选 - 支持数组
+        const features = filterObj.features || [];
+
         // 海边城市
-        if (filterObj.seaside) {
+        if (features.includes('seaside')) {
           whereClause += ' AND c.distance_to_sea < 10';
         }
 
-        // 低房租
-        if (filterObj.low_rent) {
-          whereClause += ' AND c.avg_rent < 1000';
-        }
-
-        // 超低房租
-        if (filterObj.super_low_rent) {
-          whereClause += ' AND c.avg_rent < 500';
-        }
-
         // 四季如春
-        if (filterObj.spring_climate) {
+        if (features.includes('spring_climate')) {
           whereClause += ' AND c.avg_temp BETWEEN 15 AND 25';
         }
 
         // 安静(人口少)
-        if (filterObj.quiet) {
+        if (features.includes('quiet')) {
           whereClause += ' AND c.population < 500000';
         }
 
         // 医疗完善
-        if (filterObj.medical) {
+        if (features.includes('medical')) {
           whereClause += ' AND cd.medical_access >= 7';
         }
 
         // 数字游民友好
-        if (filterObj.digital_nomad) {
+        if (features.includes('digital_nomad')) {
           whereClause += ' AND c.digital_nomad_score >= 7';
         }
 
-        // 适合养老
-        if (filterObj.elderly) {
-          whereClause += ' AND cd.elderly_care >= 8';
-        }
-
         // 临湖
-        if (filterObj.lake) {
+        if (features.includes('lake')) {
           whereClause += ' AND c.has_lake = 1';
         }
 
         // 山居
-        if (filterObj.mountain) {
+        if (features.includes('mountain')) {
           whereClause += ' AND c.altitude BETWEEN 800 AND 2000';
         }
+
+        // 【兼容旧版】保留旧的 boolean 筛选方式支持
+        if (filterObj.seaside) whereClause += ' AND c.distance_to_sea < 10';
+        if (filterObj.low_rent) whereClause += ' AND c.avg_rent < 1000';
+        if (filterObj.super_low_rent) whereClause += ' AND c.avg_rent < 500';
+        if (filterObj.spring_climate) whereClause += ' AND c.avg_temp BETWEEN 15 AND 25';
+        if (filterObj.quiet) whereClause += ' AND c.population < 500000';
+        if (filterObj.medical) whereClause += ' AND cd.medical_access >= 7';
+        if (filterObj.digital_nomad) whereClause += ' AND c.digital_nomad_score >= 7';
+        if (filterObj.elderly) whereClause += ' AND cd.elderly_care >= 8';
+        if (filterObj.lake) whereClause += ' AND c.has_lake = 1';
+        if (filterObj.mountain) whereClause += ' AND c.altitude BETWEEN 800 AND 2000';
+
       } catch (e) {
         console.warn('筛选条件解析失败:', e);
       }

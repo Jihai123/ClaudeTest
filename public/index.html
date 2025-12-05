@@ -371,6 +371,88 @@
             border-color: transparent;
         }
 
+        /* 筛选器分区 */
+        .filter-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .filter-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .filter-section .filter-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        /* 已选筛选条件 */
+        .filter-selected {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-selected .filter-title {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .selected-tag {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            background: var(--gradient-1);
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .selected-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .selected-tag .remove:hover {
+            opacity: 1;
+        }
+
+        .btn-reset-filter {
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-reset-filter:hover {
+            background: var(--primary);
+            color: white;
+        }
+
         /* 城市网格 */
         .cities-grid {
             display: grid;
@@ -950,18 +1032,64 @@
             <button class="tab active" data-list-type="china_layflat">🏖️ 躺平榜</button>
         </div>
 
-        <!-- 筛选器 -->
+        <!-- 【重构】增强筛选器 -->
         <div class="filters fade-in">
-            <div class="filter-title">🎯 快速筛选</div>
-            <div class="filter-tags">
-                <div class="filter-tag" data-filter="seaside">🏖️ 看海</div>
-                <div class="filter-tag" data-filter="low_rent">💰 低房租</div>
-                <div class="filter-tag" data-filter="spring_climate">🌡️ 四季如春</div>
-                <div class="filter-tag" data-filter="quiet">🤫 安静</div>
-                <div class="filter-tag" data-filter="medical">🏥 医疗好</div>
-                <div class="filter-tag" data-filter="digital_nomad">💻 数字游民</div>
-                <div class="filter-tag" data-filter="mountain">🏔️ 山居</div>
-                <div class="filter-tag" data-filter="lake">🌊 临湖</div>
+            <!-- 价格区间筛选 -->
+            <div class="filter-section">
+                <div class="filter-title">💰 租金区间</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="0-500">¥500以下</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="500-1000">¥500-1000</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="1000-2000">¥1000-2000</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="2000-5000">¥2000-5000</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="5000+">¥5000+</div>
+                </div>
+            </div>
+
+            <!-- 地区筛选 -->
+            <div class="filter-section">
+                <div class="filter-title">📍 地区</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华东">华东</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华南">华南</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华北">华北</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="西南">西南</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="西北">西北</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="东北">东北</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华中">华中</div>
+                </div>
+            </div>
+
+            <!-- 城市等级 -->
+            <div class="filter-section">
+                <div class="filter-title">🏙️ 城市等级</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="一线">一线城市</div>
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="新一线">新一线</div>
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="二线">二线城市</div>
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="三线">三线及以下</div>
+                </div>
+            </div>
+
+            <!-- 特色标签 -->
+            <div class="filter-section">
+                <div class="filter-title">✨ 特色</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="seaside">🏖️ 看海</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="spring_climate">🌡️ 四季如春</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="quiet">🤫 安静</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="medical">🏥 医疗好</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="digital_nomad">💻 数字游民</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="mountain">🏔️ 山居</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="lake">🌊 临湖</div>
+                </div>
+            </div>
+
+            <!-- 已选条件显示 -->
+            <div class="filter-selected" id="filterSelected" style="display: none;">
+                <div class="filter-title">已选条件:</div>
+                <div class="selected-tags" id="selectedTags"></div>
+                <button class="btn-reset-filter" id="resetFilter">清空筛选</button>
             </div>
         </div>
 
@@ -1231,22 +1359,151 @@
         }
 
         // 初始化筛选器
+        // 【重构】增强筛选器逻辑 - 支持多类型筛选
         function initFilters() {
             const filterTags = document.querySelectorAll('.filter-tag');
+            const resetButton = document.getElementById('resetFilter');
+
             filterTags.forEach(tag => {
                 tag.addEventListener('click', function() {
-                    const filter = this.dataset.filter;
+                    const filterType = this.dataset.filterType;
+                    const filterValue = this.dataset.filterValue;
+
                     this.classList.toggle('active');
 
+                    // 管理 activeFilters 结构: { rent: '500-1000', region: '华东', tier: '新一线', features: ['seaside', 'quiet'] }
                     if (this.classList.contains('active')) {
-                        activeFilters[filter] = true;
+                        if (filterType === 'feature') {
+                            // 特色标签支持多选
+                            if (!activeFilters.features) {
+                                activeFilters.features = [];
+                            }
+                            activeFilters.features.push(filterValue);
+                        } else {
+                            // 其他类型单选（自动取消同类型的其他选项）
+                            const sameTags = document.querySelectorAll(`.filter-tag[data-filter-type="${filterType}"]`);
+                            sameTags.forEach(t => {
+                                if (t !== this) {
+                                    t.classList.remove('active');
+                                }
+                            });
+                            activeFilters[filterType] = filterValue;
+                        }
                     } else {
-                        delete activeFilters[filter];
+                        if (filterType === 'feature') {
+                            activeFilters.features = activeFilters.features.filter(f => f !== filterValue);
+                            if (activeFilters.features.length === 0) {
+                                delete activeFilters.features;
+                            }
+                        } else {
+                            delete activeFilters[filterType];
+                        }
                     }
 
+                    updateSelectedFilters();
                     loadCities();
                 });
             });
+
+            // 清空筛选按钮
+            if (resetButton) {
+                resetButton.addEventListener('click', resetFilters);
+            }
+        }
+
+        // 更新已选筛选条件显示
+        function updateSelectedFilters() {
+            const filterSelectedDiv = document.getElementById('filterSelected');
+            const selectedTagsDiv = document.getElementById('selectedTags');
+
+            const hasFilters = Object.keys(activeFilters).length > 0;
+
+            if (!hasFilters) {
+                filterSelectedDiv.style.display = 'none';
+                return;
+            }
+
+            filterSelectedDiv.style.display = 'flex';
+            selectedTagsDiv.innerHTML = '';
+
+            // 租金筛选
+            if (activeFilters.rent) {
+                const tag = createSelectedTag('租金', activeFilters.rent === '5000+' ? '¥5000+' : `¥${activeFilters.rent}`, 'rent', activeFilters.rent);
+                selectedTagsDiv.appendChild(tag);
+            }
+
+            // 地区筛选
+            if (activeFilters.region) {
+                const tag = createSelectedTag('地区', activeFilters.region, 'region', activeFilters.region);
+                selectedTagsDiv.appendChild(tag);
+            }
+
+            // 城市等级
+            if (activeFilters.tier) {
+                const tag = createSelectedTag('等级', activeFilters.tier, 'tier', activeFilters.tier);
+                selectedTagsDiv.appendChild(tag);
+            }
+
+            // 特色标签
+            if (activeFilters.features && activeFilters.features.length > 0) {
+                activeFilters.features.forEach(feature => {
+                    const featureTag = document.querySelector(`.filter-tag[data-filter-type="feature"][data-filter-value="${feature}"]`);
+                    const featureName = featureTag ? featureTag.textContent.trim() : feature;
+                    const tag = createSelectedTag('特色', featureName, 'feature', feature);
+                    selectedTagsDiv.appendChild(tag);
+                });
+            }
+        }
+
+        // 创建已选标签元素
+        function createSelectedTag(type, value, filterType, filterValue) {
+            const tag = document.createElement('div');
+            tag.className = 'selected-tag';
+            tag.innerHTML = `
+                <span>${type}: ${value}</span>
+                <span class="remove" data-filter-type="${filterType}" data-filter-value="${filterValue}">✕</span>
+            `;
+
+            // 点击 × 移除筛选
+            tag.querySelector('.remove').addEventListener('click', () => {
+                removeFilter(filterType, filterValue);
+            });
+
+            return tag;
+        }
+
+        // 移除单个筛选条件
+        function removeFilter(filterType, filterValue) {
+            if (filterType === 'feature') {
+                activeFilters.features = activeFilters.features.filter(f => f !== filterValue);
+                if (activeFilters.features.length === 0) {
+                    delete activeFilters.features;
+                }
+            } else {
+                delete activeFilters[filterType];
+            }
+
+            // 更新 UI
+            const filterTag = document.querySelector(`.filter-tag[data-filter-type="${filterType}"][data-filter-value="${filterValue}"]`);
+            if (filterTag) {
+                filterTag.classList.remove('active');
+            }
+
+            updateSelectedFilters();
+            loadCities();
+        }
+
+        // 清空所有筛选
+        function resetFilters() {
+            activeFilters = {};
+
+            // 清除所有 active 状态
+            document.querySelectorAll('.filter-tag.active').forEach(tag => {
+                tag.classList.remove('active');
+            });
+
+            updateSelectedFilters();
+            loadCities();
         }
 
         // 加载城市数据
