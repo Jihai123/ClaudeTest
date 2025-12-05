@@ -157,7 +157,9 @@ async function uploadToCloudflareR2(file) {
   // 使用自定义域名或R2公共URL
   const publicDomain = process.env.R2_PUBLIC_DOMAIN;
   if (publicDomain) {
-    return `https://${publicDomain}/${fileName}`;
+    // 移除可能存在的协议前缀，避免 https://https:// 的问题
+    const cleanDomain = publicDomain.replace(/^https?:\/\//, '');
+    return `https://${cleanDomain}/${fileName}`;
   }
 
   return result.Location;
