@@ -3,8 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>躺平榜 - 发现你的理想栖居地 🏖️</title>
-    <meta name="description" content="躺平榜 - 基于多维度数据的宜居城市排行榜，帮助年轻人找到最适合躺平的城市">
+    <title>躺平榜 - 中国宜居城市排行榜 | 低房租城市推荐 | 数字游民定居指南</title>
+    <meta name="description" content="躺平榜提供300+中国城市宜居度评估,真实房租数据、气候指数、生活成本对比。大厂离职?北漂回老家?找个二三线城市躺平,最低房租仅¥450/月。10000+真实用户评价,帮你3秒找到最适合躺平的城市。">
+    <meta name="keywords" content="躺平城市,宜居城市排行榜,低房租城市,数字游民,二三线城市,生活成本,房租对比,城市评分,中国城市排名,适合躺平的城市">
+
+    <!-- Open Graph / 社交分享优化 -->
+    <meta property="og:title" content="躺平榜 - 3秒找到最适合躺平的城市">
+    <meta property="og:description" content="300+城市真实数据,最低房租¥450/月。大厂离职、北漂回老家,来这里找个二三线城市开启躺平新生活。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:image" content="https://yourdomain.com/og-image.jpg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="躺平榜 - 3秒找到最适合躺平的城市">
+    <meta name="twitter:description" content="300+城市真实数据,最低房租¥450/月">
+
+    <!-- 移动端优化 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="躺平榜">
+
+    <!-- 搜索引擎优化 -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="躺平榜团队">
+    <link rel="canonical" href="https://yourdomain.com/">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
@@ -301,6 +326,132 @@
             border-color: transparent;
         }
 
+        /* 【新增】热门城市模块 */
+        .hot-cities-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+        }
+
+        .hot-cities-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hot-cities-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hot-cities-subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .hot-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hot-tab {
+            padding: 0.8rem 2rem;
+            border: 2px solid var(--light-gray);
+            background: white;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .hot-tab:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .hot-tab.active {
+            background: var(--gradient-1);
+            color: white;
+            border-color: transparent;
+        }
+
+        .hot-cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .hot-city-card {
+            background: var(--light-gray);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hot-city-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            background: white;
+        }
+
+        .hot-city-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--gradient-1);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .hot-city-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .hot-city-rent {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.8rem;
+        }
+
+        .hot-city-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .hot-city-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
         /* 筛选器 */
         .filters {
             background: white;
@@ -347,6 +498,88 @@
             border-color: transparent;
         }
 
+        /* 筛选器分区 */
+        .filter-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .filter-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .filter-section .filter-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        /* 已选筛选条件 */
+        .filter-selected {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-selected .filter-title {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .selected-tag {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            background: var(--gradient-1);
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .selected-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .selected-tag .remove:hover {
+            opacity: 1;
+        }
+
+        .btn-reset-filter {
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-reset-filter:hover {
+            background: var(--primary);
+            color: white;
+        }
+
         /* 城市网格 */
         .cities-grid {
             display: grid;
@@ -355,14 +588,18 @@
             margin-top: 2rem;
         }
 
+        /* 【重构】城市卡片 - 新设计 */
         .city-card {
             background: white;
-            border-radius: 1rem;
+            border-radius: 1.2rem;
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: all 0.3s;
             cursor: pointer;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
         }
 
         .city-card:hover {
@@ -376,7 +613,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
+            height: 4px;
             background: var(--gradient-1);
             transform: scaleX(0);
             transition: transform 0.3s;
@@ -386,86 +623,264 @@
             transform: scaleX(1);
         }
 
-        .city-header {
-            padding: 1.5rem;
-            background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
-        }
-
+        /* 排名徽章 */
         .city-rank {
             position: absolute;
             top: 1rem;
             right: 1rem;
             background: var(--gradient-1);
             color: white;
-            padding: 0.4rem 0.8rem;
+            padding: 0.4rem 0.9rem;
             border-radius: 9999px;
-            font-weight: 700;
-            font-size: 0.85rem;
+            font-weight: 800;
+            font-size: 0.9rem;
             box-shadow: var(--shadow);
+            z-index: 1;
+        }
+
+        /* 卡片顶部 - 城市名 */
+        .city-card-top {
+            margin-bottom: 1rem;
         }
 
         .city-name {
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             color: var(--dark);
+            padding-right: 4rem; /* 为排名徽章留空间 */
         }
 
-        .city-slogan {
-            color: var(--gray);
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .city-score {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1.2rem;
-            background: var(--gradient-1);
-            color: white;
-            border-radius: 9999px;
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-
-        .city-body {
-            padding: 1.5rem;
-        }
-
-        .city-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tag {
-            padding: 0.4rem 1rem;
-            background: var(--light-gray);
-            border-radius: 9999px;
-            font-size: 0.85rem;
+        .city-province {
+            font-size: 0.9rem;
             color: var(--gray);
             font-weight: 500;
         }
 
-        .city-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+        /* 卡片主体 - 房租和评分 */
+        .city-card-main {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .info-item {
+        /* 房租高亮区 */
+        .city-rent-highlight {
+            flex: 1;
+            text-align: center;
+        }
+
+        .rent-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            letter-spacing: 1px;
+        }
+
+        .rent-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .rent-unit {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 500;
+            margin-top: 0.2rem;
+        }
+
+        /* 评分区 */
+        .city-score-section {
+            flex: 1;
+            text-align: center;
+            border-left: 2px solid rgba(0,0,0,0.05);
+            padding-left: 1.5rem;
+        }
+
+        .score-stars {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            letter-spacing: 2px;
+            filter: grayscale(0) brightness(1.1);
+        }
+
+        .score-number {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* 标签区 */
+        .city-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            min-height: 32px; /* 保持高度一致 */
+        }
+
+        .tag-chip {
+            padding: 0.4rem 0.9rem;
+            background: var(--light-gray);
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .city-card:hover .tag-chip {
+            background: #e5e7eb;
+        }
+
+        /* 标语 */
+        .city-card-slogan {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* CTA按钮 */
+        .city-card-cta {
+            width: 100%;
+            padding: 0.9rem;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 0.6rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .city-card:hover .city-card-cta {
+            background: var(--gradient-1);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        /* 【新增】城市对比功能 */
+        .compare-checkbox {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10;
+        }
+
+        .compare-checkbox input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .compare-checkbox label {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: var(--gray);
-            font-size: 0.95rem;
+            cursor: pointer;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            box-shadow: var(--shadow);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
         }
 
-        .info-icon {
-            font-size: 1.2rem;
+        .compare-checkbox label:hover {
+            transform: scale(1.05);
+        }
+
+        .compare-checkbox input[type="checkbox"]:checked + label {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 浮动对比栏 */
+        .compare-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            padding: 1rem 2rem;
+            display: none;
+            z-index: 999;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .compare-bar.show {
+            display: block;
+        }
+
+        .compare-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .compare-cities-list {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .compare-city-tag {
+            background: var(--light-gray);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .compare-city-tag .remove {
+            cursor: pointer;
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .compare-actions {
+            display: flex;
+            gap: 1rem;
         }
 
         /* 加载和空状态 */
@@ -578,6 +993,38 @@
             border-left-color: var(--danger);
         }
 
+        /* 【新增】汉堡菜单按钮 */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1001;
+        }
+
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
         /* 响应式 */
         @media (max-width: 768px) {
             .hero h1 {
@@ -588,8 +1035,69 @@
                 font-size: 1.1rem;
             }
 
+            /* 【修改】移动端导航菜单 */
             .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1.5rem 2rem;
+                box-shadow: var(--shadow-lg);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s;
+                z-index: 999;
+                gap: 0;
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            .nav-menu li {
+                margin: 0;
+                padding: 1rem 0;
+                border-bottom: 1px solid var(--light-gray);
+            }
+
+            .nav-menu li:last-child {
+                border-bottom: none;
+            }
+
+            .nav-link {
+                display: block;
+                font-size: 1.1rem;
+            }
+
+            /* 显示汉堡菜单按钮 */
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            /* 隐藏桌面端的登录注册按钮,在移动菜单中显示 */
+            #authButtons {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem 2rem;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
                 display: none;
+                gap: 0.5rem;
+                z-index: 1000;
+            }
+
+            #authButtons.active {
+                display: flex;
+            }
+
+            #authButtons button {
+                flex: 1;
             }
 
             .cities-grid {
@@ -687,9 +1195,10 @@
                 <span>🏖️</span>
                 <span>躺平榜</span>
             </div>
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="navMenu">
                 <li><a href="#" class="nav-link">首页</a></li>
                 <li><a href="#cities" class="nav-link">城市榜单</a></li>
+                <li><a href="city-compare.html" class="nav-link">🔍 城市对比</a></li>
                 <li><a href="upload-images.html" class="nav-link">上传图片</a></li>
                 <li><a href="#about" class="nav-link">关于</a></li>
             </ul>
@@ -697,17 +1206,33 @@
                 <button id="loginBtn" class="btn btn-outline" style="margin-right: 0.5rem;">登录</button>
                 <button id="registerBtn" class="btn btn-primary">注册</button>
             </div>
+            <!-- 【新增】汉堡菜单按钮 -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
     <!-- Hero区域 -->
     <section class="hero">
         <div class="hero-content">
-            <h1>🌟 发现你的理想栖居地</h1>
-            <p>探索最适合年轻人躺平的城市，基于房租、气候、生活节奏等多维度数据，帮你找到性价比最高的宜居之地</p>
+            <h1>🏖️ 3秒找到最适合躺平的城市</h1>
+            <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 1rem;">
+                房租低 · 节奏慢 · 空气好 · 生活成本透明
+            </p>
+            <p style="font-size: 1.1rem; opacity: 0.9;">
+                大厂离职？北漂回老家？来这里找个二三线城市，开启躺平新生活
+            </p>
+            <div style="display: flex; gap: 2rem; justify-content: center; margin: 2rem 0 2.5rem; flex-wrap: wrap; font-size: 1.1rem;">
+                <div><strong id="heroTotalCities">300+</strong> 精选城市</div>
+                <div><strong id="heroTotalReviews">10000+</strong> 真实评价</div>
+                <div>最低房租 <strong id="heroMinRent">¥450</strong>/月</div>
+            </div>
             <div class="hero-buttons">
-                <a href="#cities" class="btn btn-white btn-hero">开始探索</a>
-                <a href="upload-images.html" class="btn btn-outline btn-hero" style="border-color: white; color: white;">上传城市图片</a>
+                <a href="#cities" class="btn btn-white btn-hero">💫 立即探索城市</a>
+                <a href="upload-images.html" class="btn btn-outline btn-hero" style="border-color: white; color: white;">📷 分享城市美图</a>
             </div>
         </div>
     </section>
@@ -739,18 +1264,84 @@
             <button class="tab active" data-list-type="china_layflat">🏖️ 躺平榜</button>
         </div>
 
-        <!-- 筛选器 -->
+        <!-- 【新增】热门城市模块 -->
+        <div class="hot-cities-section fade-in">
+            <div class="hot-cities-header">
+                <h2>🔥 热门推荐</h2>
+                <p class="hot-cities-subtitle">发现最受欢迎的躺平城市</p>
+            </div>
+
+            <!-- 热门城市标签页 -->
+            <div class="hot-tabs">
+                <button class="hot-tab active" data-hot-type="weekly">📊 本周热门</button>
+                <button class="hot-tab" data-hot-type="featured">⭐ 编辑推荐</button>
+                <button class="hot-tab" data-hot-type="new">🆕 最新上榜</button>
+            </div>
+
+            <!-- 热门城市列表 -->
+            <div class="hot-cities-grid" id="hotCitiesGrid">
+                <!-- 将通过JS动态加载 -->
+            </div>
+        </div>
+
+        <!-- 【重构】增强筛选器 -->
         <div class="filters fade-in">
-            <div class="filter-title">🎯 快速筛选</div>
-            <div class="filter-tags">
-                <div class="filter-tag" data-filter="seaside">🏖️ 看海</div>
-                <div class="filter-tag" data-filter="low_rent">💰 低房租</div>
-                <div class="filter-tag" data-filter="spring_climate">🌡️ 四季如春</div>
-                <div class="filter-tag" data-filter="quiet">🤫 安静</div>
-                <div class="filter-tag" data-filter="medical">🏥 医疗好</div>
-                <div class="filter-tag" data-filter="digital_nomad">💻 数字游民</div>
-                <div class="filter-tag" data-filter="mountain">🏔️ 山居</div>
-                <div class="filter-tag" data-filter="lake">🌊 临湖</div>
+            <!-- 价格区间筛选 -->
+            <div class="filter-section">
+                <div class="filter-title">💰 租金区间</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="0-500">¥500以下</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="500-1000">¥500-1000</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="1000-2000">¥1000-2000</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="2000-5000">¥2000-5000</div>
+                    <div class="filter-tag" data-filter-type="rent" data-filter-value="5000+">¥5000+</div>
+                </div>
+            </div>
+
+            <!-- 地区筛选 -->
+            <div class="filter-section">
+                <div class="filter-title">📍 地区</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华东">华东</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华南">华南</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华北">华北</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="西南">西南</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="西北">西北</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="东北">东北</div>
+                    <div class="filter-tag" data-filter-type="region" data-filter-value="华中">华中</div>
+                </div>
+            </div>
+
+            <!-- 城市等级 -->
+            <div class="filter-section">
+                <div class="filter-title">🏙️ 城市等级</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="一线">一线城市</div>
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="新一线">新一线</div>
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="二线">二线城市</div>
+                    <div class="filter-tag" data-filter-type="tier" data-filter-value="三线">三线及以下</div>
+                </div>
+            </div>
+
+            <!-- 特色标签 -->
+            <div class="filter-section">
+                <div class="filter-title">✨ 特色</div>
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="seaside">🏖️ 看海</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="spring_climate">🌡️ 四季如春</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="quiet">🤫 安静</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="medical">🏥 医疗好</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="digital_nomad">💻 数字游民</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="mountain">🏔️ 山居</div>
+                    <div class="filter-tag" data-filter-type="feature" data-filter-value="lake">🌊 临湖</div>
+                </div>
+            </div>
+
+            <!-- 已选条件显示 -->
+            <div class="filter-selected" id="filterSelected" style="display: none;">
+                <div class="filter-title">已选条件:</div>
+                <div class="selected-tags" id="selectedTags"></div>
+                <button class="btn-reset-filter" id="resetFilter">清空筛选</button>
             </div>
         </div>
 
@@ -818,6 +1409,21 @@
 
     <!-- 通知 -->
     <div id="notification" class="notification"></div>
+
+    <!-- 【新增】浮动对比栏 -->
+    <div class="compare-bar" id="compareBar">
+        <div class="compare-bar-content">
+            <div class="compare-cities-list" id="compareCitiesList">
+                <!-- 动态生成 -->
+            </div>
+            <div class="compare-actions">
+                <button class="btn btn-outline" onclick="clearCompareSelection()">清空</button>
+                <button class="btn btn-primary" onclick="goToCompare()">
+                    开始对比 (<span id="compareCount">0</span>)
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- 登录模态框 -->
     <div id="loginModal" class="modal" style="display: none;">
@@ -930,13 +1536,230 @@
         }
 
         // 初始化
+        // 【新增】初始化热门城市模块
+        function initHotCities() {
+            const hotTabs = document.querySelectorAll('.hot-tab');
+            let currentHotType = 'weekly';
+
+            hotTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const hotType = this.dataset.hotType;
+
+                    // 更新标签状态
+                    hotTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // 加载对应类型的热门城市
+                    currentHotType = hotType;
+                    loadHotCities(hotType);
+                });
+            });
+
+            // 初始加载本周热门
+            loadHotCities(currentHotType);
+        }
+
+        // 【新增】加载热门城市
+        async function loadHotCities(type = 'weekly') {
+            const grid = document.getElementById('hotCitiesGrid');
+
+            try {
+                const data = await apiRequest(`/api/cities/hot?type=${type}&limit=6`);
+
+                if (data.cities && data.cities.length > 0) {
+                    renderHotCities(data.cities, type);
+                } else {
+                    grid.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 2rem;">暂无热门城市数据</p>';
+                }
+            } catch (error) {
+                console.error('加载热门城市失败:', error);
+                grid.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 2rem;">加载失败,请稍后再试</p>';
+            }
+        }
+
+        // 【新增】渲染热门城市
+        function renderHotCities(cities, type) {
+            const grid = document.getElementById('hotCitiesGrid');
+            grid.innerHTML = '';
+
+            const badgeText = {
+                weekly: '热门',
+                featured: '推荐',
+                new: '新上榜'
+            };
+
+            cities.forEach((city, index) => {
+                const card = document.createElement('div');
+                card.className = 'hot-city-card';
+
+                const rent = city.avg_rent || '暂无';
+                const score = (city.layflat_score || city.overall_score || city.world_score || 0).toFixed(1);
+                const views = city.views_count || 0;
+
+                card.innerHTML = `
+                    <div class="hot-city-badge">#${index + 1} ${badgeText[type]}</div>
+                    <div class="hot-city-name">${city.name}</div>
+                    <div class="hot-city-rent">¥${rent}/月</div>
+                    <div style="color: var(--gray); margin-bottom: 0.5rem;">${city.province || ''}</div>
+                    <div class="hot-city-stats">
+                        <div class="hot-city-stat">
+                            <span>⭐</span>
+                            <span>${score}分</span>
+                        </div>
+                        <div class="hot-city-stat">
+                            <span>👁️</span>
+                            <span>${views}次浏览</span>
+                        </div>
+                    </div>
+                `;
+
+                card.onclick = () => {
+                    window.location.href = `city-detail.html?id=${city.id}`;
+                };
+
+                grid.appendChild(card);
+
+                // 添加渐入动画
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.3s';
+
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        }
+
+        // 【新增】城市对比功能管理
+        function getCompareCities() {
+            const stored = localStorage.getItem('compareCities');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveCompareCities(cities) {
+            localStorage.setItem('compareCities', JSON.stringify(cities));
+        }
+
+        function toggleCityCompare(city) {
+            let compareCities = getCompareCities();
+            const existingIndex = compareCities.findIndex(c => c.id === city.id);
+
+            if (existingIndex >= 0) {
+                // 移除城市
+                compareCities.splice(existingIndex, 1);
+                showNotification(`已移除 ${city.name}`, 'success');
+            } else {
+                // 添加城市,最多4个
+                if (compareCities.length >= 4) {
+                    showNotification('最多只能对比4个城市', 'error');
+                    // 取消勾选
+                    const checkbox = document.getElementById(`compare-${city.id}`);
+                    if (checkbox) checkbox.checked = false;
+                    return;
+                }
+                compareCities.push({ id: city.id, name: city.name });
+                showNotification(`已添加 ${city.name} 到对比列表`, 'success');
+            }
+
+            saveCompareCities(compareCities);
+            updateCompareBar();
+        }
+
+        function updateCompareBar() {
+            const compareCities = getCompareCities();
+            const compareBar = document.getElementById('compareBar');
+            const compareCitiesList = document.getElementById('compareCitiesList');
+            const compareCount = document.getElementById('compareCount');
+
+            if (compareCities.length === 0) {
+                compareBar.classList.remove('show');
+                return;
+            }
+
+            compareBar.classList.add('show');
+            compareCount.textContent = compareCities.length;
+
+            // 渲染城市标签
+            compareCitiesList.innerHTML = compareCities.map(city => `
+                <div class="compare-city-tag">
+                    <span>${city.name}</span>
+                    <span class="remove" onclick="removeCityFromCompare(${city.id})">×</span>
+                </div>
+            `).join('');
+        }
+
+        function removeCityFromCompare(cityId) {
+            let compareCities = getCompareCities();
+            compareCities = compareCities.filter(c => c.id !== cityId);
+            saveCompareCities(compareCities);
+
+            // 取消勾选
+            const checkbox = document.getElementById(`compare-${cityId}`);
+            if (checkbox) checkbox.checked = false;
+
+            updateCompareBar();
+            showNotification('已移除城市', 'success');
+        }
+
+        function clearCompareSelection() {
+            if (confirm('确定要清空所有对比城市吗?')) {
+                localStorage.removeItem('compareCities');
+                updateCompareBar();
+
+                // 取消所有勾选
+                document.querySelectorAll('.compare-checkbox input:checked').forEach(cb => {
+                    cb.checked = false;
+                });
+
+                showNotification('已清空对比列表', 'success');
+            }
+        }
+
+        function goToCompare() {
+            const compareCities = getCompareCities();
+            if (compareCities.length < 2) {
+                showNotification('请至少选择2个城市进行对比', 'error');
+                return;
+            }
+            window.location.href = 'city-compare.html';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             initNavbar();
             initTabs();
             initFilters();
+            initHotCities(); // 【新增】初始化热门城市模块
             loadCities();
             updateAuthUI(); // 检查登录状态并更新UI
+            loadHeroStats(); // 【新增】加载Hero区统计数据
+            updateCompareBar(); // 【新增】初始化对比栏
         });
+
+        // 【新增】加载Hero区统计数据
+        async function loadHeroStats() {
+            try {
+                // 获取所有城市的统计数据
+                const data = await apiRequest('/api/cities?limit=1000');
+                if (data.cities && data.cities.length > 0) {
+                    const totalCities = data.cities.length;
+                    const rents = data.cities.filter(c => c.avg_rent).map(c => c.avg_rent);
+                    const minRent = rents.length > 0 ? Math.min(...rents) : 450;
+
+                    // 更新Hero区统计
+                    document.getElementById('heroTotalCities').textContent = totalCities + '+';
+                    document.getElementById('heroMinRent').textContent = '¥' + minRent;
+
+                    // 模拟评价数(实际应该从reviews API获取)
+                    // TODO: 后续从真实API获取评价总数
+                }
+            } catch (error) {
+                console.log('Hero区统计数据加载失败:', error);
+                // 保持默认值
+            }
+        }
 
         // 导航栏滚动效果
         function initNavbar() {
@@ -948,6 +1771,38 @@
                     navbar.classList.remove('scrolled');
                 }
             });
+
+            // 【新增】移动端菜单控制
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const navMenu = document.getElementById('navMenu');
+            const authButtons = document.getElementById('authButtons');
+
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    // 切换菜单状态
+                    this.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+                    authButtons.classList.toggle('active');
+
+                    // 防止滚动穿透
+                    if (navMenu.classList.contains('active')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+
+                // 点击菜单项后关闭菜单
+                const navLinks = navMenu.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenuToggle.classList.remove('active');
+                        navMenu.classList.remove('active');
+                        authButtons.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
         }
 
         // 初始化标签页
@@ -964,22 +1819,151 @@
         }
 
         // 初始化筛选器
+        // 【重构】增强筛选器逻辑 - 支持多类型筛选
         function initFilters() {
             const filterTags = document.querySelectorAll('.filter-tag');
+            const resetButton = document.getElementById('resetFilter');
+
             filterTags.forEach(tag => {
                 tag.addEventListener('click', function() {
-                    const filter = this.dataset.filter;
+                    const filterType = this.dataset.filterType;
+                    const filterValue = this.dataset.filterValue;
+
                     this.classList.toggle('active');
 
+                    // 管理 activeFilters 结构: { rent: '500-1000', region: '华东', tier: '新一线', features: ['seaside', 'quiet'] }
                     if (this.classList.contains('active')) {
-                        activeFilters[filter] = true;
+                        if (filterType === 'feature') {
+                            // 特色标签支持多选
+                            if (!activeFilters.features) {
+                                activeFilters.features = [];
+                            }
+                            activeFilters.features.push(filterValue);
+                        } else {
+                            // 其他类型单选（自动取消同类型的其他选项）
+                            const sameTags = document.querySelectorAll(`.filter-tag[data-filter-type="${filterType}"]`);
+                            sameTags.forEach(t => {
+                                if (t !== this) {
+                                    t.classList.remove('active');
+                                }
+                            });
+                            activeFilters[filterType] = filterValue;
+                        }
                     } else {
-                        delete activeFilters[filter];
+                        if (filterType === 'feature') {
+                            activeFilters.features = activeFilters.features.filter(f => f !== filterValue);
+                            if (activeFilters.features.length === 0) {
+                                delete activeFilters.features;
+                            }
+                        } else {
+                            delete activeFilters[filterType];
+                        }
                     }
 
+                    updateSelectedFilters();
                     loadCities();
                 });
             });
+
+            // 清空筛选按钮
+            if (resetButton) {
+                resetButton.addEventListener('click', resetFilters);
+            }
+        }
+
+        // 更新已选筛选条件显示
+        function updateSelectedFilters() {
+            const filterSelectedDiv = document.getElementById('filterSelected');
+            const selectedTagsDiv = document.getElementById('selectedTags');
+
+            const hasFilters = Object.keys(activeFilters).length > 0;
+
+            if (!hasFilters) {
+                filterSelectedDiv.style.display = 'none';
+                return;
+            }
+
+            filterSelectedDiv.style.display = 'flex';
+            selectedTagsDiv.innerHTML = '';
+
+            // 租金筛选
+            if (activeFilters.rent) {
+                const tag = createSelectedTag('租金', activeFilters.rent === '5000+' ? '¥5000+' : `¥${activeFilters.rent}`, 'rent', activeFilters.rent);
+                selectedTagsDiv.appendChild(tag);
+            }
+
+            // 地区筛选
+            if (activeFilters.region) {
+                const tag = createSelectedTag('地区', activeFilters.region, 'region', activeFilters.region);
+                selectedTagsDiv.appendChild(tag);
+            }
+
+            // 城市等级
+            if (activeFilters.tier) {
+                const tag = createSelectedTag('等级', activeFilters.tier, 'tier', activeFilters.tier);
+                selectedTagsDiv.appendChild(tag);
+            }
+
+            // 特色标签
+            if (activeFilters.features && activeFilters.features.length > 0) {
+                activeFilters.features.forEach(feature => {
+                    const featureTag = document.querySelector(`.filter-tag[data-filter-type="feature"][data-filter-value="${feature}"]`);
+                    const featureName = featureTag ? featureTag.textContent.trim() : feature;
+                    const tag = createSelectedTag('特色', featureName, 'feature', feature);
+                    selectedTagsDiv.appendChild(tag);
+                });
+            }
+        }
+
+        // 创建已选标签元素
+        function createSelectedTag(type, value, filterType, filterValue) {
+            const tag = document.createElement('div');
+            tag.className = 'selected-tag';
+            tag.innerHTML = `
+                <span>${type}: ${value}</span>
+                <span class="remove" data-filter-type="${filterType}" data-filter-value="${filterValue}">✕</span>
+            `;
+
+            // 点击 × 移除筛选
+            tag.querySelector('.remove').addEventListener('click', () => {
+                removeFilter(filterType, filterValue);
+            });
+
+            return tag;
+        }
+
+        // 移除单个筛选条件
+        function removeFilter(filterType, filterValue) {
+            if (filterType === 'feature') {
+                activeFilters.features = activeFilters.features.filter(f => f !== filterValue);
+                if (activeFilters.features.length === 0) {
+                    delete activeFilters.features;
+                }
+            } else {
+                delete activeFilters[filterType];
+            }
+
+            // 更新 UI
+            const filterTag = document.querySelector(`.filter-tag[data-filter-type="${filterType}"][data-filter-value="${filterValue}"]`);
+            if (filterTag) {
+                filterTag.classList.remove('active');
+            }
+
+            updateSelectedFilters();
+            loadCities();
+        }
+
+        // 清空所有筛选
+        function resetFilters() {
+            activeFilters = {};
+
+            // 清除所有 active 状态
+            document.querySelectorAll('.filter-tag.active').forEach(tag => {
+                tag.classList.remove('active');
+            });
+
+            updateSelectedFilters();
+            loadCities();
         }
 
         // 加载城市数据
@@ -1003,21 +1987,97 @@
                     updateStats(cities);
                     renderCities(cities);
                 } else {
-                    emptyState.style.display = 'block';
+                    // 【优化】空状态时加载推荐城市
+                    await loadFallbackCities();
                 }
             } catch (error) {
                 loading.style.display = 'none';
                 showNotification('加载失败，请稍后重试', 'error');
                 console.error('加载失败:', error);
-                // 在开发环境显示更详细的错误
+                // 【优化】加载失败时也尝试显示推荐城市
+                await loadFallbackCities();
+            }
+        }
+
+        // 【新增】加载备用推荐城市
+        async function loadFallbackCities() {
+            const emptyState = document.getElementById('emptyState');
+            const grid = document.getElementById('citiesGrid');
+
+            try {
+                // 尝试加载其他榜单的热门城市作为推荐
+                const fallbackLists = ['china_layflat', 'china_general', 'world'];
+                let recommendedCities = [];
+
+                for (const listType of fallbackLists) {
+                    if (listType === currentListType) continue; // 跳过当前榜单
+
+                    try {
+                        const data = await apiRequest(`/api/cities?list_type=${listType}&limit=10`);
+                        if (data.cities && data.cities.length > 0) {
+                            recommendedCities = data.cities;
+                            break;
+                        }
+                    } catch (e) {
+                        console.log(`备用榜单 ${listType} 加载失败`);
+                    }
+                }
+
+                if (recommendedCities.length > 0) {
+                    // 显示推荐城市
+                    emptyState.style.display = 'block';
+                    emptyState.innerHTML = `
+                        <div class="empty-icon">🔍</div>
+                        <h3>没有找到符合条件的城市</h3>
+                        <p style="margin-bottom: 2rem;">试试调整筛选条件,或者看看这些推荐城市</p>
+                    `;
+
+                    // 在空状态下方显示推荐城市
+                    cities = recommendedCities;
+                    updateStats(cities);
+                    renderCities(cities);
+
+                    // 在城市网格上方添加推荐提示
+                    const recommendHint = document.createElement('div');
+                    recommendHint.style.cssText = `
+                        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+                        padding: 1rem 2rem;
+                        border-radius: 0.5rem;
+                        margin-bottom: 2rem;
+                        text-align: center;
+                        border-left: 4px solid var(--warning);
+                    `;
+                    recommendHint.innerHTML = `
+                        <strong>💡 为你推荐其他热门城市</strong>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--gray);">
+                            切换榜单或调整筛选条件查看更多城市
+                        </p>
+                    `;
+                    grid.parentNode.insertBefore(recommendHint, grid);
+                } else {
+                    // 完全没有数据时的友好提示
+                    emptyState.style.display = 'block';
+                    emptyState.innerHTML = `
+                        <div class="empty-icon">🏙️</div>
+                        <h3>暂无城市数据</h3>
+                        <p style="margin-bottom: 1rem;">数据库可能尚未初始化</p>
+                        <div style="background: var(--light-gray); padding: 1.5rem; border-radius: 0.5rem; margin-top: 2rem; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;">
+                            <p style="font-weight: 600; margin-bottom: 1rem;">🛠️ 快速修复:</p>
+                            <ol style="margin-left: 1.5rem; color: var(--gray); line-height: 1.8;">
+                                <li>确保服务器正在运行: <code style="background: white; padding: 0.2rem 0.5rem; border-radius: 4px;">node server.js</code></li>
+                                <li>初始化数据库: <code style="background: white; padding: 0.2rem 0.5rem; border-radius: 4px;">npm run init-db</code></li>
+                                <li>导入城市数据: <code style="background: white; padding: 0.2rem 0.5rem; border-radius: 4px;">npm run import-csv</code></li>
+                            </ol>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('加载推荐城市失败:', error);
                 emptyState.style.display = 'block';
                 emptyState.innerHTML = `
-                    <div class="empty-icon">⚠️</div>
-                    <h3>加载失败</h3>
-                    <p>${error.message}</p>
-                    <p style="font-size: 0.9rem; color: var(--gray); margin-top: 1rem;">
-                        请确保服务器正在运行: node server.js
-                    </p>
+                    <div class="empty-icon">😴</div>
+                    <h3>暂时找不到城市数据</h3>
+                    <p>请稍后再试,或联系管理员</p>
                 `;
             }
         }
@@ -1044,45 +2104,67 @@
 
             const score = city.layflat_score || city.overall_score || city.world_score || 0;
             const tags = city.tags || [];
+            const rent = city.avg_rent || null;
+            const province = city.province || '';
 
+            // 检查城市是否已被选中对比
+            const compareCities = getCompareCities();
+            const isSelected = compareCities.some(c => c.id === city.id);
+
+            // 【重构】新的卡片结构 - 突出房租和评分 + 对比选择框
             card.innerHTML = `
+                <div class="compare-checkbox">
+                    <input type="checkbox"
+                           id="compare-${city.id}"
+                           ${isSelected ? 'checked' : ''}
+                           onclick="event.stopPropagation()">
+                    <label for="compare-${city.id}" onclick="event.stopPropagation()">
+                        对比
+                    </label>
+                </div>
                 <div class="city-rank">#${rank}</div>
-                <div class="city-header">
+                <div class="city-card-top">
                     <div class="city-name">${city.name}</div>
-                    <div class="city-slogan">${city.slogan || city.location_intro || '宜居之城'}</div>
-                    <div class="city-score">
-                        <span>⭐</span>
-                        <span>${score.toFixed(1)}</span>
+                    <div class="city-province">${province}</div>
+                </div>
+                <div class="city-card-main">
+                    <div class="city-rent-highlight">
+                        ${rent ? `
+                            <div class="rent-label">月租</div>
+                            <div class="rent-value">¥${rent}</div>
+                            <div class="rent-unit">/月</div>
+                        ` : `
+                            <div class="rent-label">月租</div>
+                            <div class="rent-value" style="font-size: 1.5rem; color: var(--gray);">暂无数据</div>
+                        `}
+                    </div>
+                    <div class="city-score-section">
+                        <div class="score-stars">⭐⭐⭐⭐⭐</div>
+                        <div class="score-number">${score.toFixed(1)} 分</div>
                     </div>
                 </div>
-                <div class="city-body">
-                    <div class="city-tags">
-                        ${tags.slice(0, 3).map(tag => `
-                            <span class="tag">${tag.tag_icon || ''} ${tag.tag_name || ''}</span>
-                        `).join('')}
-                    </div>
-                    <div class="city-info">
-                        <div class="info-item">
-                            <span class="info-icon">📍</span>
-                            <span>${city.province || '未知省份'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">🏠</span>
-                            <span>房价: ${city.house_price ? '¥' + city.house_price + '万/套' : '暂无'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">💰</span>
-                            <span>租金: ${city.avg_rent ? '¥' + city.avg_rent + '/月' : '暂无'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">🌡️</span>
-                            <span>气候: ${city.climate_desc || '暂无'}</span>
-                        </div>
-                    </div>
+                <div class="city-card-tags">
+                    ${tags.slice(0, 3).map(tag => `
+                        <span class="tag-chip">${tag.tag_icon || '🏷️'} ${tag.tag_name || ''}</span>
+                    `).join('')}
                 </div>
+                <div class="city-card-slogan">${city.slogan || city.location_intro || '宜居之城'}</div>
+                <button class="city-card-cta">查看详情 →</button>
             `;
 
-            card.onclick = () => {
+            // 对比复选框事件
+            const checkbox = card.querySelector(`#compare-${city.id}`);
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                toggleCityCompare(city);
+            });
+
+            // 卡片点击事件
+            card.onclick = (e) => {
+                // 如果点击的是复选框区域,不跳转
+                if (e.target.closest('.compare-checkbox')) {
+                    return;
+                }
                 window.location.href = `city-detail.html?id=${city.id}`;
             };
 
