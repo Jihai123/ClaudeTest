@@ -379,14 +379,18 @@
             margin-top: 2rem;
         }
 
+        /* 【重构】城市卡片 - 新设计 */
         .city-card {
             background: white;
-            border-radius: 1rem;
+            border-radius: 1.2rem;
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: all 0.3s;
             cursor: pointer;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
         }
 
         .city-card:hover {
@@ -400,7 +404,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
+            height: 4px;
             background: var(--gradient-1);
             transform: scaleX(0);
             transition: transform 0.3s;
@@ -410,86 +414,160 @@
             transform: scaleX(1);
         }
 
-        .city-header {
-            padding: 1.5rem;
-            background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
-        }
-
+        /* 排名徽章 */
         .city-rank {
             position: absolute;
             top: 1rem;
             right: 1rem;
             background: var(--gradient-1);
             color: white;
-            padding: 0.4rem 0.8rem;
+            padding: 0.4rem 0.9rem;
             border-radius: 9999px;
-            font-weight: 700;
-            font-size: 0.85rem;
+            font-weight: 800;
+            font-size: 0.9rem;
             box-shadow: var(--shadow);
+            z-index: 1;
+        }
+
+        /* 卡片顶部 - 城市名 */
+        .city-card-top {
+            margin-bottom: 1rem;
         }
 
         .city-name {
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             color: var(--dark);
+            padding-right: 4rem; /* 为排名徽章留空间 */
         }
 
-        .city-slogan {
-            color: var(--gray);
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .city-score {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1.2rem;
-            background: var(--gradient-1);
-            color: white;
-            border-radius: 9999px;
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-
-        .city-body {
-            padding: 1.5rem;
-        }
-
-        .city-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tag {
-            padding: 0.4rem 1rem;
-            background: var(--light-gray);
-            border-radius: 9999px;
-            font-size: 0.85rem;
+        .city-province {
+            font-size: 0.9rem;
             color: var(--gray);
             font-weight: 500;
         }
 
-        .city-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .info-item {
+        /* 卡片主体 - 房租和评分 */
+        .city-card-main {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 0.5rem;
-            color: var(--gray);
-            font-size: 0.95rem;
         }
 
-        .info-icon {
-            font-size: 1.2rem;
+        /* 房租高亮区 */
+        .city-rent-highlight {
+            flex: 1;
+            text-align: center;
+        }
+
+        .rent-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            letter-spacing: 1px;
+        }
+
+        .rent-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .rent-unit {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 500;
+            margin-top: 0.2rem;
+        }
+
+        /* 评分区 */
+        .city-score-section {
+            flex: 1;
+            text-align: center;
+            border-left: 2px solid rgba(0,0,0,0.05);
+            padding-left: 1.5rem;
+        }
+
+        .score-stars {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            letter-spacing: 2px;
+            filter: grayscale(0) brightness(1.1);
+        }
+
+        .score-number {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* 标签区 */
+        .city-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            min-height: 32px; /* 保持高度一致 */
+        }
+
+        .tag-chip {
+            padding: 0.4rem 0.9rem;
+            background: var(--light-gray);
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .city-card:hover .tag-chip {
+            background: #e5e7eb;
+        }
+
+        /* 标语 */
+        .city-card-slogan {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* CTA按钮 */
+        .city-card-cta {
+            width: 100%;
+            padding: 0.9rem;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 0.6rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .city-card:hover .city-card-cta {
+            background: var(--gradient-1);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
         }
 
         /* 加载和空状态 */
@@ -1309,42 +1387,39 @@
 
             const score = city.layflat_score || city.overall_score || city.world_score || 0;
             const tags = city.tags || [];
+            const rent = city.avg_rent || null;
+            const province = city.province || '';
 
+            // 【重构】新的卡片结构 - 突出房租和评分
             card.innerHTML = `
                 <div class="city-rank">#${rank}</div>
-                <div class="city-header">
+                <div class="city-card-top">
                     <div class="city-name">${city.name}</div>
-                    <div class="city-slogan">${city.slogan || city.location_intro || '宜居之城'}</div>
-                    <div class="city-score">
-                        <span>⭐</span>
-                        <span>${score.toFixed(1)}</span>
+                    <div class="city-province">${province}</div>
+                </div>
+                <div class="city-card-main">
+                    <div class="city-rent-highlight">
+                        ${rent ? `
+                            <div class="rent-label">月租</div>
+                            <div class="rent-value">¥${rent}</div>
+                            <div class="rent-unit">/月</div>
+                        ` : `
+                            <div class="rent-label">月租</div>
+                            <div class="rent-value" style="font-size: 1.5rem; color: var(--gray);">暂无数据</div>
+                        `}
+                    </div>
+                    <div class="city-score-section">
+                        <div class="score-stars">⭐⭐⭐⭐⭐</div>
+                        <div class="score-number">${score.toFixed(1)} 分</div>
                     </div>
                 </div>
-                <div class="city-body">
-                    <div class="city-tags">
-                        ${tags.slice(0, 3).map(tag => `
-                            <span class="tag">${tag.tag_icon || ''} ${tag.tag_name || ''}</span>
-                        `).join('')}
-                    </div>
-                    <div class="city-info">
-                        <div class="info-item">
-                            <span class="info-icon">📍</span>
-                            <span>${city.province || '未知省份'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">🏠</span>
-                            <span>房价: ${city.house_price ? '¥' + city.house_price + '万/套' : '暂无'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">💰</span>
-                            <span>租金: ${city.avg_rent ? '¥' + city.avg_rent + '/月' : '暂无'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-icon">🌡️</span>
-                            <span>气候: ${city.climate_desc || '暂无'}</span>
-                        </div>
-                    </div>
+                <div class="city-card-tags">
+                    ${tags.slice(0, 3).map(tag => `
+                        <span class="tag-chip">${tag.tag_icon || '🏷️'} ${tag.tag_name || ''}</span>
+                    `).join('')}
                 </div>
+                <div class="city-card-slogan">${city.slogan || city.location_intro || '宜居之城'}</div>
+                <button class="city-card-cta">查看详情 →</button>
             `;
 
             card.onclick = () => {
