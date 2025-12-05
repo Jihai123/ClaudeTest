@@ -618,6 +618,20 @@
         let cityData = null;
         let currentRating = 5;
 
+        // 获取API基础路径的辅助函数
+        function getApiBase() {
+            const pathname = window.location.pathname;
+            const href = window.location.href;
+            // 检测是否在子路径下（支持 /yiju、/livablecities 等）
+            if (pathname.includes('/yiju') || href.includes('/yiju')) {
+                return window.location.origin + '/yiju';
+            }
+            if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
+                return window.location.origin + '/livablecities';
+            }
+            return window.location.origin;
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 获取城市ID
@@ -647,11 +661,7 @@
         async function loadCityData() {
             try {
                 // 自动检测API基础路径
-                const pathname = window.location.pathname;
-                const href = window.location.href;
-                const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
-                    ? window.location.origin + '/livablecities'
-                    : window.location.origin;
+                const apiBase = getApiBase();
                 console.log('🔍 API Base:', apiBase);
                 const response = await fetch(`${apiBase}/api/cities/${cityId}`);
                 if (!response.ok) throw new Error('城市不存在');
@@ -882,11 +892,7 @@
         // 加载评价列表
         async function loadReviews() {
             try {
-                const pathname = window.location.pathname;
-                const href = window.location.href;
-                const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
-                    ? window.location.origin + '/livablecities'
-                    : window.location.origin;
+                const apiBase = getApiBase();
                 const response = await fetch(`${apiBase}/api/reviews/city/${cityId}?limit=20`);
                 const data = await response.json();
 
@@ -957,11 +963,7 @@
                 const rating = parseInt(document.getElementById('ratingValue').value);
 
                 try {
-                    const pathname = window.location.pathname;
-                    const href = window.location.href;
-                    const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
-                        ? window.location.origin + '/livablecities'
-                        : window.location.origin;
+                    const apiBase = getApiBase();
 
                     // 获取token
                     const token = localStorage.getItem('token');
@@ -1016,11 +1018,7 @@
         // 点赞评价
         async function likeReview(reviewId) {
             try {
-                const pathname = window.location.pathname;
-                const href = window.location.href;
-                const apiBase = (pathname.includes('/livablecities') || href.includes('/livablecities'))
-                    ? window.location.origin + '/livablecities'
-                    : window.location.origin;
+                const apiBase = getApiBase();
 
                 // 获取token
                 const token = localStorage.getItem('token');

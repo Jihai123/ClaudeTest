@@ -470,6 +470,20 @@
         let selectedFiles = [];
         let cities = [];
 
+        // 获取API基础路径的辅助函数
+        function getApiBase() {
+            const pathname = window.location.pathname;
+            const href = window.location.href;
+            // 检测是否在子路径下（支持 /yiju、/livablecities 等）
+            if (pathname.includes('/yiju') || href.includes('/yiju')) {
+                return window.location.origin + '/yiju';
+            }
+            if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
+                return window.location.origin + '/livablecities';
+            }
+            return window.location.origin;
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             loadCities();
@@ -480,9 +494,7 @@
         // 加载城市列表
         async function loadCities() {
             try {
-                const apiBase = window.location.pathname.startsWith('/livablecities/')
-                    ? window.location.origin + '/livablecities'
-                    : window.location.origin;
+                const apiBase = getApiBase();
                 console.log('🔍 API Base:', apiBase);
                 const response = await fetch(`${apiBase}/api/cities?limit=1000&status=approved`);
                 const data = await response.json();
@@ -671,9 +683,7 @@
 
         // 上传图片（模拟）
         async function uploadImage(file) {
-            const apiBase = window.location.pathname.startsWith('/livablecities/')
-                ? window.location.origin + '/livablecities'
-                : window.location.origin;
+            const apiBase = getApiBase();
 
             const formData = new FormData();
             formData.append('image', file);
@@ -699,9 +709,7 @@
 
         // 保存图片记录
         async function saveImageRecord(cityId, imageUrl, description, season) {
-            const apiBase = window.location.pathname.startsWith('/livablecities/')
-                ? window.location.origin + '/livablecities'
-                : window.location.origin;
+            const apiBase = getApiBase();
 
             // 获取token
             const token = localStorage.getItem('token');
