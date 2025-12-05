@@ -36,7 +36,14 @@
     "express-validator": "^7.0.1",
     "cheerio": "^1.0.0-rc.12",
     "axios": "^1.6.2",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.7.0",
+    "form-data": "^4.0.0"
+  },
+  "optionalDependencies": {
+    "aws-sdk": "^2.1519.0",
+    "ali-oss": "^6.18.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",
