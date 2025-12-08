@@ -690,10 +690,11 @@
             const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
             document.getElementById('cityScore').textContent = score.toFixed(1);
 
-            // 设置上传图片链接，传递城市信息
+            // 设置上传图片链接，传递城市信息和返回URL
             const uploadLink = document.getElementById('uploadLink');
             if (uploadLink) {
-                uploadLink.href = `upload-images.html?cityId=${cityData.id}&cityName=${encodeURIComponent(cityData.name)}`;
+                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                uploadLink.href = `upload-images.html?cityId=${cityData.id}&cityName=${encodeURIComponent(cityData.name)}&returnUrl=${returnUrl}`;
             }
 
             // 【新增】动态更新SEO标签
