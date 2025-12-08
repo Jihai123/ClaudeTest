@@ -550,7 +550,7 @@
                     <div class="empty-state-icon">📷</div>
                     <h3>暂无图片</h3>
                     <p>成为第一个上传这座城市图片的人</p>
-                    <a href="upload-images.html" class="btn btn-primary" style="margin-top: 20px;">上传图片</a>
+                    <a href="#" id="uploadLink" class="btn btn-primary" style="margin-top: 20px;">上传图片</a>
                 </div>
             </section>
 
@@ -689,6 +689,12 @@
 
             const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
             document.getElementById('cityScore').textContent = score.toFixed(1);
+
+            // 设置上传图片链接，传递城市信息
+            const uploadLink = document.getElementById('uploadLink');
+            if (uploadLink) {
+                uploadLink.href = `upload-images.html?cityId=${cityData.id}&cityName=${encodeURIComponent(cityData.name)}`;
+            }
 
             // 【新增】动态更新SEO标签
             updateSEOTags();
