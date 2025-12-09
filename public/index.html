@@ -498,6 +498,16 @@
             border-color: transparent;
         }
 
+        /* 省份筛选 */
+        .filter-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .province-filter {
         /* 筛选器分区 */
         .filter-section {
             margin-bottom: 2rem;
@@ -529,6 +539,57 @@
             flex-wrap: wrap;
         }
 
+        .province-label {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .select-wrapper {
+            position: relative;
+            min-width: 200px;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+
+        .province-select {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 9999px;
+            background: white;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        .province-select:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .province-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .province-select option {
+            padding: 0.5rem;
         .filter-selected .filter-title {
             margin: 0;
             font-size: 0.95rem;
@@ -1286,6 +1347,32 @@
 
         <!-- 【重构】增强筛选器 -->
         <div class="filters fade-in">
+            <div class="filter-title">🎯 快速筛选</div>
+
+            <!-- 省份筛选 -->
+            <div class="filter-section">
+                <div class="province-filter">
+                    <label for="provinceSelect" class="province-label">📍 选择省份：</label>
+                    <div class="select-wrapper">
+                        <select id="provinceSelect" class="province-select">
+                            <option value="">全部省份</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 标签筛选 -->
+            <div class="filter-section">
+                <div class="filter-tags">
+                    <div class="filter-tag" data-filter="seaside">🏖️ 看海</div>
+                    <div class="filter-tag" data-filter="low_rent">💰 低房租</div>
+                    <div class="filter-tag" data-filter="spring_climate">🌡️ 四季如春</div>
+                    <div class="filter-tag" data-filter="quiet">🤫 安静</div>
+                    <div class="filter-tag" data-filter="medical">🏥 医疗好</div>
+                    <div class="filter-tag" data-filter="digital_nomad">💻 数字游民</div>
+                    <div class="filter-tag" data-filter="mountain">🏔️ 山居</div>
+                    <div class="filter-tag" data-filter="lake">🌊 临湖</div>
+                </div>
             <!-- 价格区间筛选 -->
             <div class="filter-section">
                 <div class="filter-title">💰 租金区间</div>
@@ -1746,6 +1833,7 @@
             initNavbar();
             initTabs();
             initFilters();
+            initProvinceFilter();
             initHotCities(); // 【新增】初始化热门城市模块
             loadCities();
             updateAuthUI(); // 检查登录状态并更新UI
@@ -1832,6 +1920,14 @@
                     tabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     currentListType = this.dataset.listType;
+
+                    // 切换榜单时，重置省份筛选
+                    const provinceSelect = document.getElementById('provinceSelect');
+                    if (provinceSelect) {
+                        provinceSelect.value = '';
+                        delete activeFilters.province;
+                    }
+
                     loadCities();
                 });
             });
@@ -1983,6 +2079,35 @@
 
             updateSelectedFilters();
             loadCities();
+        }
+
+        // 初始化省份筛选器
+        async function initProvinceFilter() {
+            try {
+                const data = await apiRequest('/api/cities/provinces');
+                const provinceSelect = document.getElementById('provinceSelect');
+
+                if (data.provinces && data.provinces.length > 0) {
+                    data.provinces.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province;
+                        option.textContent = province;
+                        provinceSelect.appendChild(option);
+                    });
+                }
+
+                // 添加省份选择事件监听器
+                provinceSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        activeFilters.province = this.value;
+                    } else {
+                        delete activeFilters.province;
+                    }
+                    loadCities();
+                });
+            } catch (error) {
+                console.error('加载省份列表失败:', error);
+            }
         }
 
         // 加载城市数据
@@ -2160,6 +2285,23 @@
                             <div class="rent-value" style="font-size: 1.5rem; color: var(--gray);">暂无数据</div>
                         `}
                     </div>
+                    <div class="city-info">
+                        <div class="info-item">
+                            <span class="info-icon">📍</span>
+                            <span>${city.province || '未知省份'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🏠</span>
+                            <span>房价: ${city.house_price ? '¥' + (city.house_price / 10000).toFixed(1) + '万/套' : '暂无'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">💰</span>
+                            <span>租金: ${city.avg_rent ? '¥' + city.avg_rent + '/月' : '暂无'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🌡️</span>
+                            <span>气候: ${city.climate_desc || city.climate || '暂无'}</span>
+                        </div>
                     <div class="city-score-section">
                         <div class="score-stars">⭐⭐⭐⭐⭐</div>
                         <div class="score-number">${score.toFixed(1)} 分</div>
