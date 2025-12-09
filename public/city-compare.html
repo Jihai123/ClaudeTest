@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>城市对比 - 躺平榜</title>
+    <meta name="description" content="多城市对比工具,一键对比房租、气候、生活成本等多维度数据,帮你做出最佳选择 - 躺平榜">
+    <meta name="keywords" content="城市对比,房租对比,生活成本对比,城市选择,躺平榜">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="城市对比 - 躺平榜">
+    <meta property="og:description" content="多城市对比工具,一键对比房租、气候、生活成本等多维度数据">
+
+    <!-- SEO -->
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://yourdomain.com/city-compare.html">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --danger: #f56565;
+            --warning: #ed8936;
+            --dark: #2d3748;
+            --gray: #718096;
+            --light-gray: #f7fafc;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 3rem;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .compare-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .compare-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .compare-header h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 城市对比网格 */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .city-compare-card {
+            background: var(--light-gray);
+            border-radius: 1rem;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .city-compare-card.highlight {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+            border: 2px solid var(--primary);
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--danger);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: all 0.3s;
+        }
+
+        .remove-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow);
+        }
+
+        .city-name-large {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .city-province {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .compare-metric {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .compare-metric:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-value.best {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .best-badge {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* 雷达图 */
+        #radarChart {
+            width: 100%;
+            height: 500px;
+            margin-top: 2rem;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray);
+        }
+
+        .empty-state-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            #radarChart {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">🏖️ 躺平榜</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">首页</a></li>
+                <li><a href="/city-compare.html" class="nav-link">城市对比</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 页头 -->
+    <div class="page-header">
+        <h1>🔍 城市对比</h1>
+        <p>多维度数据对比,帮你找到最适合躺平的城市</p>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- 城市对比区 -->
+        <div class="compare-section" id="compareSection">
+            <div class="compare-header">
+                <h2>数据对比</h2>
+                <button class="btn btn-outline" onclick="clearComparison()">清空对比</button>
+            </div>
+
+            <div id="compareContent">
+                <!-- 空状态 -->
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏙️</div>
+                    <h3>还没有选择城市</h3>
+                    <p>请从<a href="/" style="color: var(--primary);">首页</a>选择2-4个城市进行对比</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 雷达图对比 -->
+        <div class="compare-section" id="radarSection" style="display: none;">
+            <div class="compare-header">
+                <h2>多维度雷达图对比</h2>
+            </div>
+            <div id="radarChart"></div>
+        </div>
+    </div>
+
+    <script>
+        // API配置
+        const API_CONFIG = {
+            baseURL: window.API_BASE_URL || (() => {
+                const pathname = window.location.pathname;
+                const href = window.location.href;
+                if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
+                    return window.location.origin + '/livablecities';
+                }
+                return window.location.origin;
+            })()
+        };
+
+        // API请求辅助函数
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_CONFIG.baseURL}${endpoint}`;
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`API请求失败: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        // 从LocalStorage获取对比城市列表
+        function getCompareCities() {
+            const stored = localStorage.getItem('compareCities');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        // 保存对比城市列表
+        function saveCompareCities(cities) {
+            localStorage.setItem('compareCities', JSON.stringify(cities));
+        }
+
+        // 移除城市
+        function removeCity(cityId) {
+            let cities = getCompareCities();
+            cities = cities.filter(id => id !== cityId);
+            saveCompareCities(cities);
+            loadComparison();
+        }
+
+        // 清空对比
+        function clearComparison() {
+            if (confirm('确定要清空所有对比城市吗?')) {
+                localStorage.removeItem('compareCities');
+                loadComparison();
+            }
+        }
+
+        // 加载城市对比
+        async function loadComparison() {
+            const cityIds = getCompareCities();
+            const compareContent = document.getElementById('compareContent');
+            const radarSection = document.getElementById('radarSection');
+
+            if (cityIds.length === 0) {
+                compareContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏙️</div>
+                        <h3>还没有选择城市</h3>
+                        <p>请从<a href="/" style="color: var(--primary);">首页</a>选择2-4个城市进行对比</p>
+                    </div>
+                `;
+                radarSection.style.display = 'none';
+                return;
+            }
+
+            try {
+                // 获取城市数据
+                const cities = await Promise.all(
+                    cityIds.map(id => apiRequest(`/api/cities/${id}`))
+                );
+
+                // 渲染对比数据
+                renderComparison(cities);
+
+                // 渲染雷达图
+                if (cities.length >= 2) {
+                    radarSection.style.display = 'block';
+                    renderRadarChart(cities);
+                } else {
+                    radarSection.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('加载城市数据失败:', error);
+                compareContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😞</div>
+                        <h3>加载失败</h3>
+                        <p>请稍后再试</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 渲染对比数据
+        function renderComparison(cities) {
+            const compareContent = document.getElementById('compareContent');
+
+            // 找出最优值
+            const rents = cities.filter(c => c.avg_rent).map(c => c.avg_rent);
+            const bestRent = rents.length > 0 ? Math.min(...rents) : null;
+
+            const scores = cities.map(c => c.layflat_score || c.overall_score || c.world_score || 0);
+            const bestScore = Math.max(...scores);
+
+            const html = `
+                <div class="compare-grid">
+                    ${cities.map((city, index) => {
+                        const rent = city.avg_rent || 0;
+                        const score = city.layflat_score || city.overall_score || city.world_score || 0;
+                        const isBestRent = rent && rent === bestRent;
+                        const isBestScore = score === bestScore && score > 0;
+
+                        return `
+                            <div class="city-compare-card ${index === 0 ? 'highlight' : ''}">
+                                <button class="remove-btn" onclick="removeCity(${city.id})" title="移除">×</button>
+                                <div class="city-name-large">${city.name}</div>
+                                <div class="city-province">${city.province || ''}</div>
+
+                                <div class="compare-metric">
+                                    <div class="metric-label">月租金</div>
+                                    <div class="metric-value ${isBestRent ? 'best' : ''}">
+                                        ¥${rent || '暂无'}/月
+                                        ${isBestRent ? '<span class="best-badge">最低</span>' : ''}
+                                    </div>
+                                </div>
+
+                                <div class="compare-metric">
+                                    <div class="metric-label">躺平指数</div>
+                                    <div class="metric-value ${isBestScore ? 'best' : ''}">
+                                        ${score.toFixed(1)} 分
+                                        ${isBestScore ? '<span class="best-badge">最高</span>' : ''}
+                                    </div>
+                                </div>
+
+                                <div class="compare-metric">
+                                    <div class="metric-label">人口</div>
+                                    <div class="metric-value">${formatPopulation(city.population)}</div>
+                                </div>
+
+                                <div class="compare-metric">
+                                    <div class="metric-label">气候</div>
+                                    <div class="metric-value" style="font-size: 1.2rem;">
+                                        ${city.climate || '暂无数据'}
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="window.location.href='city-detail.html?id=${city.id}'">
+                                    查看详情 →
+                                </button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+
+            compareContent.innerHTML = html;
+        }
+
+        // 渲染雷达图
+        function renderRadarChart(cities) {
+            const chart = echarts.init(document.getElementById('radarChart'));
+
+            const indicators = [
+                { name: '房租成本', max: 10 },
+                { name: '气候环境', max: 10 },
+                { name: '生活节奏', max: 10 },
+                { name: '医疗设施', max: 10 },
+                { name: '数字游民', max: 10 },
+                { name: '综合评分', max: 10 }
+            ];
+
+            const series = cities.map((city, index) => {
+                const dimensions = city.dimensions || {};
+                const rentScore = calculateRentScore(city.avg_rent);
+                const climateScore = dimensions.climate || 5;
+                const slowPaceScore = dimensions.slow_pace || city.slow_pace_score || 5;
+                const medicalScore = dimensions.medical || 5;
+                const digitalScore = city.digital_nomad_score || 5;
+                const overallScore = city.layflat_score || city.overall_score || city.world_score || 5;
+
+                return {
+                    name: city.name,
+                    type: 'radar',
+                    data: [[
+                        rentScore,
+                        climateScore,
+                        slowPaceScore,
+                        medicalScore,
+                        digitalScore,
+                        overallScore
+                    ]]
+                };
+            });
+
+            const colors = ['#667eea', '#f093fb', '#48bb78', '#ed8936'];
+
+            const option = {
+                color: colors,
+                title: {
+                    text: '城市多维度对比'
+                },
+                legend: {
+                    data: cities.map(c => c.name),
+                    bottom: 20
+                },
+                radar: {
+                    indicator: indicators,
+                    radius: '60%'
+                },
+                series: series
+            };
+
+            chart.setOption(option);
+
+            // 响应式
+            window.addEventListener('resize', () => {
+                chart.resize();
+            });
+        }
+
+        // 计算房租评分 (房租越低分数越高)
+        function calculateRentScore(rent) {
+            if (!rent) return 5;
+            if (rent <= 500) return 10;
+            if (rent <= 1000) return 8;
+            if (rent <= 2000) return 6;
+            if (rent <= 3000) return 4;
+            return 2;
+        }
+
+        // 格式化人口
+        function formatPopulation(pop) {
+            if (!pop) return '暂无';
+            if (pop >= 10000000) return (pop / 10000000).toFixed(1) + '千万';
+            if (pop >= 10000) return (pop / 10000).toFixed(0) + '万';
+            return pop.toString();
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', () => {
+            loadComparison();
+        });
+    </script>
+</body>
+</html>

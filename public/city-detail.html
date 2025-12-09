@@ -3,7 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>城市详情 - 躺平榜</title>
+    <title id="pageTitle">城市详情 - 躺平榜</title>
+    <meta name="description" id="pageDescription" content="查看城市详细信息,包括房租、气候、生活成本、用户评价等多维度数据 - 躺平榜">
+    <meta name="keywords" id="pageKeywords" content="城市详情,房租,气候,生活成本,用户评价,躺平榜">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" id="ogTitle" content="城市详情 - 躺平榜">
+    <meta property="og:description" id="ogDescription" content="查看城市详细信息">
+    <meta property="og:url" id="ogUrl" content="">
+
+    <!-- SEO -->
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" id="canonicalUrl" href="">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         * {
@@ -667,6 +680,9 @@
             const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
             document.getElementById('cityScore').textContent = score.toFixed(1);
 
+            // 【新增】动态更新SEO标签
+            updateSEOTags();
+
             // 城市元信息 - 展示所有字段
             const meta = document.getElementById('cityMeta');
             const metaItems = [];
@@ -789,6 +805,78 @@
 
             chart.setOption(option);
             window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 【新增】更新SEO标签
+        function updateSEOTags() {
+            const cityName = cityData.name;
+            const province = cityData.province || '';
+            const score = (cityData.layflat_score || cityData.overall_score || cityData.world_score || 0).toFixed(1);
+            const rent = cityData.avg_rent ? `¥${cityData.avg_rent}/月` : '暂无数据';
+            const climate = cityData.climate_desc || '';
+
+            // 动态Title
+            const title = `${cityName}躺平指南 - 房租${rent} | 躺平指数${score}分 | 躺平榜`;
+            document.title = title;
+            document.getElementById('pageTitle').textContent = title;
+
+            // 动态Description
+            const description = `${cityName}(${province})真实房租${rent},躺平指数${score}分。${climate}。查看${cityName}生活成本、气候数据、用户真实评价,为你的躺平生活提供参考 - 躺平榜`;
+            const metaDesc = document.getElementById('pageDescription');
+            if (metaDesc) metaDesc.setAttribute('content', description);
+
+            // Keywords
+            const keywords = `${cityName},${cityName}房租,${cityName}生活成本,${province}宜居城市,${cityName}躺平,${cityName}评价,躺平榜`;
+            const metaKeywords = document.getElementById('pageKeywords');
+            if (metaKeywords) metaKeywords.setAttribute('content', keywords);
+
+            // Open Graph
+            document.getElementById('ogTitle').setAttribute('content', `${cityName} - 躺平指数${score}分 | 房租${rent}`);
+            document.getElementById('ogDescription').setAttribute('content', description);
+
+            // Canonical URL
+            const currentUrl = window.location.href;
+            document.getElementById('ogUrl').setAttribute('content', currentUrl);
+            document.getElementById('canonicalUrl').setAttribute('href', currentUrl);
+
+            // 【新增】添加结构化数据 (Schema.org)
+            addStructuredData();
+        }
+
+        // 【新增】添加Schema.org结构化数据
+        function addStructuredData() {
+            // 移除旧的结构化数据
+            const oldScript = document.getElementById('structuredData');
+            if (oldScript) oldScript.remove();
+
+            const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
+
+            // Place Schema (城市地理信息)
+            const structuredData = {
+                "@context": "https://schema.org",
+                "@type": "Place",
+                "name": cityData.name,
+                "description": cityData.slogan || cityData.location_intro || cityData.evaluation,
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressRegion": cityData.province,
+                    "addressCountry": "CN"
+                },
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": score.toFixed(1),
+                    "bestRating": "10",
+                    "worstRating": "0",
+                    "ratingCount": "100"
+                },
+                "priceRange": cityData.avg_rent ? `¥${cityData.avg_rent}` : null
+            };
+
+            const script = document.createElement('script');
+            script.id = 'structuredData';
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(structuredData);
+            document.head.appendChild(script);
         }
 
         // 加载评价列表

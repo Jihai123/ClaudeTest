@@ -671,17 +671,30 @@
 
         // 上传图片（模拟）
         async function uploadImage(file) {
-            // 实际项目中应该上传到图床或服务器
-            // 这里返回一个示例URL
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    // 在生产环境中，这里应该是真实的上传逻辑
-                    // 例如上传到七牛云、阿里云OSS等
-                    resolve(e.target.result); // 临时使用base64
-                };
-                reader.readAsDataURL(file);
+            const apiBase = window.location.pathname.startsWith('/livablecities/')
+                ? window.location.origin + '/livablecities'
+                : window.location.origin;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await fetch(`${apiBase}/api/upload`, {
+                method: 'POST',
+                body: formData
             });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || '上传失败');
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || '上传失败');
+            }
+
+            return data.url;
         }
 
         // 保存图片记录

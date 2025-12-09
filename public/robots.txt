@@ -1,0 +1,39 @@
+# 躺平榜 - Robots.txt
+# 允许所有搜索引擎抓取
+
+User-agent: *
+Allow: /
+
+# 重要页面
+Allow: /index.html
+Allow: /city-detail.html
+
+# API端点不抓取
+Disallow: /api/
+
+# 用户上传内容不抓取
+Disallow: /upload-images.html
+
+# 指定Sitemap位置
+Sitemap: https://tangping.com/sitemap.xml
+
+# 搜索引擎抓取速度（建议值）
+# 百度
+User-agent: Baiduspider
+Crawl-delay: 1
+
+# 谷歌
+User-agent: Googlebot
+Crawl-delay: 0
+
+# 搜狗
+User-agent: Sogou web spider
+Crawl-delay: 1
+
+# 360搜索
+User-agent: 360Spider
+Crawl-delay: 1
+
+# 必应
+User-agent: Bingbot
+Crawl-delay: 0
