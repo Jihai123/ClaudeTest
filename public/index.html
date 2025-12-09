@@ -1577,7 +1577,10 @@
             baseURL: window.API_BASE_URL || (() => {
                 const pathname = window.location.pathname;
                 const href = window.location.href;
-                // 检测是否在子路径下（如 /livablecities/ 或 /livablecities）
+                // 检测是否在子路径下（支持 /yiju、/livablecities 等）
+                if (pathname.includes('/yiju') || href.includes('/yiju')) {
+                    return window.location.origin + '/yiju';
+                }
                 if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
                     return window.location.origin + '/livablecities';
                 }

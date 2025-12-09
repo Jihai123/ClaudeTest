@@ -74,7 +74,7 @@ router.post('/upload', verifyToken, async (req, res) => {
         JSON.stringify(tags || []),
         req.user.id,
         image_type === 'user' ? 30 : 10, // 默认权重
-        'pending', // MVP版本自动通过，生产环境应为pending
+        'approved', // MVP版本自动通过
         season || null
       ]
     );
