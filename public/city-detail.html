@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">城市详情 - 躺平榜</title>
-    <meta name="description" id="pageDescription" content="查看城市详细信息,包括房租、气候、生活成本、用户评价等多维度数据 - 躺平榜">
-    <meta name="keywords" id="pageKeywords" content="城市详情,房租,气候,生活成本,用户评价,躺平榜">
+    <title id="pageTitle">城市详情 - 宜居城市指南</title>
+    <meta name="description" id="pageDescription" content="查看城市详细信息,包括房租、气候、生活成本、用户评价等多维度数据 - 宜居城市指南">
+    <meta name="keywords" id="pageKeywords" content="城市详情,房租,气候,生活成本,用户评价,宜居城市指南">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
-    <meta property="og:title" id="ogTitle" content="城市详情 - 躺平榜">
+    <meta property="og:title" id="ogTitle" content="城市详情 - 宜居城市指南">
     <meta property="og:description" id="ogDescription" content="查看城市详细信息">
     <meta property="og:url" id="ogUrl" content="">
 
@@ -515,7 +515,7 @@
 <body>
     <!-- 顶部导航 -->
     <div class="header">
-        <div class="logo" onclick="window.location.href='index.html'">🏖️ 躺平榜</div>
+        <div class="logo" onclick="window.location.href='index.html'">🏖️ 宜居城市指南</div>
         <div>
             <a href="index.html" class="btn btn-outline">← 返回列表</a>
         </div>
@@ -544,7 +544,10 @@
 
             <!-- 图片墙 -->
             <section class="section">
-                <h2 class="section-title">📷 城市印象</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">📷 城市印象</h2>
+                    <a href="#" id="uploadLinkWithImages" class="btn btn-primary" style="display: none;">📷 上传你的城市印象</a>
+                </div>
                 <div id="imageGallery" class="image-gallery"></div>
                 <div id="uploadPrompt" class="upload-prompt" style="display: none;">
                     <div class="empty-state-icon">📷</div>
@@ -690,13 +693,6 @@
             const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
             document.getElementById('cityScore').textContent = score.toFixed(1);
 
-            // 设置上传图片链接，传递城市信息和返回URL
-            const uploadLink = document.getElementById('uploadLink');
-            if (uploadLink) {
-                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
-                uploadLink.href = `upload-images.html?cityId=${cityData.id}&cityName=${encodeURIComponent(cityData.name)}&returnUrl=${returnUrl}`;
-            }
-
             // 【新增】动态更新SEO标签
             updateSEOTags();
 
@@ -748,6 +744,11 @@
         function renderImageGallery() {
             const gallery = document.getElementById('imageGallery');
             const uploadPrompt = document.getElementById('uploadPrompt');
+            const uploadLinkWithImages = document.getElementById('uploadLinkWithImages');
+
+            // 设置上传链接
+            const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            const uploadUrl = `upload-images.html?cityId=${cityData.id}&cityName=${encodeURIComponent(cityData.name)}&returnUrl=${returnUrl}`;
 
             if (cityData.images && cityData.images.length > 0) {
                 gallery.innerHTML = cityData.images.map(image => `
@@ -755,8 +756,16 @@
                         <img src="${image.thumbnail_url || image.image_url}" alt="${image.alt_text || cityData.name}">
                     </div>
                 `).join('');
+                // 有图片时，显示顶部的上传按钮
+                uploadLinkWithImages.style.display = 'inline-block';
+                uploadLinkWithImages.href = uploadUrl;
             } else {
+                // 没有图片时，显示上传提示
                 uploadPrompt.style.display = 'block';
+                const uploadLink = document.getElementById('uploadLink');
+                if (uploadLink) {
+                    uploadLink.href = uploadUrl;
+                }
             }
         }
 
@@ -833,17 +842,17 @@
             const climate = cityData.climate_desc || '';
 
             // 动态Title
-            const title = `${cityName}躺平指南 - 房租${rent} | 躺平指数${score}分 | 躺平榜`;
+            const title = `${cityName}躺平指南 - 房租${rent} | 躺平指数${score}分 | 宜居城市指南`;
             document.title = title;
             document.getElementById('pageTitle').textContent = title;
 
             // 动态Description
-            const description = `${cityName}(${province})真实房租${rent},躺平指数${score}分。${climate}。查看${cityName}生活成本、气候数据、用户真实评价,为你的躺平生活提供参考 - 躺平榜`;
+            const description = `${cityName}(${province})真实房租${rent},躺平指数${score}分。${climate}。查看${cityName}生活成本、气候数据、用户真实评价,为你的躺平生活提供参考 - 宜居城市指南`;
             const metaDesc = document.getElementById('pageDescription');
             if (metaDesc) metaDesc.setAttribute('content', description);
 
             // Keywords
-            const keywords = `${cityName},${cityName}房租,${cityName}生活成本,${province}宜居城市,${cityName}躺平,${cityName}评价,躺平榜`;
+            const keywords = `${cityName},${cityName}房租,${cityName}生活成本,${province}宜居城市,${cityName}躺平,${cityName}评价,宜居城市指南`;
             const metaKeywords = document.getElementById('pageKeywords');
             if (metaKeywords) metaKeywords.setAttribute('content', keywords);
 

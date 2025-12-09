@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>上传城市图片 - 躺平榜</title>
+    <title>上传城市图片 - 宜居城市指南</title>
     <style>
         * {
             margin: 0;
@@ -377,12 +377,105 @@
         .info-box li {
             margin-bottom: 5px;
         }
+
+        /* 城市搜索框样式 */
+        .city-search-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .city-search {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .city-search:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .city-select-wrapper {
+            position: relative;
+        }
+
+        .city-options {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: white;
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .city-options.show {
+            display: block;
+        }
+
+        .city-option {
+            padding: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        .city-option:hover {
+            background: var(--bg-light);
+        }
+
+        .city-option:last-child {
+            border-bottom: none;
+        }
+
+        .city-option.selected {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .city-option-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .city-option-info {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .city-option.selected .city-option-info {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
     <!-- 顶部导航 -->
     <div class="header">
-        <div class="logo" onclick="window.location.href='index.html'">🏖️ 躺平榜</div>
+        <div class="logo" onclick="window.location.href='index.html'">🏖️ 宜居城市指南</div>
         <div>
             <a href="index.html" class="btn btn-outline">← 返回首页</a>
         </div>
@@ -407,10 +500,18 @@
             <!-- 选择城市 -->
             <div class="form-group">
                 <label class="form-label">选择城市 *</label>
-                <select id="citySelect" class="form-select" required>
-                    <option value="">正在加载城市列表...</option>
-                </select>
-                <div class="form-hint">选择你要上传图片的城市</div>
+                <div class="city-search-wrapper">
+                    <input type="text" id="citySearch" class="city-search" placeholder="搜索城市名称或省份...">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="city-select-wrapper">
+                    <input type="hidden" id="citySelect" required>
+                    <div id="cityOptions" class="city-options"></div>
+                </div>
+                <div id="selectedCityDisplay" style="margin-top: 10px; padding: 10px; background: var(--bg-light); border-radius: var(--radius-sm); display: none;">
+                    <strong>已选择：</strong><span id="selectedCityName"></span>
+                </div>
+                <div class="form-hint">搜索并选择你要上传图片的城市</div>
             </div>
 
             <!-- 图片上传 -->
@@ -469,6 +570,7 @@
         // 全局变量
         let selectedFiles = [];
         let cities = [];
+        let selectedCityId = null;
 
         // 获取API基础路径的辅助函数
         function getApiBase() {
@@ -489,6 +591,7 @@
             loadCities();
             initUploadArea();
             initForm();
+            initCitySearch();
         });
 
         // 加载城市列表
@@ -501,28 +604,120 @@
 
                 cities = data.cities || [];
 
-                const select = document.getElementById('citySelect');
                 if (cities.length > 0) {
-                    select.innerHTML = '<option value="">请选择城市</option>' +
-                        cities.map(city => `<option value="${city.id}">${city.name} - ${city.province || ''}</option>`).join('');
-
                     // 【新增】从URL参数自动选中城市
                     const urlParams = new URLSearchParams(window.location.search);
                     const cityId = urlParams.get('cityId');
                     const cityName = urlParams.get('cityName');
 
                     if (cityId) {
-                        select.value = cityId;
-                        console.log(`✅ 自动选中城市: ${cityName} (ID: ${cityId})`);
-                        showNotification(`已为您选择城市：${cityName}`, 'success');
+                        const city = cities.find(c => c.id == cityId);
+                        if (city) {
+                            selectCity(city);
+                            console.log(`✅ 自动选中城市: ${cityName} (ID: ${cityId})`);
+                            showNotification(`已为您选择城市：${cityName}`, 'success');
+                        }
                     }
                 } else {
-                    select.innerHTML = '<option value="">暂无城市数据</option>';
+                    showNotification('暂无城市数据', 'error');
                 }
             } catch (error) {
                 console.error('加载城市失败:', error);
                 showNotification('加载城市列表失败', 'error');
             }
+        }
+
+        // 初始化城市搜索
+        function initCitySearch() {
+            const searchInput = document.getElementById('citySearch');
+            const optionsContainer = document.getElementById('cityOptions');
+
+            // 搜索输入事件
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+
+                if (query.length === 0) {
+                    optionsContainer.classList.remove('show');
+                    return;
+                }
+
+                // 过滤城市
+                const filtered = cities.filter(city => {
+                    const name = (city.name || '').toLowerCase();
+                    const province = (city.province || '').toLowerCase();
+                    const country = (city.country || '').toLowerCase();
+                    return name.includes(query) || province.includes(query) || country.includes(query);
+                });
+
+                renderCityOptions(filtered);
+            });
+
+            // 点击搜索框显示所有城市
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length === 0) {
+                    renderCityOptions(cities.slice(0, 50)); // 显示前50个城市
+                }
+            });
+
+            // 点击外部关闭选项列表
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.city-search-wrapper') && !e.target.closest('.city-select-wrapper')) {
+                    optionsContainer.classList.remove('show');
+                }
+            });
+        }
+
+        // 渲染城市选项
+        function renderCityOptions(cityList) {
+            const optionsContainer = document.getElementById('cityOptions');
+
+            if (cityList.length === 0) {
+                optionsContainer.innerHTML = '<div class="no-results">没有找到匹配的城市</div>';
+                optionsContainer.classList.add('show');
+                return;
+            }
+
+            optionsContainer.innerHTML = cityList.map(city => {
+                const isSelected = selectedCityId === city.id;
+                const province = city.province ? ` · ${city.province}` : '';
+                const country = city.country && city.country !== '中国' ? ` · ${city.country}` : '';
+
+                return `
+                    <div class="city-option ${isSelected ? 'selected' : ''}" data-city-id="${city.id}">
+                        <div class="city-option-name">${city.name}</div>
+                        <div class="city-option-info">${province}${country}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // 添加点击事件
+            optionsContainer.querySelectorAll('.city-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const cityId = this.dataset.cityId;
+                    const city = cities.find(c => c.id == cityId);
+                    if (city) {
+                        selectCity(city);
+                    }
+                });
+            });
+
+            optionsContainer.classList.add('show');
+        }
+
+        // 选择城市
+        function selectCity(city) {
+            selectedCityId = city.id;
+            document.getElementById('citySelect').value = city.id;
+            document.getElementById('citySearch').value = '';
+            document.getElementById('cityOptions').classList.remove('show');
+
+            // 显示已选择的城市
+            const displayDiv = document.getElementById('selectedCityDisplay');
+            const nameSpan = document.getElementById('selectedCityName');
+            const province = city.province ? ` (${city.province})` : '';
+            const country = city.country && city.country !== '中国' ? ` - ${city.country}` : '';
+            nameSpan.textContent = `${city.name}${province}${country}`;
+            displayDiv.style.display = 'block';
         }
 
         // 初始化上传区域

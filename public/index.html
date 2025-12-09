@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>躺平榜 - 中国宜居城市排行榜 | 低房租城市推荐 | 数字游民定居指南</title>
-    <meta name="description" content="躺平榜提供300+中国城市宜居度评估,真实房租数据、气候指数、生活成本对比。大厂离职?北漂回老家?找个二三线城市躺平,最低房租仅¥450/月。10000+真实用户评价,帮你3秒找到最适合躺平的城市。">
+    <title>宜居城市指南 - 中国宜居城市排行榜 | 低房租城市推荐 | 数字游民定居指南</title>
+    <meta name="description" content="宜居城市指南提供300+中国城市宜居度评估,真实房租数据、气候指数、生活成本对比。大厂离职?北漂回老家?找个二三线城市躺平,最低房租仅¥450/月。10000+真实用户评价,帮你3秒找到最适合躺平的城市。">
     <meta name="keywords" content="躺平城市,宜居城市排行榜,低房租城市,数字游民,二三线城市,生活成本,房租对比,城市评分,中国城市排名,适合躺平的城市">
 
     <!-- Open Graph / 社交分享优化 -->
-    <meta property="og:title" content="躺平榜 - 3秒找到最适合躺平的城市">
+    <meta property="og:title" content="宜居城市指南 - 3秒找到最适合躺平的城市">
     <meta property="og:description" content="300+城市真实数据,最低房租¥450/月。大厂离职、北漂回老家,来这里找个二三线城市开启躺平新生活。">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://yourdomain.com/">
@@ -16,18 +16,18 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="躺平榜 - 3秒找到最适合躺平的城市">
+    <meta name="twitter:title" content="宜居城市指南 - 3秒找到最适合躺平的城市">
     <meta name="twitter:description" content="300+城市真实数据,最低房租¥450/月">
 
     <!-- 移动端优化 -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="躺平榜">
+    <meta name="apple-mobile-web-app-title" content="宜居城市指南">
 
     <!-- 搜索引擎优化 -->
     <meta name="robots" content="index, follow">
-    <meta name="author" content="躺平榜团队">
+    <meta name="author" content="宜居城市指南团队">
     <link rel="canonical" href="https://yourdomain.com/">
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -519,6 +519,15 @@
             border-bottom: none;
             margin-bottom: 0;
             padding-bottom: 0;
+        }
+
+        /* 中国专属筛选器 - 世界榜单时隐藏 */
+        .china-only-filter {
+            display: block;
+        }
+
+        .china-only-filter.hidden {
+            display: none;
         }
 
         .filter-section .filter-title {
@@ -1254,7 +1263,7 @@
         <div class="nav-container">
             <div class="logo">
                 <span>🏖️</span>
-                <span>躺平榜</span>
+                <span>宜居城市指南</span>
             </div>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#" class="nav-link">首页</a></li>
@@ -1322,7 +1331,7 @@
         <div class="tabs">
             <button class="tab" data-list-type="world">🌍 世界榜</button>
             <button class="tab" data-list-type="china_general">🏙️ 中国综合榜</button>
-            <button class="tab active" data-list-type="china_layflat">🏖️ 躺平榜</button>
+            <button class="tab active" data-list-type="china_layflat">🏖️ 宜居城市指南</button>
         </div>
 
         <!-- 【新增】热门城市模块 -->
@@ -1362,7 +1371,7 @@
             </div>
 
             <!-- 标签筛选 -->
-            <div class="filter-section">
+            <div class="filter-section china-only-filter">
                 <div class="filter-tags">
                     <div class="filter-tag" data-filter="seaside">🏖️ 看海</div>
                     <div class="filter-tag" data-filter="low_rent">💰 低房租</div>
@@ -1374,7 +1383,7 @@
                     <div class="filter-tag" data-filter="lake">🌊 临湖</div>
                 </div>
             <!-- 价格区间筛选 -->
-            <div class="filter-section">
+            <div class="filter-section china-only-filter">
                 <div class="filter-title">💰 租金区间</div>
                 <div class="filter-tags">
                     <div class="filter-tag" data-filter-type="rent" data-filter-value="0-500">¥500以下</div>
@@ -1386,7 +1395,7 @@
             </div>
 
             <!-- 地区筛选 -->
-            <div class="filter-section">
+            <div class="filter-section china-only-filter">
                 <div class="filter-title">📍 地区</div>
                 <div class="filter-tags">
                     <div class="filter-tag" data-filter-type="region" data-filter-value="华东">华东</div>
@@ -1400,7 +1409,7 @@
             </div>
 
             <!-- 城市等级 -->
-            <div class="filter-section">
+            <div class="filter-section china-only-filter">
                 <div class="filter-title">🏙️ 城市等级</div>
                 <div class="filter-tags">
                     <div class="filter-tag" data-filter-type="tier" data-filter-value="一线">一线城市</div>
@@ -1411,7 +1420,7 @@
             </div>
 
             <!-- 特色标签 -->
-            <div class="filter-section">
+            <div class="filter-section china-only-filter">
                 <div class="filter-title">✨ 特色</div>
                 <div class="filter-tags">
                     <div class="filter-tag" data-filter-type="feature" data-filter-value="seaside">🏖️ 看海</div>
@@ -1454,9 +1463,9 @@
         <div class="footer-container">
             <div class="footer-grid">
                 <div class="footer-section">
-                    <h3>关于躺平榜</h3>
+                    <h3>关于宜居城市指南</h3>
                     <p style="color: rgba(255,255,255,0.7); line-height: 1.8;">
-                        躺平榜致力于帮助年轻人找到最适合自己的宜居城市，
+                        宜居城市指南致力于帮助年轻人找到最适合自己的宜居城市，
                         通过多维度数据分析，让每个人都能找到理想的栖居之地。
                     </p>
                 </div>
@@ -1489,7 +1498,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 躺平榜. 让生活回归本质，发现属于你的理想之城.</p>
+                <p>&copy; 2024 宜居城市指南. 让生活回归本质，发现属于你的理想之城.</p>
             </div>
         </div>
     </footer>
@@ -1923,6 +1932,16 @@
                     tabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     currentListType = this.dataset.listType;
+
+                    // 根据榜单类型显示/隐藏中国专属筛选器
+                    const chinaOnlyFilters = document.querySelectorAll(".china-only-filter");
+                    if (currentListType === "world") {
+                        // 世界榜单：隐藏中国专属筛选器
+                        chinaOnlyFilters.forEach(filter => filter.classList.add("hidden"));
+                    } else {
+                        // 中国榜单：显示中国专属筛选器
+                        chinaOnlyFilters.forEach(filter => filter.classList.remove("hidden"));
+                    }
 
                     // 切换榜单时，重置省份筛选
                     const provinceSelect = document.getElementById('provinceSelect');
