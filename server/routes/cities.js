@@ -128,6 +128,8 @@ router.get('/', optionalAuth, async (req, res) => {
         // 海边城市
         if (filterObj.seaside) {
           whereClause += ' AND c.distance_to_sea < 10';
+        }
+
         // 【新增】租金区间筛选
         if (filterObj.rent) {
           if (filterObj.rent === '5000+') {
