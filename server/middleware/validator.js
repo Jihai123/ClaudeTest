@@ -124,8 +124,20 @@ const validateReply = [
 // ID参数验证
 const validateId = [
   param('id')
-    .isInt({ min: 1 })
-    .withMessage('无效的ID'),
+    .custom((value) => {
+      // 排除特殊路径（provinces等）
+      const specialPaths = ['provinces', 'hot', 'compare'];
+      if (specialPaths.includes(value)) {
+        // 这些路径有自己的路由处理，跳过ID验证
+        return true;
+      }
+      // 其他情况必须是正整数
+      const numValue = parseInt(value, 10);
+      if (!Number.isInteger(numValue) || numValue < 1) {
+        throw new Error('无效的ID');
+      }
+      return true;
+    }),
   handleValidationErrors
 ];
 
