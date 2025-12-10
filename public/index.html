@@ -51,6 +51,7 @@
             --gray: #6b7280;
             --light-gray: #f3f4f6;
             --white: #ffffff;
+            --text-secondary: #6b7280;
             --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -2447,15 +2448,19 @@
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
 
-        // 打开登录模态框
-        loginBtn.addEventListener('click', () => {
-            loginModal.style.display = 'flex';
-        });
+        // 打开登录模态框（只在按钮存在时添加）
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                loginModal.style.display = 'flex';
+            });
+        }
 
-        // 打开注册模态框
-        registerBtn.addEventListener('click', () => {
-            registerModal.style.display = 'flex';
-        });
+        // 打开注册模态框（只在按钮存在时添加）
+        if (registerBtn) {
+            registerBtn.addEventListener('click', () => {
+                registerModal.style.display = 'flex';
+            });
+        }
 
         // 关闭登录模态框
         closeLoginModal.addEventListener('click', () => {
