@@ -1379,18 +1379,6 @@
                 </div>
             </div>
 
-            <!-- 标签筛选 -->
-            <div class="filter-section china-only-filter">
-                <div class="filter-tags">
-                    <div class="filter-tag" data-filter="seaside">🏖️ 看海</div>
-                    <div class="filter-tag" data-filter="low_rent">💰 低房租</div>
-                    <div class="filter-tag" data-filter="spring_climate">🌡️ 四季如春</div>
-                    <div class="filter-tag" data-filter="quiet">🤫 安静</div>
-                    <div class="filter-tag" data-filter="medical">🏥 医疗好</div>
-                    <div class="filter-tag" data-filter="digital_nomad">💻 数字游民</div>
-                    <div class="filter-tag" data-filter="mountain">🏔️ 山居</div>
-                    <div class="filter-tag" data-filter="lake">🌊 临湖</div>
-                </div>
             <!-- 价格区间筛选 -->
             <div class="filter-section china-only-filter">
                 <div class="filter-title">💰 租金区间</div>
@@ -1952,12 +1940,8 @@
                         chinaOnlyFilters.forEach(filter => filter.classList.remove("hidden"));
                     }
 
-                    // 切换榜单时，重置省份筛选
-                    const provinceSelect = document.getElementById('provinceSelect');
-                    if (provinceSelect) {
-                        provinceSelect.value = '';
-                        delete activeFilters.province;
-                    }
+                    // 切换榜单时，重新加载省份/国家列表
+                    loadProvinceFilter();
 
                     loadCities();
                 });
@@ -2112,32 +2096,66 @@
             loadCities();
         }
 
-        // 初始化省份筛选器
+        // 初始化省份/国家筛选器
         async function initProvinceFilter() {
-            try {
-                const data = await apiRequest('/api/cities/provinces');
-                const provinceSelect = document.getElementById('provinceSelect');
+            await loadProvinceFilter();
 
-                if (data.provinces && data.provinces.length > 0) {
-                    data.provinces.forEach(province => {
+            // 添加省份/国家选择事件监听器（只绑定一次）
+            const provinceSelect = document.getElementById('provinceSelect');
+            provinceSelect.addEventListener('change', function() {
+                // 清除之前的省份/国家筛选
+                delete activeFilters.province;
+                delete activeFilters.country;
+
+                if (this.value) {
+                    // 根据当前榜单类型决定使用province还是country
+                    if (currentListType === 'world') {
+                        activeFilters.country = this.value;
+                    } else {
+                        activeFilters.province = this.value;
+                    }
+                }
+                loadCities();
+            });
+        }
+
+        // 加载省份/国家列表（根据榜单类型动态加载）
+        async function loadProvinceFilter() {
+            try {
+                const data = await apiRequest(`/api/cities/provinces?list_type=${currentListType}`);
+                const provinceSelect = document.getElementById('provinceSelect');
+                const provinceLabel = document.querySelector('.province-label');
+
+                // 清空现有选项（保留第一个默认选项）
+                while (provinceSelect.options.length > 1) {
+                    provinceSelect.remove(1);
+                }
+
+                // 重置选择
+                provinceSelect.value = '';
+                delete activeFilters.province;
+                delete activeFilters.country;
+
+                // 更新标签和默认选项
+                if (data.type === 'country') {
+                    provinceLabel.textContent = '🌍 ' + data.label + '：';
+                    provinceSelect.options[0].textContent = '全部国家';
+                } else {
+                    provinceLabel.textContent = '📍 ' + data.label + '：';
+                    provinceSelect.options[0].textContent = '全部省份';
+                }
+
+                // 添加选项
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
                         const option = document.createElement('option');
-                        option.value = province;
-                        option.textContent = province;
+                        option.value = item;
+                        option.textContent = item;
                         provinceSelect.appendChild(option);
                     });
                 }
-
-                // 添加省份选择事件监听器
-                provinceSelect.addEventListener('change', function() {
-                    if (this.value) {
-                        activeFilters.province = this.value;
-                    } else {
-                        delete activeFilters.province;
-                    }
-                    loadCities();
-                });
             } catch (error) {
-                console.error('加载省份列表失败:', error);
+                console.error('加载省份/国家列表失败:', error);
             }
         }
 
@@ -2167,6 +2185,8 @@
                 loading.style.display = 'none';
 
                 if (data.cities && data.cities.length > 0) {
+                    // 清除推荐提示（如果有的话）
+                    clearRecommendHint();
                     cities = data.cities;
                     updateStats(cities);
                     renderCities(cities);
@@ -2183,10 +2203,21 @@
             }
         }
 
+        // 清除推荐提示元素
+        function clearRecommendHint() {
+            const existingHint = document.getElementById('recommendHint');
+            if (existingHint) {
+                existingHint.remove();
+            }
+        }
+
         // 【新增】加载备用推荐城市
         async function loadFallbackCities() {
             const emptyState = document.getElementById('emptyState');
             const grid = document.getElementById('citiesGrid');
+
+            // 先清除之前的推荐提示
+            clearRecommendHint();
 
             try {
                 // 尝试加载其他榜单的热门城市作为推荐
@@ -2221,8 +2252,9 @@
                     updateStats(cities);
                     renderCities(cities);
 
-                    // 在城市网格上方添加推荐提示
+                    // 在城市网格上方添加推荐提示（带固定ID，避免重复）
                     const recommendHint = document.createElement('div');
+                    recommendHint.id = 'recommendHint';
                     recommendHint.style.cssText = `
                         background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
                         padding: 1rem 2rem;
