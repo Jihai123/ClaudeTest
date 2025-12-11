@@ -125,6 +125,12 @@ router.get('/', optionalAuth, async (req, res) => {
           params.push(filterObj.province);
         }
 
+        // 国家筛选（用于世界榜单）
+        if (filterObj.country) {
+          whereClause += ' AND c.country = ?';
+          params.push(filterObj.country);
+        }
+
         // 海边城市
         if (filterObj.seaside) {
           whereClause += ' AND c.distance_to_sea < 10';
@@ -181,55 +187,39 @@ router.get('/', optionalAuth, async (req, res) => {
           }
         }
 
-        // 【重构】特色标签筛选 - 支持数组
+        // 【重构】特色标签筛选 - 使用city_tags表进行筛选
         const features = filterObj.features || [];
 
-        // 海边城市
-        if (features.includes('seaside')) {
-          whereClause += ' AND c.distance_to_sea < 10';
+        if (features.length > 0) {
+          // 使用子查询检查城市是否有对应的标签
+          const tagPlaceholders = features.map(() => '?').join(',');
+          whereClause += ` AND c.id IN (
+            SELECT DISTINCT city_id FROM city_tags
+            WHERE tag_key IN (${tagPlaceholders})
+          )`;
+          params.push(...features);
         }
 
-        // 四季如春
-        if (features.includes('spring_climate')) {
-          whereClause += ' AND c.avg_temp BETWEEN 15 AND 25';
-        }
+        // 【兼容旧版】保留旧的 boolean 筛选方式支持（同样使用city_tags）
+        const legacyFeatures = [];
+        if (filterObj.seaside) legacyFeatures.push('seaside');
+        if (filterObj.low_rent) legacyFeatures.push('low_rent');
+        if (filterObj.spring_climate) legacyFeatures.push('spring_climate');
+        if (filterObj.quiet) legacyFeatures.push('quiet');
+        if (filterObj.medical) legacyFeatures.push('medical');
+        if (filterObj.digital_nomad) legacyFeatures.push('digital_nomad');
+        if (filterObj.elderly) legacyFeatures.push('elderly_friendly');
+        if (filterObj.lake) legacyFeatures.push('lake');
+        if (filterObj.mountain) legacyFeatures.push('mountain');
 
-        // 安静(人口少)
-        if (features.includes('quiet')) {
-          whereClause += ' AND c.population < 500000';
+        if (legacyFeatures.length > 0) {
+          const legacyPlaceholders = legacyFeatures.map(() => '?').join(',');
+          whereClause += ` AND c.id IN (
+            SELECT DISTINCT city_id FROM city_tags
+            WHERE tag_key IN (${legacyPlaceholders})
+          )`;
+          params.push(...legacyFeatures);
         }
-
-        // 医疗完善
-        if (features.includes('medical')) {
-          whereClause += ' AND cd.medical_access >= 7';
-        }
-
-        // 数字游民友好
-        if (features.includes('digital_nomad')) {
-          whereClause += ' AND c.digital_nomad_score >= 7';
-        }
-
-        // 临湖
-        if (features.includes('lake')) {
-          whereClause += ' AND c.has_lake = 1';
-        }
-
-        // 山居
-        if (features.includes('mountain')) {
-          whereClause += ' AND c.altitude BETWEEN 800 AND 2000';
-        }
-
-        // 【兼容旧版】保留旧的 boolean 筛选方式支持
-        if (filterObj.seaside) whereClause += ' AND c.distance_to_sea < 10';
-        if (filterObj.low_rent) whereClause += ' AND c.avg_rent < 1000';
-        if (filterObj.super_low_rent) whereClause += ' AND c.avg_rent < 500';
-        if (filterObj.spring_climate) whereClause += ' AND c.avg_temp BETWEEN 15 AND 25';
-        if (filterObj.quiet) whereClause += ' AND c.population < 500000';
-        if (filterObj.medical) whereClause += ' AND cd.medical_access >= 7';
-        if (filterObj.digital_nomad) whereClause += ' AND c.digital_nomad_score >= 7';
-        if (filterObj.elderly) whereClause += ' AND cd.elderly_care >= 8';
-        if (filterObj.lake) whereClause += ' AND c.has_lake = 1';
-        if (filterObj.mountain) whereClause += ' AND c.altitude BETWEEN 800 AND 2000';
 
       } catch (e) {
         console.warn('筛选条件解析失败:', e);
@@ -308,20 +298,59 @@ router.get('/', optionalAuth, async (req, res) => {
   }
 });
 
-// 获取省份列表（必须在/:id路由之前）
+// 获取省份/国家列表（必须在/:id路由之前）
+// 根据榜单类型返回不同的地理筛选选项
 router.get('/provinces', async (req, res) => {
   try {
-    const provinces = await db.query(
-      `SELECT DISTINCT province
-       FROM cities
-       WHERE province IS NOT NULL AND province != '' AND country = '中国'
-       ORDER BY province`
-    );
+    const { list_type } = req.query;
 
-    res.json({ provinces: provinces.map(p => p.province) });
+    if (list_type === 'world') {
+      // 世界榜单：返回国家列表
+      const countries = await db.query(
+        `SELECT DISTINCT country
+         FROM cities
+         WHERE country IS NOT NULL AND country != '' AND list_type = 'world'
+         ORDER BY country`
+      );
+
+      // 如果没有world类型的城市，返回所有非中国的国家
+      if (countries.length === 0) {
+        const allCountries = await db.query(
+          `SELECT DISTINCT country
+           FROM cities
+           WHERE country IS NOT NULL AND country != '' AND country != '中国'
+           ORDER BY country`
+        );
+        res.json({
+          type: 'country',
+          label: '选择国家',
+          items: allCountries.map(c => c.country)
+        });
+      } else {
+        res.json({
+          type: 'country',
+          label: '选择国家',
+          items: countries.map(c => c.country)
+        });
+      }
+    } else {
+      // 中国榜单：返回省份列表
+      const provinces = await db.query(
+        `SELECT DISTINCT province
+         FROM cities
+         WHERE province IS NOT NULL AND province != '' AND country = '中国'
+         ORDER BY province`
+      );
+
+      res.json({
+        type: 'province',
+        label: '选择省份',
+        items: provinces.map(p => p.province)
+      });
+    }
   } catch (error) {
-    console.error('获取省份列表失败:', error);
-    res.status(500).json({ error: '获取省份列表失败' });
+    console.error('获取省份/国家列表失败:', error);
+    res.status(500).json({ error: '获取省份/国家列表失败' });
   }
 });
 
@@ -351,6 +380,46 @@ router.get('/:id', validateId, async (req, res) => {
       WHERE city_id = ? AND status = 'approved'`,
       [req.params.id]
     );
+
+    // 计算综合评分（结合系统评分和用户评分）
+    const reviewCount = reviewStats.total_reviews || 0;
+    const avgRating = reviewStats.avg_rating || 0;
+    const userScoreMapped = avgRating * 2; // 用户评分映射到10分制
+
+    // 根据评价数量确定权重
+    let userWeight = 0;
+    if (reviewCount < 5) userWeight = 0.1;
+    else if (reviewCount < 20) userWeight = 0.2;
+    else if (reviewCount < 50) userWeight = 0.3;
+    else userWeight = 0.4;
+    const systemWeight = 1 - userWeight;
+
+    // 根据榜单类型选择系统评分
+    let systemScore;
+    if (city.list_type === 'world') {
+      systemScore = city.world_score || 0;
+    } else if (city.list_type === 'china_layflat') {
+      systemScore = city.layflat_score || 0;
+    } else {
+      systemScore = city.overall_score || 0;
+    }
+
+    // 计算综合评分
+    let combinedScore = reviewCount === 0
+      ? systemScore
+      : systemScore * systemWeight + userScoreMapped * userWeight;
+    combinedScore = Math.round(combinedScore * 100) / 100;
+
+    // 评分详情
+    const scoreBreakdown = {
+      system_score: systemScore,
+      user_score: reviewCount > 0 ? userScoreMapped : null,
+      user_rating_original: reviewCount > 0 ? avgRating : null,
+      review_count: reviewCount,
+      user_weight: userWeight,
+      system_weight: systemWeight,
+      combined_score: combinedScore
+    };
 
     // 获取城市标签
     const tags = await db.query(
@@ -384,6 +453,7 @@ router.get('/:id', validateId, async (req, res) => {
     res.json({
       ...city,
       review_stats: reviewStats,
+      score_breakdown: scoreBreakdown,
       tags,
       images,
       cover_image: coverImage

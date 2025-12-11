@@ -5,6 +5,100 @@ const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateReview, validateReply, validateId } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
 
+/**
+ * 计算城市的综合评分（结合系统评分和用户评分）
+ *
+ * 加权公式：综合评分 = 系统评分 × 系统权重 + 用户平均评分 × 用户权重
+ * 权重动态调整：评价数量越多，用户评分权重越大
+ *   - 评价数 < 5：用户权重 = 10%
+ *   - 5 <= 评价数 < 20：用户权重 = 20%
+ *   - 20 <= 评价数 < 50：用户权重 = 30%
+ *   - 评价数 >= 50：用户权重 = 40%
+ *
+ * 用户评分（1-5分）会被映射到10分制
+ *
+ * 注意：此函数不会修改数据库中的系统评分，而是返回综合评分信息
+ * 供前端展示使用。这样可以保留原始的系统评分数据。
+ */
+async function calculateCombinedScore(cityId) {
+  try {
+    // 获取城市当前的系统评分
+    const city = await db.get(
+      'SELECT overall_score, layflat_score, world_score, list_type FROM cities WHERE id = ?',
+      [cityId]
+    );
+
+    if (!city) {
+      return null;
+    }
+
+    // 获取城市的用户评价统计
+    const reviewStats = await db.get(
+      `SELECT COUNT(*) as review_count, AVG(rating) as avg_rating
+       FROM reviews
+       WHERE city_id = ? AND status = 'approved'`,
+      [cityId]
+    );
+
+    const reviewCount = reviewStats.review_count || 0;
+    const avgRating = reviewStats.avg_rating || 0;
+
+    // 将用户评分（1-5分）映射到10分制
+    const userScoreMapped = avgRating * 2;
+
+    // 根据评价数量确定用户评分权重
+    let userWeight = 0;
+    if (reviewCount < 5) {
+      userWeight = 0.1;
+    } else if (reviewCount < 20) {
+      userWeight = 0.2;
+    } else if (reviewCount < 50) {
+      userWeight = 0.3;
+    } else {
+      userWeight = 0.4;
+    }
+    const systemWeight = 1 - userWeight;
+
+    // 根据榜单类型选择对应的系统评分
+    let systemScore;
+    if (city.list_type === 'world') {
+      systemScore = city.world_score || 0;
+    } else if (city.list_type === 'china_layflat') {
+      systemScore = city.layflat_score || 0;
+    } else {
+      systemScore = city.overall_score || 0;
+    }
+
+    // 计算综合评分
+    let combinedScore;
+    if (reviewCount === 0) {
+      combinedScore = systemScore;
+    } else {
+      combinedScore = systemScore * systemWeight + userScoreMapped * userWeight;
+    }
+
+    // 保留两位小数
+    combinedScore = Math.round(combinedScore * 100) / 100;
+
+    return {
+      system_score: systemScore,
+      user_score: userScoreMapped,
+      user_rating_original: avgRating, // 原始的1-5分
+      review_count: reviewCount,
+      user_weight: userWeight,
+      system_weight: systemWeight,
+      combined_score: combinedScore
+    };
+
+  } catch (error) {
+    console.error(`计算城市综合评分失败 [ID: ${cityId}]:`, error);
+    return null;
+  }
+}
+
+// 导出计算函数供其他模块使用
+module.exports.calculateCombinedScore = calculateCombinedScore;
+
 // 获取城市的评价列表
 router.get('/city/:cityId', optionalAuth, async (req, res) => {
   try {
@@ -90,9 +184,13 @@ router.post('/', verifyToken, validateReview, async (req, res) => {
       [city_id, req.user.id, rating, comment || null]
     );
 
+    // 计算并返回新的综合评分
+    const scoreInfo = await calculateCombinedScore(city_id);
+
     res.status(201).json({
       message: '评价提交成功',
-      review_id: result.id
+      review_id: result.id,
+      score_info: scoreInfo
     });
   } catch (error) {
     console.error('创建评价失败:', error);
@@ -120,7 +218,10 @@ router.put('/:id', verifyToken, validateId, validateReview, async (req, res) => 
       [rating, comment || null, req.params.id]
     );
 
-    res.json({ message: '评价更新成功' });
+    // 计算并返回新的综合评分
+    const scoreInfo = await calculateCombinedScore(review.city_id);
+
+    res.json({ message: '评价更新成功', score_info: scoreInfo });
   } catch (error) {
     console.error('更新评价失败:', error);
     res.status(500).json({ error: '更新评价失败' });
@@ -140,9 +241,14 @@ router.delete('/:id', verifyToken, validateId, async (req, res) => {
       return res.status(403).json({ error: '无权限删除此评价' });
     }
 
+    const cityId = review.city_id; // 保存城市ID，删除后需要用到
+
     await db.run('DELETE FROM reviews WHERE id = ?', [req.params.id]);
 
-    res.json({ message: '评价删除成功' });
+    // 计算并返回新的综合评分
+    const scoreInfo = await calculateCombinedScore(cityId);
+
+    res.json({ message: '评价删除成功', score_info: scoreInfo });
   } catch (error) {
     console.error('删除评价失败:', error);
     res.status(500).json({ error: '删除评价失败' });
