@@ -2136,18 +2136,22 @@
                 delete activeFilters.province;
                 delete activeFilters.country;
 
+                // 兼容新旧API格式
+                const isCountry = data.type === 'country';
+                const items = data.items || data.provinces || [];
+
                 // 更新标签和默认选项
-                if (data.type === 'country') {
-                    provinceLabel.textContent = '🌍 ' + data.label + '：';
+                if (isCountry) {
+                    provinceLabel.textContent = '🌍 选择国家：';
                     provinceSelect.options[0].textContent = '全部国家';
                 } else {
-                    provinceLabel.textContent = '📍 ' + data.label + '：';
+                    provinceLabel.textContent = '📍 选择省份：';
                     provinceSelect.options[0].textContent = '全部省份';
                 }
 
                 // 添加选项
-                if (data.items && data.items.length > 0) {
-                    data.items.forEach(item => {
+                if (items && items.length > 0) {
+                    items.forEach(item => {
                         const option = document.createElement('option');
                         option.value = item;
                         option.textContent = item;
