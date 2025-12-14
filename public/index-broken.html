@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宜居城市指南 - 发现你的理想生活之城 | 智能筛选 · 真实数据 · 躺平首选</title>
+    <meta name="description" content="300+精选城市,10000+真实评价。用数据找到最适合你的躺平之城,最低房租¥450/月起。AI智能推荐+多维度筛选,3秒找到理想生活。">
+    <meta name="keywords" content="躺平城市,宜居城市,低房租,数字游民,二三线城市,生活成本,城市评分">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="宜居城市指南 - 发现你的理想生活之城">
+    <meta property="og:description" content="300+精选城市,10000+真实评价,最低房租¥450/月">
+    <meta property="og:type" content="website">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* ==================== SVG 图标系统 ==================== */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
+        }
+
+        /* ==================== 基础设置 ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* 主色调 */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --accent: #14b8a6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+
+            /* 中性色 */
+            --dark: #0f172a;
+            --gray-900: #1e293b;
+            --gray-800: #334155;
+            --gray-700: #475569;
+            --gray-600: #64748b;
+            --gray-500: #94a3b8;
+            --gray-400: #cbd5e1;
+            --gray-300: #e2e8f0;
+            --gray-200: #f1f5f9;
+            --gray-100: #f8fafc;
+            --white: #ffffff;
+
+            /* 渐变色 */
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+
+            /* 阴影 */
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 30px 0 rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 50px 0 rgba(0, 0, 0, 0.15);
+
+            /* 圆角 */
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-2xl: 2rem;
+            --radius-full: 9999px;
+
+            /* 过渡 */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.3s ease;
+            --transition-slow: 0.5s ease;
+
+            /* 字体 */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+
+        /* 暗黑模式 */
+        [data-theme="dark"] {
+            --dark: #f8fafc;
+            --gray-900: #f1f5f9;
+            --gray-800: #e2e8f0;
+            --gray-700: #cbd5e1;
+            --gray-600: #94a3b8;
+            --gray-500: #64748b;
+            --gray-400: #475569;
+            --gray-300: #334155;
+            --gray-200: #1e293b;
+            --gray-100: #0f172a;
+            --white: #020617;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--gray-100);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* ==================== 导航栏 ==================== */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--gray-300);
+            transition: all var(--transition-base);
+        }
+
+        .navbar.scrolled {
+            box-shadow: var(--shadow-md);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom-color: var(--gray-300);
+        }
+
+        [data-theme="dark"] .navbar.scrolled {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: transform var(--transition-base);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color var(--transition-base);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width var(--transition-base);
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-base);
+            color: var(--gray-600);
+            font-size: 1.25rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--gray-200);
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.75rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 2.5px;
+            background: var(--dark);
+            border-radius: var(--radius-full);
+            transition: all var(--transition-base);
+        }
+
+        /* ==================== Hero 区域 ==================== */
+        .hero {
+            background: var(--gradient-hero);
+            padding: 8rem 2rem 6rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(20, 184, 166, 0.2) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.5rem;
+            border-radius: var(--radius-full);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero .highlight {
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.35rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            line-height: 1.8;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .btn-hero {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .hero-search {
+            max-width: 650px;
+            margin: 3rem auto 0;
+            animation: fadeInUp 0.8s ease 0.8s both;
+        }
+
+        .search-wrapper {
+            display: flex;
+            background: white;
+            border-radius: var(--radius-full);
+            padding: 0.5rem;
+            box-shadow: var(--shadow-xl);
+            transition: all var(--transition-base);
+        }
+
+        .search-wrapper:focus-within {
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.05rem;
+            color: var(--dark);
+            background: transparent;
+        }
+
+        .search-input::placeholder {
+            color: var(--gray-500);
+        }
+
+        .search-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* ==================== 统计卡片 ==================== */
+        .stats-section {
+            max-width: 1400px;
+            margin: -4rem auto 4rem;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2.5rem 2rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            transition: all var(--transition-base);
+            border: 1px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform var(--transition-base);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        [data-theme="dark"] .stat-card {
+            background: var(--gray-200);
+            border-color: var(--gray-300);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: var(--gradient-secondary);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: var(--gradient-accent);
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-card:nth-child(2) .stat-value {
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card:nth-child(3) .stat-value {
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .section {
+            margin-bottom: 5rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ==================== 筛选器 ==================== */
+        .filters-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 3rem;
+        }
+
+        [data-theme="dark"] .filters-section {
+            background: var(--gray-200);
+        }
+
+        .filter-group {
+            margin-bottom: 2rem;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-tag {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-full);
+            background: var(--gray-100);
+            color: var(--dark);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-weight: 600;
+            border: 2px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .filter-tag:hover {
+            background: var(--gray-200);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-tag.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--shadow-md);
+        }
+
+        [data-theme="dark"] .filter-tag {
+            background: var(--gray-300);
+        }
+
+        [data-theme="dark"] .filter-tag:hover {
+            background: var(--gray-400);
+        }
+
+        /* ==================== 城市卡片 ==================== */
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .city-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+            position: relative;
+        }
+
+        .city-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        [data-theme="dark"] .city-card {
+            background: var(--gray-200);
+            border-color: var(--gray-300);
+        }
+
+        .city-image {
+            height: 200px;
+            background: var(--gradient-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-card:nth-child(2n) .city-image {
+            background: var(--gradient-secondary);
+        }
+
+        .city-card:nth-child(3n) .city-image {
+            background: var(--gradient-accent);
+        }
+
+        .city-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+        }
+
+        .city-rank {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .city-score-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-lg);
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .city-icon-placeholder {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .city-content {
+            padding: 2rem;
+        }
+
+        .city-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .city-name {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .city-province {
+            color: var(--gray-600);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .city-rent {
+            background: var(--gray-100);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        [data-theme="dark"] .city-rent {
+            background: var(--gray-300);
+        }
+
+        .city-rent-label {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .city-rent-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .city-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .city-tag {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            background: var(--gray-100);
+            color: var(--dark);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        [data-theme="dark"] .city-tag {
+            background: var(--gray-300);
+        }
+
+        .city-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .city-stat {
+            text-align: center;
+        }
+
+        .city-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .city-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+        }
+
+        /* ==================== 模态框 ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.95);
+            transition: transform var(--transition-base);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-base);
+            color: var(--gray-600);
+            font-size: 1.5rem;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--dark);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* ==================== 加载动画 ==================== */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==================== 通知 ==================== */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            max-width: 400px;
+            padding: 1.25rem 1.75rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            z-index: 10000;
+            transform: translateX(500px);
+            opacity: 0;
+            transition: all var(--transition-base);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .notification-error {
+            background: var(--danger);
+            color: white;
+        }
+
+        .notification-info {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ==================== 页脚 ==================== */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 4rem 2rem 2rem;
+            margin-top: 6rem;
+        }
+
+        [data-theme="dark"] .footer {
+            background: var(--gray-200);
+            color: var(--dark);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color var(--transition-base);
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        [data-theme="dark"] .footer-section a {
+            color: var(--gray-600);
+        }
+
+        [data-theme="dark"] .footer-section a:hover {
+            color: var(--dark);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        [data-theme="dark"] .footer-bottom {
+            border-top-color: var(--gray-300);
+            color: var(--gray-600);
+        }
+
+        /* ==================== 响应式 ==================== */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .cities-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow-lg);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all var(--transition-base);
+                gap: 1.5rem;
+            }
+
+            [data-theme="dark"] .nav-menu {
+                background: var(--gray-200);
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .hero {
+                padding: 5rem 1.5rem 4rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn-hero {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .cities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .filters-section {
+                padding: 1.5rem;
+            }
+
+            .notification {
+                left: 1rem;
+                right: 1rem;
+                max-width: none;
+            }
+        }
+
+        /* ==================== 滚动动画 ==================== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">🏙</div>
+                <span>宜居城市指南</span>
+            </div>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="/" class="nav-link">首页</a></li>
+                <li><a href="#rankings" class="nav-link">城市榜单</a></li>
+                <li><a href="#compare" class="nav-link">城市对比</a></li>
+                <li><a href="#about" class="nav-link">关于</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" title="切换主题">
+                    🌙
+                </button>
+                <button class="btn btn-outline" id="loginBtn">登录</button>
+                <button class="btn btn-primary" id="registerBtn">
+                    <span>📝</span>
+                    <span>注册</span>
+                </button>
+                <button class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>🔥</span>
+                <span id="heroBadgeText">已帮助 50,000+ 用户找到理想城市</span>
+            </div>
+
+            <h1>
+                发现你的<span class="highlight">理想生活之城</span>
+            </h1>
+
+            <p>
+                基于真实数据和用户评价,智能推荐最适合你的宜居城市。
+                低房租、好环境、慢节奏——开启你的躺平新生活。
+            </p>
+
+            <div class="hero-buttons">
+                <button class="btn btn-hero btn-white" onclick="document.getElementById('citiesGrid').scrollIntoView({behavior: 'smooth'})">
+                    <span>🔍</span>
+                    <span>立即探索</span>
+                </button>
+                <button class="btn btn-hero btn-glass" onclick="document.getElementById('citiesGrid').scrollIntoView({behavior: 'smooth'})">
+                    <span>📊</span>
+                    <span>查看榜单</span>
+                </button>
+            </div>
+
+            <div class="hero-search">
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索城市名称、省份或特色标签...">
+                    <button class="search-btn" id="searchBtn">
+                        <span>🔍</span>
+                        搜索
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 统计数据 -->
+    <section class="stats-section">
+        <div class="stats-grid scroll-reveal">
+            <div class="stat-card">
+                <div class="stat-icon">🏙</div>
+                <div class="stat-value" id="totalCities">300+</div>
+                <div class="stat-label">精选城市</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-value" id="totalReviews">10,000+</div>
+                <div class="stat-label">真实评价</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="minRent">¥450</div>
+                <div class="stat-label">最低月租</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <!-- 筛选器 -->
+        <section class="section scroll-reveal">
+            <div class="filters-section">
+                <div class="filter-group">
+                    <div class="filter-label">
+                        <span>📍</span>
+                        <span>选择省份</span>
+                    </div>
+                    <div class="filter-tags" id="provinceFilters">
+                        <div class="filter-tag active" data-filter="all">全部</div>
+                        <!-- 动态加载省份 -->
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">
+                        <span>🏷️</span>
+                        <span>城市特色</span>
+                    </div>
+                    <div class="filter-tags" id="featureFilters">
+                        <!-- 动态加载特色标签 -->
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">
+                        <span>💵</span>
+                        <span>月租预算</span>
+                    </div>
+                    <div class="filter-tags" id="rentFilters">
+                        <div class="filter-tag active" data-rent="all">全部</div>
+                        <div class="filter-tag" data-rent="0-500">&lt; ¥500</div>
+                        <div class="filter-tag" data-rent="500-1000">¥500 - ¥1000</div>
+                        <div class="filter-tag" data-rent="1000-2000">¥1000 - ¥2000</div>
+                        <div class="filter-tag" data-rent="2000-99999">&gt; ¥2000</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 城市列表 -->
+        <section class="section scroll-reveal">
+            <div class="section-header">
+                <h2 class="section-title">热门推荐城市</h2>
+                <p class="section-subtitle">基于用户评价和综合数据,为你精选最宜居的城市</p>
+            </div>
+
+            <div class="cities-grid" id="citiesGrid">
+                <!-- 动态加载城市卡片 -->
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>加载中...</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;" id="loadMoreContainer" class="hidden">
+                <button class="btn btn-outline btn-hero" id="loadMoreBtn">
+                    <span>⬇️</span>
+                    加载更多城市
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- 城市详情模态框 -->
+    <div class="modal-overlay" id="cityModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalCityName">城市详情</h2>
+                <button class="modal-close" onclick="closeCityModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalCityContent">
+                <!-- 动态加载城市详情 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知容器 -->
+    <div id="notificationContainer"></div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>关于我们</h4>
+                <ul>
+                    <li><a href="#">项目介绍</a></li>
+                    <li><a href="#">团队成员</a></li>
+                    <li><a href="#">联系我们</a></li>
+                    <li><a href="#">加入我们</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>数据维度</h4>
+                <ul>
+                    <li><a href="#">生活成本</a></li>
+                    <li><a href="#">空气质量</a></li>
+                    <li><a href="#">医疗设施</a></li>
+                    <li><a href="#">就业机会</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>帮助中心</h4>
+                <ul>
+                    <li><a href="#">使用指南</a></li>
+                    <li><a href="#">常见问题</a></li>
+                    <li><a href="#">数据说明</a></li>
+                    <li><a href="#">隐私政策</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>关注我们</h4>
+                <ul>
+                    <li><a href="#">微信公众号</a></li>
+                    <li><a href="#">新浪微博</a></li>
+                    <li><a href="#">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 宜居城市指南. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
