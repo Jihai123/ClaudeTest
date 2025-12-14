@@ -12,10 +12,19 @@
     <meta property="og:description" content="300+精选城市,10000+真实评价,最低房租¥450/月">
     <meta property="og:type" content="website">
 
-    <!-- 图标库 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
 
     <style>
+        /* ==================== SVG 图标系统 ==================== */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
+        }
+
         /* ==================== 基础设置 ==================== */
         * {
             margin: 0;
@@ -24,7 +33,7 @@
         }
 
         :root {
-            /* 主色调 - 现代渐变色 */
+            /* 主色调 */
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --primary-light: #818cf8;
@@ -78,7 +87,7 @@
             --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
         }
 
-        /* 暗黑模式颜色 */
+        /* 暗黑模式 */
         [data-theme="dark"] {
             --dark: #f8fafc;
             --gray-900: #f1f5f9;
@@ -159,11 +168,16 @@
             transform: scale(1.05);
         }
 
-        .logo i {
+        .logo-icon {
+            width: 32px;
+            height: 32px;
             background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.8rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
         }
 
         .nav-menu {
@@ -221,6 +235,7 @@
             justify-content: center;
             transition: all var(--transition-base);
             color: var(--gray-600);
+            font-size: 1.25rem;
         }
 
         .theme-toggle:hover {
@@ -419,7 +434,6 @@
             transform: translateY(-3px);
         }
 
-        /* 搜索框 */
         .hero-search {
             max-width: 650px;
             margin: 3rem auto 0;
@@ -635,10 +649,6 @@
             gap: 0.5rem;
         }
 
-        .filter-label i {
-            color: var(--primary);
-        }
-
         .filter-tags {
             display: flex;
             flex-wrap: wrap;
@@ -761,7 +771,7 @@
             box-shadow: var(--shadow-md);
         }
 
-        .city-icon {
+        .city-icon-placeholder {
             position: absolute;
             bottom: 1rem;
             left: 50%;
@@ -843,10 +853,6 @@
             background: var(--gray-300);
         }
 
-        .city-tag i {
-            font-size: 0.75rem;
-        }
-
         .city-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -871,6 +877,84 @@
             color: var(--gray-600);
         }
 
+        /* ==================== 模态框 ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.95);
+            transition: transform var(--transition-base);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-base);
+            color: var(--gray-600);
+            font-size: 1.5rem;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--dark);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
         /* ==================== 加载动画 ==================== */
         .loading {
             text-align: center;
@@ -889,6 +973,41 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        /* ==================== 通知 ==================== */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            max-width: 400px;
+            padding: 1.25rem 1.75rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            z-index: 10000;
+            transform: translateX(500px);
+            opacity: 0;
+            transition: all var(--transition-base);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .notification-error {
+            background: var(--danger);
+            color: white;
+        }
+
+        .notification-info {
+            background: var(--primary);
+            color: white;
         }
 
         /* ==================== 页脚 ==================== */
@@ -957,7 +1076,7 @@
             color: var(--gray-600);
         }
 
-        /* ==================== 响应式设计 ==================== */
+        /* ==================== 响应式 ==================== */
         @media (max-width: 1024px) {
             .hero h1 {
                 font-size: 3rem;
@@ -1033,6 +1152,12 @@
             .filters-section {
                 padding: 1.5rem;
             }
+
+            .notification {
+                left: 1rem;
+                right: 1rem;
+                max-width: none;
+            }
         }
 
         /* ==================== 滚动动画 ==================== */
@@ -1047,19 +1172,8 @@
             transform: translateY(0);
         }
 
-        /* ==================== 实用类 ==================== */
-        .text-gradient {
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -1067,25 +1181,25 @@
     <!-- 导航栏 -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-city"></i>
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">🏙</div>
                 <span>宜居城市指南</span>
             </div>
 
             <ul class="nav-menu" id="navMenu">
-                <li><a href="#home" class="nav-link">首页</a></li>
+                <li><a href="/" class="nav-link">首页</a></li>
                 <li><a href="#rankings" class="nav-link">城市榜单</a></li>
                 <li><a href="#compare" class="nav-link">城市对比</a></li>
-                <li><a href="#about" class="nav-link">关于我们</a></li>
+                <li><a href="#about" class="nav-link">关于</a></li>
             </ul>
 
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" title="切换主题">
-                    <i class="fas fa-moon"></i>
+                    🌙
                 </button>
-                <button class="btn btn-outline">登录</button>
-                <button class="btn btn-primary">
-                    <i class="fas fa-user-plus"></i>
+                <button class="btn btn-outline" id="loginBtn">登录</button>
+                <button class="btn btn-primary" id="registerBtn">
+                    <span>📝</span>
                     <span>注册</span>
                 </button>
                 <button class="nav-toggle" id="navToggle">
@@ -1101,8 +1215,8 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-badge">
-                <i class="fas fa-fire"></i>
-                <span>已帮助 50,000+ 用户找到理想城市</span>
+                <span>🔥</span>
+                <span id="heroBadgeText">已帮助 50,000+ 用户找到理想城市</span>
             </div>
 
             <h1>
@@ -1115,21 +1229,21 @@
             </p>
 
             <div class="hero-buttons">
-                <button class="btn btn-hero btn-white">
-                    <i class="fas fa-search"></i>
+                <button class="btn btn-hero btn-white" onclick="document.getElementById('citiesGrid').scrollIntoView({behavior: 'smooth'})">
+                    <span>🔍</span>
                     <span>立即探索</span>
                 </button>
-                <button class="btn btn-hero btn-glass">
-                    <i class="fas fa-chart-line"></i>
+                <button class="btn btn-hero btn-glass" onclick="document.getElementById('citiesGrid').scrollIntoView({behavior: 'smooth'})">
+                    <span>📊</span>
                     <span>查看榜单</span>
                 </button>
             </div>
 
             <div class="hero-search">
                 <div class="search-wrapper">
-                    <input type="text" class="search-input" placeholder="搜索城市名称、省份或特色标签...">
-                    <button class="search-btn">
-                        <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索城市名称、省份或特色标签...">
+                    <button class="search-btn" id="searchBtn">
+                        <span>🔍</span>
                         搜索
                     </button>
                 </div>
@@ -1141,26 +1255,20 @@
     <section class="stats-section">
         <div class="stats-grid scroll-reveal">
             <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-city"></i>
-                </div>
-                <div class="stat-value">300+</div>
+                <div class="stat-icon">🏙</div>
+                <div class="stat-value" id="totalCities">300+</div>
                 <div class="stat-label">精选城市</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-comments"></i>
-                </div>
-                <div class="stat-value">10,000+</div>
+                <div class="stat-icon">💬</div>
+                <div class="stat-value" id="totalReviews">10,000+</div>
                 <div class="stat-label">真实评价</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-coins"></i>
-                </div>
-                <div class="stat-value">¥450</div>
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="minRent">¥450</div>
                 <div class="stat-label">最低月租</div>
             </div>
         </div>
@@ -1173,69 +1281,36 @@
             <div class="filters-section">
                 <div class="filter-group">
                     <div class="filter-label">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <span>📍</span>
                         <span>选择省份</span>
                     </div>
-                    <div class="filter-tags">
-                        <div class="filter-tag active">全部</div>
-                        <div class="filter-tag">云南</div>
-                        <div class="filter-tag">四川</div>
-                        <div class="filter-tag">广西</div>
-                        <div class="filter-tag">贵州</div>
-                        <div class="filter-tag">福建</div>
-                        <div class="filter-tag">浙江</div>
-                        <div class="filter-tag">江西</div>
+                    <div class="filter-tags" id="provinceFilters">
+                        <div class="filter-tag active" data-filter="all">全部</div>
+                        <!-- 动态加载省份 -->
                     </div>
                 </div>
 
                 <div class="filter-group">
                     <div class="filter-label">
-                        <i class="fas fa-tag"></i>
+                        <span>🏷️</span>
                         <span>城市特色</span>
                     </div>
-                    <div class="filter-tags">
-                        <div class="filter-tag">
-                            <i class="fas fa-water"></i>
-                            看海
-                        </div>
-                        <div class="filter-tag">
-                            <i class="fas fa-sun"></i>
-                            四季如春
-                        </div>
-                        <div class="filter-tag">
-                            <i class="fas fa-leaf"></i>
-                            安静
-                        </div>
-                        <div class="filter-tag">
-                            <i class="fas fa-hospital"></i>
-                            医疗好
-                        </div>
-                        <div class="filter-tag">
-                            <i class="fas fa-laptop"></i>
-                            数字游民
-                        </div>
-                        <div class="filter-tag">
-                            <i class="fas fa-mountain"></i>
-                            山居
-                        </div>
-                        <div class="filter-tag">
-                            <i class="fas fa-bridge-water"></i>
-                            临湖
-                        </div>
+                    <div class="filter-tags" id="featureFilters">
+                        <!-- 动态加载特色标签 -->
                     </div>
                 </div>
 
                 <div class="filter-group">
                     <div class="filter-label">
-                        <i class="fas fa-dollar-sign"></i>
+                        <span>💵</span>
                         <span>月租预算</span>
                     </div>
-                    <div class="filter-tags">
-                        <div class="filter-tag">全部</div>
-                        <div class="filter-tag">&lt; ¥500</div>
-                        <div class="filter-tag">¥500 - ¥1000</div>
-                        <div class="filter-tag">¥1000 - ¥2000</div>
-                        <div class="filter-tag">&gt; ¥2000</div>
+                    <div class="filter-tags" id="rentFilters">
+                        <div class="filter-tag active" data-rent="all">全部</div>
+                        <div class="filter-tag" data-rent="0-500">&lt; ¥500</div>
+                        <div class="filter-tag" data-rent="500-1000">¥500 - ¥1000</div>
+                        <div class="filter-tag" data-rent="1000-2000">¥1000 - ¥2000</div>
+                        <div class="filter-tag" data-rent="2000-99999">&gt; ¥2000</div>
                     </div>
                 </div>
             </div>
@@ -1249,174 +1324,38 @@
             </div>
 
             <div class="cities-grid" id="citiesGrid">
-                <!-- 城市卡片示例 -->
-                <div class="city-card">
-                    <div class="city-image">
-                        <div class="city-rank">#1</div>
-                        <div class="city-score-badge">9.2</div>
-                        <i class="fas fa-city city-icon"></i>
-                    </div>
-                    <div class="city-content">
-                        <div class="city-header">
-                            <h3 class="city-name">大理</h3>
-                            <div class="city-province">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>云南省</span>
-                            </div>
-                        </div>
-
-                        <div class="city-rent">
-                            <div class="city-rent-label">平均月租</div>
-                            <div class="city-rent-value">¥800</div>
-                        </div>
-
-                        <div class="city-tags">
-                            <div class="city-tag">
-                                <i class="fas fa-water"></i>
-                                看海
-                            </div>
-                            <div class="city-tag">
-                                <i class="fas fa-sun"></i>
-                                四季如春
-                            </div>
-                            <div class="city-tag">
-                                <i class="fas fa-leaf"></i>
-                                安静
-                            </div>
-                        </div>
-
-                        <div class="city-stats">
-                            <div class="city-stat">
-                                <div class="city-stat-value">4.8</div>
-                                <div class="city-stat-label">空气质量</div>
-                            </div>
-                            <div class="city-stat">
-                                <div class="city-stat-value">4.5</div>
-                                <div class="city-stat-label">生活成本</div>
-                            </div>
-                            <div class="city-stat">
-                                <div class="city-stat-value">4.9</div>
-                                <div class="city-stat-label">气候宜人</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 更多城市卡片... -->
-                <div class="city-card">
-                    <div class="city-image">
-                        <div class="city-rank">#2</div>
-                        <div class="city-score-badge">9.0</div>
-                        <i class="fas fa-umbrella-beach city-icon"></i>
-                    </div>
-                    <div class="city-content">
-                        <div class="city-header">
-                            <h3 class="city-name">三亚</h3>
-                            <div class="city-province">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>海南省</span>
-                            </div>
-                        </div>
-
-                        <div class="city-rent">
-                            <div class="city-rent-label">平均月租</div>
-                            <div class="city-rent-value">¥1,200</div>
-                        </div>
-
-                        <div class="city-tags">
-                            <div class="city-tag">
-                                <i class="fas fa-water"></i>
-                                看海
-                            </div>
-                            <div class="city-tag">
-                                <i class="fas fa-umbrella-beach"></i>
-                                度假天堂
-                            </div>
-                            <div class="city-tag">
-                                <i class="fas fa-sun"></i>
-                                阳光充足
-                            </div>
-                        </div>
-
-                        <div class="city-stats">
-                            <div class="city-stat">
-                                <div class="city-stat-value">4.9</div>
-                                <div class="city-stat-label">空气质量</div>
-                            </div>
-                            <div class="city-stat">
-                                <div class="city-stat-value">3.8</div>
-                                <div class="city-stat-label">生活成本</div>
-                            </div>
-                            <div class="city-stat">
-                                <div class="city-stat-value">5.0</div>
-                                <div class="city-stat-label">气候宜人</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="city-card">
-                    <div class="city-image">
-                        <div class="city-rank">#3</div>
-                        <div class="city-score-badge">8.9</div>
-                        <i class="fas fa-mountain city-icon"></i>
-                    </div>
-                    <div class="city-content">
-                        <div class="city-header">
-                            <h3 class="city-name">桂林</h3>
-                            <div class="city-province">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>广西壮族自治区</span>
-                            </div>
-                        </div>
-
-                        <div class="city-rent">
-                            <div class="city-rent-label">平均月租</div>
-                            <div class="city-rent-value">¥650</div>
-                        </div>
-
-                        <div class="city-tags">
-                            <div class="city-tag">
-                                <i class="fas fa-mountain"></i>
-                                山水如画
-                            </div>
-                            <div class="city-tag">
-                                <i class="fas fa-leaf"></i>
-                                安静
-                            </div>
-                            <div class="city-tag">
-                                <i class="fas fa-sun"></i>
-                                气候温和
-                            </div>
-                        </div>
-
-                        <div class="city-stats">
-                            <div class="city-stat">
-                                <div class="city-stat-value">4.7</div>
-                                <div class="city-stat-label">空气质量</div>
-                            </div>
-                            <div class="city-stat">
-                                <div class="city-stat-value">4.6</div>
-                                <div class="city-stat-label">生活成本</div>
-                            </div>
-                            <div class="city-stat">
-                                <div class="city-stat-value">4.8</div>
-                                <div class="city-stat-label">气候宜人</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- 动态加载城市卡片 -->
             </div>
 
-            <!-- 加载更多 -->
-            <div style="text-align: center; margin-top: 3rem;">
-                <button class="btn btn-outline btn-hero">
-                    <i class="fas fa-arrow-down"></i>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>加载中...</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;" id="loadMoreContainer" class="hidden">
+                <button class="btn btn-outline btn-hero" id="loadMoreBtn">
+                    <span>⬇️</span>
                     加载更多城市
                 </button>
             </div>
         </section>
     </div>
+
+    <!-- 城市详情模态框 -->
+    <div class="modal-overlay" id="cityModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalCityName">城市详情</h2>
+                <button class="modal-close" onclick="closeCityModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalCityContent">
+                <!-- 动态加载城市详情 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知容器 -->
+    <div id="notificationContainer"></div>
 
     <!-- 页脚 -->
     <footer class="footer">
@@ -1454,9 +1393,9 @@
             <div class="footer-section">
                 <h4>关注我们</h4>
                 <ul>
-                    <li><a href="#"><i class="fab fa-weixin"></i> 微信公众号</a></li>
-                    <li><a href="#"><i class="fab fa-weibo"></i> 新浪微博</a></li>
-                    <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
+                    <li><a href="#">微信公众号</a></li>
+                    <li><a href="#">新浪微博</a></li>
+                    <li><a href="#">GitHub</a></li>
                 </ul>
             </div>
         </div>
@@ -1466,150 +1405,8 @@
         </div>
     </footer>
 
-    <script>
-        // ==================== 导航栏滚动效果 ====================
-        const navbar = document.getElementById('navbar');
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // ==================== 移动端菜单 ====================
-        const navToggle = document.getElementById('navToggle');
-        const navMenu = document.getElementById('navMenu');
-
-        navToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
-
-        // 点击菜单项后关闭菜单
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-            });
-        });
-
-        // ==================== 主题切换 ====================
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-
-        // 检查本地存储的主题设置
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-theme', currentTheme);
-        updateThemeIcon(currentTheme);
-
-        themeToggle.addEventListener('click', () => {
-            const theme = html.getAttribute('data-theme');
-            const newTheme = theme === 'light' ? 'dark' : 'light';
-
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-
-        function updateThemeIcon(theme) {
-            const icon = themeToggle.querySelector('i');
-            icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-        }
-
-        // ==================== 滚动显示动画 ====================
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.scroll-reveal').forEach(el => {
-            observer.observe(el);
-        });
-
-        // ==================== 筛选功能 ====================
-        document.querySelectorAll('.filter-tag').forEach(tag => {
-            tag.addEventListener('click', function() {
-                // 如果是同一组内的标签,取消其他激活状态
-                const parent = this.parentElement;
-                const siblings = parent.querySelectorAll('.filter-tag');
-
-                // 如果点击的是"全部",取消其他所有选中
-                if (this.textContent.includes('全部')) {
-                    siblings.forEach(s => s.classList.remove('active'));
-                    this.classList.add('active');
-                } else {
-                    // 取消"全部"的选中
-                    siblings.forEach(s => {
-                        if (s.textContent.includes('全部')) {
-                            s.classList.remove('active');
-                        }
-                    });
-
-                    // 切换当前标签的激活状态
-                    this.classList.toggle('active');
-
-                    // 如果没有任何标签被选中,激活"全部"
-                    const hasActive = Array.from(siblings).some(s =>
-                        s.classList.contains('active') && !s.textContent.includes('全部')
-                    );
-
-                    if (!hasActive) {
-                        siblings[0].classList.add('active');
-                    }
-                }
-
-                // 这里可以添加实际的筛选逻辑
-                console.log('筛选条件已更新');
-            });
-        });
-
-        // ==================== 平滑滚动 ====================
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // ==================== 城市卡片点击 ====================
-        document.querySelectorAll('.city-card').forEach(card => {
-            card.addEventListener('click', function() {
-                console.log('打开城市详情');
-                // 这里可以添加打开详情模态框的逻辑
-            });
-        });
-
-        // ==================== 搜索功能 ====================
-        const searchInput = document.querySelector('.search-input');
-        const searchBtn = document.querySelector('.search-btn');
-
-        searchBtn.addEventListener('click', () => {
-            const query = searchInput.value.trim();
-            if (query) {
-                console.log('搜索:', query);
-                // 这里添加实际的搜索逻辑
-            }
-        });
-
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                searchBtn.click();
-            }
-        });
-    </script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>
