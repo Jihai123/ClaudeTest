@@ -1,0 +1,170 @@
+<!--pages/my-reviews/my-reviews.wxml-->
+<view class="container">
+  <view class="page-title">我的</view>
+
+  <!-- 用户信息 -->
+  <view class="user-section card">
+    <view wx:if="{{userInfo}}" class="user-info">
+      <view class="user-avatar">{{userInfo.username.charAt(0).toUpperCase()}}</view>
+      <view class="user-details">
+        <view class="username">{{userInfo.username}}</view>
+        <view class="user-email">{{userInfo.email}}</view>
+      </view>
+      <button class="btn-small btn-outline" bindtap="onLogout">退出</button>
+    </view>
+
+    <view wx:else class="not-logged-in">
+      <view class="login-prompt">
+        <text class="prompt-icon">👤</text>
+        <text class="prompt-text">登录后查看我的评价</text>
+      </view>
+      <button class="btn btn-primary btn-block" bindtap="onLogin">登录</button>
+    </view>
+  </view>
+
+  <!-- 我的评价列表 -->
+  <view wx:if="{{userInfo}}" class="reviews-section">
+    <view class="section-header">
+      <text class="page-title">我的评价</text>
+    </view>
+
+    <view wx:if="{{reviews.length > 0}}" class="reviews-list">
+      <view
+        wx:for="{{reviews}}"
+        wx:key="id"
+        class="review-card card"
+      >
+        <view class="review-header">
+          <view class="city-info" bindtap="onCityTap" data-id="{{item.city_id}}">
+            <view class="city-name">{{item.city_name}}</view>
+            <view class="review-date">{{item.created_at_text}}</view>
+          </view>
+          <view class="review-rating">
+            <text class="stars">{{item.stars}}</text>
+            <text class="rating-value">{{item.rating}}</text>
+          </view>
+        </view>
+
+        <view wx:if="{{item.comment}}" class="review-content">
+          {{item.comment}}
+        </view>
+
+        <view class="review-footer">
+          <view class="likes">
+            <text class="icon">❤️</text>
+            <text>{{item.likes || 0}} 个赞</text>
+          </view>
+          <button class="btn-small btn-outline" bindtap="onDeleteReview" data-id="{{item.id}}">
+            删除
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else-if="{{!loading}}" class="empty">
+      <view class="empty-icon">💬</view>
+      <text class="empty-text">还没有发表过评价</text>
+      <button class="btn btn-primary" bindtap="onGoHome">
+        去评价
+      </button>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">加载中...</view>
+  </view>
+</view>
+
+<!-- 登录弹窗 -->
+<view wx:if="{{showLoginModal}}" class="modal" bindtap="onCloseModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">登录</text>
+      <text class="modal-close" bindtap="onCloseModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">用户名</text>
+        <input
+          class="form-input"
+          placeholder="请输入用户名"
+          value="{{loginUsername}}"
+          bindinput="onUsernameInput"
+        />
+      </view>
+      <view class="form-group">
+        <text class="form-label">密码</text>
+        <input
+          class="form-input"
+          type="password"
+          placeholder="请输入密码"
+          value="{{loginPassword}}"
+          bindinput="onPasswordInput"
+        />
+      </view>
+      <button class="btn btn-primary btn-block" bindtap="onSubmitLogin">
+        登录
+      </button>
+      <view class="register-hint">
+        <text>还没有账号？</text>
+        <text class="link" bindtap="onShowRegister">立即注册</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 注册弹窗 -->
+<view wx:if="{{showRegisterModal}}" class="modal" bindtap="onCloseModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">注册</text>
+      <text class="modal-close" bindtap="onCloseModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">用户名</text>
+        <input
+          class="form-input"
+          placeholder="请输入用户名"
+          value="{{registerUsername}}"
+          bindinput="onRegUsernameInput"
+        />
+      </view>
+      <view class="form-group">
+        <text class="form-label">邮箱</text>
+        <input
+          class="form-input"
+          type="text"
+          placeholder="请输入邮箱"
+          value="{{registerEmail}}"
+          bindinput="onRegEmailInput"
+        />
+      </view>
+      <view class="form-group">
+        <text class="form-label">密码</text>
+        <input
+          class="form-input"
+          type="password"
+          placeholder="请输入密码"
+          value="{{registerPassword}}"
+          bindinput="onRegPasswordInput"
+        />
+      </view>
+      <view class="form-group">
+        <text class="form-label">确认密码</text>
+        <input
+          class="form-input"
+          type="password"
+          placeholder="请再次输入密码"
+          value="{{registerPasswordConfirm}}"
+          bindinput="onRegPasswordConfirmInput"
+        />
+      </view>
+      <button class="btn btn-primary btn-block" bindtap="onSubmitRegister">
+        注册
+      </button>
+      <view class="register-hint">
+        <text>已有账号？</text>
+        <text class="link" bindtap="onShowLogin">去登录</text>
+      </view>
+    </view>
+  </view>
+</view>

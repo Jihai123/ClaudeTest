@@ -1,0 +1,137 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-box">
+      <icon class="search-icon" type="search" size="16" color="#64748b" />
+      <input
+        class="search-input"
+        placeholder="搜索城市名称或省份"
+        value="{{searchQuery}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+        bindconfirm="onSearchConfirm"
+      />
+      <icon wx:if="{{searchQuery}}" class="clear-icon" type="clear" size="16" color="#64748b" bindtap="onClearSearch" />
+    </view>
+  </view>
+
+  <!-- 筛选和排序 -->
+  <view class="filter-bar">
+    <picker class="filter-item" mode="selector" range="{{sortOptions}}" range-key="label" value="{{sortIndex}}" bindchange="onSortChange">
+      <view class="picker-text">
+        <text>{{sortOptions[sortIndex].label}}</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+    <picker class="filter-item" mode="selector" range="{{orderOptions}}" range-key="label" value="{{orderIndex}}" bindchange="onOrderChange">
+      <view class="picker-text">
+        <text>{{orderOptions[orderIndex].label}}</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 城市列表 -->
+  <view class="cities-list">
+    <view
+      wx:for="{{cities}}"
+      wx:key="id"
+      class="city-card"
+      bindtap="onCityTap"
+      data-id="{{item.id}}"
+    >
+      <!-- 城市头部 -->
+      <view class="city-header">
+        <view class="city-info">
+          <view class="city-name">{{item.name}}</view>
+          <view class="city-province">{{item.province || '未知省份'}}</view>
+        </view>
+        <view class="city-score">
+          <text class="score-value">{{item.overall_score || 0}}</text>
+          <text class="score-label">分</text>
+        </view>
+      </view>
+
+      <!-- 城市维度 -->
+      <view class="city-dimensions">
+        <view class="dimension-item">
+          <text class="dimension-label">生活成本</text>
+          <text class="dimension-value" style="color: {{getDimensionColor(item.living_cost)}}">
+            {{item.living_cost || 0}}
+          </text>
+        </view>
+        <view class="dimension-item">
+          <text class="dimension-label">空气质量</text>
+          <text class="dimension-value" style="color: {{getDimensionColor(item.air_quality)}}">
+            {{item.air_quality || 0}}
+          </text>
+        </view>
+        <view class="dimension-item">
+          <text class="dimension-label">医疗设施</text>
+          <text class="dimension-value" style="color: {{getDimensionColor(item.medical_facilities)}}">
+            {{item.medical_facilities || 0}}
+          </text>
+        </view>
+        <view class="dimension-item">
+          <text class="dimension-label">就业机会</text>
+          <text class="dimension-value" style="color: {{getDimensionColor(item.employment)}}">
+            {{item.employment || 0}}
+          </text>
+        </view>
+        <view class="dimension-item">
+          <text class="dimension-label">安全指数</text>
+          <text class="dimension-value" style="color: {{getDimensionColor(item.safety)}}">
+            {{item.safety || 0}}
+          </text>
+        </view>
+        <view class="dimension-item">
+          <text class="dimension-label">适合养老</text>
+          <text class="dimension-value" style="color: {{getDimensionColor(item.elderly_care)}}">
+            {{item.elderly_care || 0}}
+          </text>
+        </view>
+      </view>
+
+      <!-- 城市底部 -->
+      <view class="city-footer">
+        <text class="reviews-count">{{item.review_count || 0}} 条评价</text>
+        <view wx:if="{{item.avg_rating}}" class="rating">
+          <text class="stars">{{item.stars}}</text>
+          <text class="rating-value">{{item.avg_rating}}</text>
+        </view>
+        <text wx:else class="no-rating">暂无评分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && cities.length === 0}}" class="empty">
+    <view class="empty-icon">🏙️</view>
+    <text class="empty-text">暂无城市数据</text>
+  </view>
+
+  <!-- 分页 -->
+  <view wx:if="{{cities.length > 0}}" class="pagination">
+    <button
+      class="page-btn"
+      disabled="{{currentPage === 1}}"
+      bindtap="onPrevPage"
+    >
+      上一页
+    </button>
+    <text class="page-info">{{currentPage}} / {{totalPages}}</text>
+    <button
+      class="page-btn"
+      disabled="{{currentPage === totalPages}}"
+      bindtap="onNextPage"
+    >
+      下一页
+    </button>
+  </view>
+</view>

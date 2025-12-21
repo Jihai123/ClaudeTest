@@ -1,0 +1,343 @@
+/* pages/city-detail/city-detail.wxss */
+.detail-content {
+  padding-bottom: 30rpx;
+}
+
+/* 城市头部 */
+.city-header {
+  margin-bottom: 20rpx;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30rpx;
+}
+
+.city-name {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #0f172a;
+  margin-bottom: 10rpx;
+}
+
+.city-location {
+  font-size: 28rpx;
+  color: #64748b;
+}
+
+.dot {
+  margin: 0 10rpx;
+}
+
+.overall-score {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-radius: 16rpx;
+  text-align: center;
+  min-width: 140rpx;
+}
+
+.score-value {
+  font-size: 56rpx;
+  font-weight: bold;
+  display: block;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 基本信息 */
+.basic-info {
+  display: flex;
+  gap: 30rpx;
+  padding-top: 30rpx;
+  border-top: 1rpx solid #e2e8f0;
+}
+
+.info-item {
+  flex: 1;
+  text-align: center;
+}
+
+.info-label {
+  font-size: 24rpx;
+  color: #64748b;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #0f172a;
+}
+
+/* 维度评分 */
+.dimensions-section {
+  margin-bottom: 20rpx;
+}
+
+.dimensions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.dimension-card {
+  background: #f8fafc;
+  padding: 24rpx;
+  border-radius: 12rpx;
+}
+
+.dimension-label {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 12rpx;
+}
+
+.dimension-score {
+  margin-bottom: 12rpx;
+}
+
+.score-num {
+  font-size: 48rpx;
+  font-weight: bold;
+}
+
+.score-max {
+  font-size: 24rpx;
+  color: #94a3b8;
+  margin-left: 4rpx;
+}
+
+.score-bar {
+  height: 8rpx;
+  background: #e2e8f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+
+/* 评价统计 */
+.review-stats {
+  margin-bottom: 20rpx;
+}
+
+.stats-summary {
+  margin-top: 20rpx;
+}
+
+.rating-summary {
+  text-align: center;
+}
+
+.avg-rating {
+  font-size: 72rpx;
+  font-weight: bold;
+  color: #f59e0b;
+  display: block;
+  line-height: 1;
+}
+
+.total-reviews {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-top: 12rpx;
+  display: block;
+}
+
+/* 评价部分 */
+.reviews-section {
+  margin-bottom: 20rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.review-item {
+  padding-bottom: 30rpx;
+  border-bottom: 1rpx solid #e2e8f0;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.username {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #0f172a;
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.review-date {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+.review-rating {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.rating-text {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #f59e0b;
+}
+
+.review-content {
+  font-size: 28rpx;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+}
+
+.review-actions {
+  display: flex;
+  gap: 30rpx;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: #64748b;
+  padding: 8rpx 16rpx;
+  background: #f8fafc;
+  border-radius: 8rpx;
+}
+
+.icon {
+  font-size: 28rpx;
+}
+
+/* 评价弹窗 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 16rpx;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #e2e8f0;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.modal-close {
+  font-size: 48rpx;
+  color: #94a3b8;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.form-group {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #0f172a;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.rating-selector {
+  display: flex;
+  gap: 16rpx;
+}
+
+.star {
+  font-size: 60rpx;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.star.active {
+  color: #f59e0b;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 200rpx;
+  padding: 20rpx;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.char-count {
+  font-size: 24rpx;
+  color: #94a3b8;
+  margin-top: 8rpx;
+  display: block;
+  text-align: right;
+}
