@@ -1,0 +1,156 @@
+<!--pages/city-detail/city-detail.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+  <view wx:else class="detail-content">
+    <!-- 城市头部信息 -->
+    <view class="city-header card">
+      <view class="header-top">
+        <view class="city-info">
+          <view class="city-name">{{city.name}}</view>
+          <view class="city-location">
+            <text>{{city.province || '未知省份'}}</text>
+            <text wx:if="{{city.country}}" class="dot">·</text>
+            <text wx:if="{{city.country}}">{{city.country}}</text>
+          </view>
+        </view>
+        <view class="overall-score">
+          <text class="score-value">{{city.overall_score || 0}}</text>
+          <text class="score-label">综合评分</text>
+        </view>
+      </view>
+
+      <!-- 基本信息 -->
+      <view class="basic-info">
+        <view wx:if="{{city.population}}" class="info-item">
+          <text class="info-label">人口</text>
+          <text class="info-value">{{city.population_text}}</text>
+        </view>
+        <view wx:if="{{city.gdp}}" class="info-item">
+          <text class="info-label">GDP</text>
+          <text class="info-value">{{city.gdp_text}}</text>
+        </view>
+        <view wx:if="{{city.area}}" class="info-item">
+          <text class="info-label">面积</text>
+          <text class="info-value">{{city.area_text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 维度评分 -->
+    <view class="dimensions-section card">
+      <view class="card-title">各项评分</view>
+      <view class="dimensions-grid">
+        <view
+          wx:for="{{dimensions}}"
+          wx:key="key"
+          class="dimension-card"
+        >
+          <view class="dimension-label">{{item.label}}</view>
+          <view class="dimension-score">
+            <text class="score-num" style="color: {{item.color}}">{{item.value}}</text>
+            <text class="score-max">/10</text>
+          </view>
+          <view class="score-bar">
+            <view class="score-fill" style="{{item.barStyle}}"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 评价统计 -->
+    <view wx:if="{{city.review_stats}}" class="review-stats card">
+      <view class="card-title">用户评价</view>
+      <view class="stats-summary">
+        <view class="rating-summary">
+          <text class="avg-rating">{{city.review_stats.avg_rating || '暂无'}}</text>
+          <view class="stars">{{city.stars}}</view>
+          <text class="total-reviews">共 {{city.review_stats.total_reviews}} 条评价</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 评价列表 -->
+    <view class="reviews-section card">
+      <view class="section-header">
+        <text class="card-title">全部评价</text>
+        <button wx:if="{{userInfo}}" class="btn-small btn-primary" bindtap="onWriteReview">
+          写评价
+        </button>
+      </view>
+
+      <view wx:if="{{reviews.length > 0}}" class="reviews-list">
+        <view
+          wx:for="{{reviews}}"
+          wx:key="id"
+          class="review-item"
+        >
+          <view class="review-header">
+            <view class="user-info">
+              <text class="username">{{item.username}}</text>
+              <text class="review-date">{{item.created_at_text}}</text>
+            </view>
+            <view class="review-rating">
+              <text class="stars">{{item.stars}}</text>
+              <text class="rating-text">{{item.rating}}</text>
+            </view>
+          </view>
+          <view wx:if="{{item.comment}}" class="review-content">
+            {{item.comment}}
+          </view>
+          <view class="review-actions">
+            <view class="action-btn" bindtap="onLikeReview" data-id="{{item.id}}">
+              <text class="icon">{{item.user_liked ? '❤️' : '🤍'}}</text>
+              <text>{{item.likes || 0}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view wx:else class="empty">
+        <view class="empty-icon">💬</view>
+        <text class="empty-text">暂无评价</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 写评价弹窗 -->
+<view wx:if="{{showReviewModal}}" class="modal" bindtap="onCloseModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">评价{{city.name}}</text>
+      <text class="modal-close" bindtap="onCloseModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">评分</text>
+        <view class="rating-selector">
+          <text
+            wx:for="{{[1,2,3,4,5]}}"
+            wx:key="*this"
+            class="star {{reviewRating >= item ? 'active' : ''}}"
+            bindtap="onSelectRating"
+            data-rating="{{item}}"
+          >
+            ★
+          </text>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">评论内容（选填）</text>
+        <textarea
+          class="form-textarea"
+          placeholder="分享你的感受..."
+          value="{{reviewComment}}"
+          bindinput="onCommentInput"
+          maxlength="500"
+        />
+        <text class="char-count">{{reviewComment.length}}/500</text>
+      </view>
+      <button class="btn btn-primary btn-block" bindtap="onSubmitReview">
+        提交评价
+      </button>
+    </view>
+  </view>
+</view>

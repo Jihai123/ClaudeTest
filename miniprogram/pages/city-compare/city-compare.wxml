@@ -1,0 +1,145 @@
+<!--pages/city-compare/city-compare.wxml-->
+<view class="container">
+  <view class="page-title">城市对比</view>
+  <view class="page-desc">选择2-5个城市进行对比分析</view>
+
+  <!-- 城市选择 -->
+  <view class="selection-section card">
+    <view class="card-title">选择城市</view>
+    <view class="cities-grid">
+      <label
+        wx:for="{{availableCities}}"
+        wx:key="id"
+        class="city-checkbox {{item.selected ? 'selected' : ''}}"
+      >
+        <checkbox value="{{item.id}}" checked="{{item.selected}}" bindtap="onCitySelect" data-id="{{item.id}}" />
+        <text>{{item.name}}</text>
+        <text class="city-province">{{item.province}}</text>
+      </label>
+    </view>
+
+    <view class="selection-info">
+      已选择 {{selectedCities.length}} 个城市
+      <text wx:if="{{selectedCities.length >= 2}}" class="text-success"> (可以对比)</text>
+      <text wx:else class="text-secondary"> (至少选择2个)</text>
+    </view>
+
+    <button
+      class="btn btn-primary btn-block"
+      disabled="{{selectedCities.length < 2}}"
+      bindtap="onCompare"
+    >
+      开始对比
+    </button>
+  </view>
+
+  <!-- 对比结果 -->
+  <view wx:if="{{compareResult.length > 0}}" class="result-section">
+    <!-- 维度对比图表 -->
+    <view class="card">
+      <view class="card-title">综合评分对比</view>
+      <view class="score-bars">
+        <view
+          wx:for="{{compareResult}}"
+          wx:key="id"
+          class="score-bar-item"
+        >
+          <view class="city-name-small">{{item.name}}</view>
+          <view class="bar-container">
+            <view class="bar-fill" style="{{item.barStyle}}"></view>
+            <text class="bar-value">{{item.overall_score}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 详细数据对比表 -->
+    <view class="card">
+      <view class="card-title">详细数据对比</view>
+      <scroll-view scroll-x class="compare-table">
+        <view class="table">
+          <!-- 表头 -->
+          <view class="table-row header">
+            <view class="table-cell">指标</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.name}}
+            </view>
+          </view>
+
+          <!-- 各项维度 -->
+          <view class="table-row">
+            <view class="table-cell label">综合评分</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.overall_score || 0}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">生活成本</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.living_cost || 0}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">空气质量</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.air_quality || 0}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">医疗设施</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.medical_facilities || 0}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">就业机会</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.employment || 0}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">安全指数</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.safety || 0}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">适合养老</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.elderly_care || 0}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">人口</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.population_text}}
+            </view>
+          </view>
+
+          <view class="table-row">
+            <view class="table-cell label">GDP</view>
+            <view wx:for="{{compareResult}}" wx:key="id" class="table-cell">
+              {{item.gdp_text}}
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && availableCities.length === 0}}" class="empty">
+    <view class="empty-icon">🏙️</view>
+    <text class="empty-text">暂无可对比的城市</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+</view>

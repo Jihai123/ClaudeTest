@@ -1,0 +1,227 @@
+/* pages/my-reviews/my-reviews.wxss */
+
+/* 用户信息区 */
+.user-section {
+  margin-bottom: 30rpx;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.user-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  font-size: 40rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.username {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #0f172a;
+  margin-bottom: 8rpx;
+}
+
+.user-email {
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+/* 未登录状态 */
+.not-logged-in {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.login-prompt {
+  margin-bottom: 40rpx;
+}
+
+.prompt-icon {
+  font-size: 120rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.prompt-text {
+  font-size: 28rpx;
+  color: #64748b;
+}
+
+/* 评价列表 */
+.reviews-section {
+  margin-top: 30rpx;
+}
+
+.section-header {
+  margin-bottom: 20rpx;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.review-card {
+  padding: 30rpx;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.city-info {
+  flex: 1;
+}
+
+.city-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #0f172a;
+  margin-bottom: 8rpx;
+}
+
+.review-date {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+.review-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6rpx;
+}
+
+.stars {
+  color: #f59e0b;
+  font-size: 28rpx;
+}
+
+.rating-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #f59e0b;
+}
+
+.review-content {
+  font-size: 28rpx;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #e2e8f0;
+}
+
+.likes {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.icon {
+  font-size: 28rpx;
+}
+
+/* 模态框 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 16rpx;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #e2e8f0;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.modal-close {
+  font-size: 48rpx;
+  color: #94a3b8;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.form-group {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #0f172a;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  padding: 24rpx;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.register-hint {
+  text-align: center;
+  font-size: 24rpx;
+  color: #64748b;
+  margin-top: 20rpx;
+}
+
+.link {
+  color: #2563eb;
+  margin-left: 10rpx;
+}
