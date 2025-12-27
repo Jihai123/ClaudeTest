@@ -46,7 +46,7 @@
         >
           <view class="city-name-small">{{item.name}}</view>
           <view class="bar-container">
-            <view class="bar-fill" style="width: {{item.overall_score * 10}}%; background: {{item.color}}"></view>
+            <view class="bar-fill" style="width: {{item.overall_score * 10}}%; background-color: {{item.color}}"></view>
             <text class="bar-value">{{item.overall_score}}</text>
           </view>
         </view>
