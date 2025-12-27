@@ -34,7 +34,6 @@
 /* 筛选栏 */
 .filter-bar {
   display: flex;
-  gap: 20rpx;
   padding: 0 30rpx 20rpx;
   background: #ffffff;
   margin-bottom: 20rpx;
@@ -45,6 +44,11 @@
   background: #f8fafc;
   border-radius: 12rpx;
   padding: 20rpx;
+  margin-right: 20rpx;
+}
+
+.filter-item:last-child {
+  margin-right: 0;
 }
 
 .picker-text {
@@ -126,7 +130,6 @@
 .city-dimensions {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16rpx;
   margin: 20rpx 0;
 }
 
@@ -137,6 +140,7 @@
   padding: 16rpx 20rpx;
   background: #f8fafc;
   border-radius: 8rpx;
+  margin: 0 8rpx 16rpx 8rpx;
 }
 
 .dimension-label {
@@ -167,12 +171,12 @@
 .rating {
   display: flex;
   align-items: center;
-  gap: 10rpx;
 }
 
 .stars {
   color: #f59e0b;
   font-size: 24rpx;
+  margin-right: 10rpx;
 }
 
 .rating-value {
@@ -191,7 +195,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30rpx;
   margin-top: 40rpx;
   padding: 0 30rpx;
 }
@@ -203,6 +206,7 @@
   color: #ffffff;
   border-radius: 12rpx;
   border: none;
+  margin: 0 15rpx;
 }
 
 .page-btn[disabled] {
