@@ -88,12 +88,16 @@ Page({
     try {
       const result = await api.compareCities(this.data.selectedCities)
 
-      const compareResult = (result.cities || []).map((city, index) => ({
-        ...city,
-        color: this.data.colors[index % this.data.colors.length],
-        population_text: city.population ? util.formatNumber(city.population) : '未知',
-        gdp_text: city.gdp ? `${util.formatNumber(city.gdp)}亿` : '未知'
-      }))
+      const compareResult = (result.cities || []).map((city, index) => {
+        const color = this.data.colors[index % this.data.colors.length]
+        return {
+          ...city,
+          color,
+          barStyle: `width: ${(city.overall_score || 0) * 10}%; background-color: ${color}`,
+          population_text: city.population ? util.formatNumber(city.population) : '未知',
+          gdp_text: city.gdp ? `${util.formatNumber(city.gdp)}亿` : '未知'
+        }
+      })
 
       this.setData({
         compareResult

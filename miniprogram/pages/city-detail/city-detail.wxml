@@ -52,7 +52,7 @@
             <text class="score-max">/10</text>
           </view>
           <view class="score-bar">
-            <view class="score-fill" style="width: {{item.value * 10}}%; background-color: {{item.color}}"></view>
+            <view class="score-fill" style="{{item.barStyle}}"></view>
           </view>
         </view>
       </view>

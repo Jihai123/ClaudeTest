@@ -78,7 +78,10 @@ Page({
           value: city.elderly_care || 0,
           color: util.getDimensionColor(city.elderly_care || 0)
         }
-      ]
+      ].map(item => ({
+        ...item,
+        barStyle: `width: ${item.value * 10}%; background-color: ${item.color}`
+      }))
 
       this.setData({
         city: processedCity,
