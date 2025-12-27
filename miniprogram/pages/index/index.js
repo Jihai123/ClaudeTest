@@ -134,27 +134,36 @@ Page({
       // 解析搜索关键词
       const searchConfig = this.parseSearchKeywords(this.data.searchQuery)
 
+      // 构建筛选条件（后端API支持filters参数）
+      const filters = {}
+
+      // 地区筛选（国内/国际）- 在后端直接筛选，性能更好
+      if (this.data.regionFilter === 'domestic') {
+        filters.country = '中国'
+      } else if (this.data.regionFilter === 'international') {
+        // 国际城市：country不等于中国的（后端需要支持not equal）
+        // 暂时在前端筛选，或者传递特殊标记
+      }
+
       const params = {
-        search: searchConfig ? '' : this.data.searchQuery, // 如果是关键词搜索，不传原始搜索词
+        search: searchConfig ? '' : this.data.searchQuery,
         sort: this.data.sortOptions[this.data.sortIndex].value,
         order: this.data.orderOptions[this.data.orderIndex].value,
-        page: this.data.currentPage,
-        limit: 100 // 加载更多数据以便前端筛选
+        page: 1,
+        limit: 500, // 加载更多数据
+        filters: Object.keys(filters).length > 0 ? JSON.stringify(filters) : undefined
       }
 
       const result = await api.getCities(params)
       let cities = result.cities || []
 
-      // 应用地区筛选（国内/国际）
-      cities = cities.filter(city => {
-        const isInternational = city.country && city.country !== '中国'
-        if (this.data.regionFilter === 'domestic') {
-          return !isInternational
-        } else if (this.data.regionFilter === 'international') {
+      // 国际城市筛选（后端暂不支持NOT操作，需要前端处理）
+      if (this.data.regionFilter === 'international') {
+        cities = cities.filter(city => {
+          const isInternational = city.country && city.country !== '中国'
           return isInternational
-        }
-        return true
-      })
+        })
+      }
 
       // 应用场景筛选
       if (this.data.activeScenario) {
