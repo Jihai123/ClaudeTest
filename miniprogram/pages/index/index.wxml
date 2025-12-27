@@ -1,18 +1,57 @@
 <!--pages/index/index.wxml-->
 <view class="container">
-  <!-- 搜索栏 -->
-  <view class="search-bar">
-    <view class="search-box">
-      <icon class="search-icon" type="search" size="16" color="#64748b" />
-      <input
-        class="search-input"
-        placeholder="搜索城市名称或省份"
-        value="{{searchQuery}}"
-        bindinput="onSearchInput"
-        confirm-type="search"
-        bindconfirm="onSearchConfirm"
-      />
-      <icon wx:if="{{searchQuery}}" class="clear-icon" type="clear" size="16" color="#64748b" bindtap="onClearSearch" />
+  <!-- 顶部场景入口 - Hero Section -->
+  <view class="hero-section">
+    <text class="hero-title">发现你的理想城市</text>
+    <text class="hero-subtitle">数字游民 · 康养旅居 · 退休生活</text>
+
+    <!-- 搜索栏 -->
+    <view class="search-bar-new">
+      <view class="search-box-new">
+        <icon class="search-icon" type="search" size="16" color="#87A878" />
+        <input
+          class="search-input-new"
+          placeholder="搜索城市或输入你的需求..."
+          value="{{searchQuery}}"
+          bindinput="onSearchInput"
+          confirm-type="search"
+          bindconfirm="onSearchConfirm"
+        />
+        <icon wx:if="{{searchQuery}}" class="clear-icon" type="clear" size="16" color="#999" bindtap="onClearSearch" />
+      </view>
+    </view>
+
+    <!-- 场景化入口磁贴 -->
+    <view class="scenario-tiles">
+      <view
+        class="scenario-tile {{activeScenario === 'nomad' ? 'active' : ''}}"
+        bindtap="onScenarioTap"
+        data-scenario="nomad"
+      >
+        <view class="tile-icon">💻</view>
+        <text class="tile-label">数字游民</text>
+        <text class="tile-desc">网速快·咖啡多</text>
+      </view>
+
+      <view
+        class="scenario-tile {{activeScenario === 'vacation' ? 'active' : ''}}"
+        bindtap="onScenarioTap"
+        data-scenario="vacation"
+      >
+        <view class="tile-icon">🏖️</view>
+        <text class="tile-label">避暑避寒</text>
+        <text class="tile-desc">气候宜人·风景好</text>
+      </view>
+
+      <view
+        class="scenario-tile {{activeScenario === 'retirement' ? 'active' : ''}}"
+        bindtap="onScenarioTap"
+        data-scenario="retirement"
+      >
+        <view class="tile-icon">🏥</view>
+        <text class="tile-label">康养退休</text>
+        <text class="tile-desc">医疗好·空气佳</text>
+      </view>
     </view>
   </view>
 
@@ -49,80 +88,95 @@
     </picker>
   </view>
 
-  <!-- 城市列表 -->
-  <view class="cities-list">
+  <!-- 城市列表 - 重构版 -->
+  <view class="cities-list-new">
     <view
       wx:for="{{cities}}"
       wx:key="id"
-      class="city-card"
+      class="city-card-new"
       bindtap="onCityTap"
       data-id="{{item.id}}"
     >
-      <!-- 城市头部 -->
-      <view class="city-header">
-        <view class="city-info">
-          <view class="city-name-row">
-            <text class="city-name">{{item.name}}</text>
-            <text class="city-emoji">{{item.emoji}}</text>
-            <text wx:if="{{item.isInternational}}" class="location-badge international">{{item.locationText}}</text>
-            <text wx:else class="location-badge">{{item.locationText}}</text>
+      <!-- 城市封面图 -->
+      <view class="city-cover">
+        <image
+          class="cover-image"
+          src="{{item.coverImage || '/images/city-placeholder.jpg'}}"
+          mode="aspectFill"
+          lazy-load
+        />
+        <!-- 毛玻璃评分标签 -->
+        <view class="score-badge-glass" style="{{item.cardStyle}}">
+          <text class="score-value-glass">{{item.overall_score || 0}}</text>
+          <text class="score-label-glass">{{item.emotionalLevel}}</text>
+        </view>
+        <!-- 收藏按钮 -->
+        <view class="favorite-btn {{item.isFavorite ? 'active' : ''}}" catchtap="onToggleFavorite" data-id="{{item.id}}">
+          <text class="favorite-icon">{{item.isFavorite ? '❤️' : '🤍'}}</text>
+        </view>
+        <!-- 对比勾选框 -->
+        <view class="compare-checkbox {{item.isComparing ? 'checked' : ''}}" catchtap="onToggleCompare" data-id="{{item.id}}">
+          <text class="checkbox-icon">{{item.isComparing ? '✓' : ''}}</text>
+        </view>
+      </view>
+
+      <!-- 城市信息区 -->
+      <view class="city-content">
+        <!-- 头部：城市名 + 位置 -->
+        <view class="city-header-new">
+          <view class="city-name-section">
+            <text class="city-name-new">{{item.name}}</text>
+            <text class="city-emoji-new">{{item.emoji}}</text>
           </view>
-          <view class="city-personality">{{item.personality}}</view>
+          <text class="location-badge-new {{item.isInternational ? 'international' : ''}}">
+            {{item.locationText}}
+          </text>
         </view>
-        <view class="city-score" style="{{item.cardStyle}}">
-          <text class="score-value">{{item.overall_score || 0}}</text>
-          <text class="score-label">{{item.emotionalLevel}}</text>
-        </view>
-      </view>
 
-      <!-- 城市维度 -->
-      <view class="city-dimensions">
-        <view class="dimension-item">
-          <text class="dimension-label">生活成本</text>
-          <text class="dimension-value" style="color: {{getDimensionColor(item.living_cost)}}">
-            {{item.living_cost || 0}}
-          </text>
-        </view>
-        <view class="dimension-item">
-          <text class="dimension-label">空气质量</text>
-          <text class="dimension-value" style="color: {{getDimensionColor(item.air_quality)}}">
-            {{item.air_quality || 0}}
-          </text>
-        </view>
-        <view class="dimension-item">
-          <text class="dimension-label">医疗设施</text>
-          <text class="dimension-value" style="color: {{getDimensionColor(item.medical_facilities)}}">
-            {{item.medical_facilities || 0}}
-          </text>
-        </view>
-        <view class="dimension-item">
-          <text class="dimension-label">就业机会</text>
-          <text class="dimension-value" style="color: {{getDimensionColor(item.employment)}}">
-            {{item.employment || 0}}
-          </text>
-        </view>
-        <view class="dimension-item">
-          <text class="dimension-label">安全指数</text>
-          <text class="dimension-value" style="color: {{getDimensionColor(item.safety)}}">
-            {{item.safety || 0}}
-          </text>
-        </view>
-        <view class="dimension-item">
-          <text class="dimension-label">适合养老</text>
-          <text class="dimension-value" style="color: {{getDimensionColor(item.elderly_care)}}">
-            {{item.elderly_care || 0}}
-          </text>
-        </view>
-      </view>
+        <!-- 城市个性描述 -->
+        <text class="city-personality-new">{{item.personality}}</text>
 
-      <!-- 城市底部 -->
-      <view class="city-footer">
-        <text class="reviews-count">{{item.review_count || 0}} 条评价</text>
-        <view wx:if="{{item.avg_rating}}" class="rating">
-          <text class="stars">{{item.stars}}</text>
-          <text class="rating-value">{{item.avg_rating}}</text>
+        <!-- 语义化标签（只显示突出优势） -->
+        <view class="semantic-tags" wx:if="{{item.semanticTags && item.semanticTags.length > 0}}">
+          <view
+            wx:for="{{item.semanticTags}}"
+            wx:for-item="tag"
+            wx:key="index"
+            class="semantic-tag"
+            style="background-color: {{tag.color}}15; color: {{tag.color}}; border-color: {{tag.color}}30;"
+          >
+            {{tag.text}}
+          </view>
         </view>
-        <text wx:else class="no-rating">暂无评分</text>
+
+        <!-- 动态指标展示（只显示前3名且>0的） -->
+        <view class="top-dimensions" wx:if="{{item.topDimensions && item.topDimensions.length > 0}}">
+          <view
+            wx:for="{{item.topDimensions}}"
+            wx:for-item="dim"
+            wx:key="key"
+            class="dimension-bar"
+          >
+            <view class="dimension-info">
+              <text class="dimension-icon">{{dim.icon}}</text>
+              <text class="dimension-label-new">{{dim.label}}</text>
+            </view>
+            <view class="progress-bar">
+              <view class="progress-fill" style="width: {{dim.value * 10}}%; background: {{dim.color}};"></view>
+              <text class="progress-value">{{dim.value}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 底部：评价信息 -->
+        <view class="city-footer-new">
+          <view class="rating-section" wx:if="{{item.avg_rating}}">
+            <text class="stars-new">{{item.stars}}</text>
+            <text class="rating-value-new">{{item.avg_rating}}</text>
+            <text class="reviews-count-new">{{item.review_count || 0}} 条评价</text>
+          </view>
+          <text wx:else class="no-rating-new">暂无评分 · {{item.review_count || 0}} 条评价</text>
+        </view>
       </view>
     </view>
   </view>
@@ -155,5 +209,25 @@
     >
       下一页
     </button>
+  </view>
+
+  <!-- 浮动对比篮子 -->
+  <view class="compare-basket {{compareCities.length > 0 ? 'visible' : ''}}" wx:if="{{compareCities.length > 0}}">
+    <view class="basket-content">
+      <view class="basket-info">
+        <text class="basket-icon">⚖️</text>
+        <text class="basket-text">已选择 {{compareCities.length}} 个城市</text>
+      </view>
+      <button
+        class="basket-btn"
+        disabled="{{compareCities.length < 2}}"
+        bindtap="onCompareNow"
+      >
+        {{compareCities.length < 2 ? '请再选一个' : '开始对比'}}
+      </button>
+      <view class="basket-clear" bindtap="onClearCompare">
+        <text>✕</text>
+      </view>
+    </view>
   </view>
 </view>
