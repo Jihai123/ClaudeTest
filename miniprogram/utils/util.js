@@ -265,6 +265,79 @@ const saveImage = (url) => {
   })
 }
 
+// 动态指标展示逻辑（只显示>0且排名前3的）
+const getTopDimensions = (city) => {
+  const dimensions = [
+    { key: 'air_quality', label: '空气质量', icon: '🌿', value: city.air_quality || 0, color: '#87A878' },
+    { key: 'safety', label: '安全指数', icon: '🛡️', value: city.safety || 0, color: '#4682B4' },
+    { key: 'elderly_care', label: '养老友好', icon: '🏥', value: city.elderly_care || 0, color: '#D4AF37' },
+    { key: 'living_cost', label: '生活成本', icon: '💰', value: city.living_cost || 0, inverted: true, color: '#51CF66' },
+    { key: 'employment', label: '就业机会', icon: '💼', value: city.employment || 0, color: '#FF6B6B' },
+    { key: 'medical_facilities', label: '医疗设施', icon: '⚕️', value: city.medical_facilities || 0, color: '#9370DB' }
+  ]
+
+  return dimensions
+    .filter(d => d.value > 0)
+    .sort((a, b) => {
+      // 生活成本是反向指标，分数越低越好
+      if (a.inverted) return a.value - b.value
+      if (b.inverted) return b.value - a.value
+      return b.value - a.value
+    })
+    .slice(0, 3)
+}
+
+// 语义化标签生成
+const getSemanticTags = (city) => {
+  const tags = []
+
+  if ((city.safety || 0) >= 9) {
+    tags.push({ text: '单身女性友好', color: '#87A878' })
+  }
+
+  if ((city.air_quality || 0) >= 9) {
+    tags.push({ text: '呼吸天堂', color: '#4682B4' })
+  }
+
+  if ((city.elderly_care || 0) >= 8) {
+    tags.push({ text: '康养胜地', color: '#D4AF37' })
+  }
+
+  if ((city.employment || 0) >= 8) {
+    tags.push({ text: '机会之城', color: '#FF6B6B' })
+  }
+
+  if ((city.living_cost || 0) <= 3 && (city.overall_score || 0) >= 70) {
+    tags.push({ text: '性价比之王', color: '#51CF66' })
+  }
+
+  if ((city.medical_facilities || 0) >= 8) {
+    tags.push({ text: '医疗完善', color: '#9370DB' })
+  }
+
+  return tags.slice(0, 2) // 最多显示2个
+}
+
+// 根据城市名生成封面图（临时方案，实际应该从后端获取）
+const getCityImage = (cityName) => {
+  const cityImages = {
+    '成都': 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800',
+    '杭州': 'https://images.unsplash.com/photo-1559564484-e48bf5e37589?w=800',
+    '苏州': 'https://images.unsplash.com/photo-1564594022564-4c52cbfda6dd?w=800',
+    '厦门': 'https://images.unsplash.com/photo-1598947195055-a87e0e0fdd7b?w=800',
+    '青岛': 'https://images.unsplash.com/photo-1607002714961-0e3e4b1b7e3f?w=800',
+    '大理': 'https://images.unsplash.com/photo-1581888227599-779811939961?w=800',
+    '丽江': 'https://images.unsplash.com/photo-1599809275671-b5942cabc7a2?w=800',
+    '西安': 'https://images.unsplash.com/photo-1587561449-bda1dc1c8edb?w=800',
+    '上海': 'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=800',
+    '北京': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800',
+    '深圳': 'https://images.unsplash.com/photo-1543731068-391649f6d03d?w=800',
+    '广州': 'https://images.unsplash.com/photo-1529065618223-930025c00eb7?w=800'
+  }
+
+  return cityImages[cityName] || 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800'
+}
+
 module.exports = {
   formatNumber,
   formatDate,
@@ -281,5 +354,8 @@ module.exports = {
   getDimensionLabel,
   getEmotionalScore,
   getCityPersonality,
-  saveImage
+  saveImage,
+  getTopDimensions,
+  getSemanticTags,
+  getCityImage
 }
