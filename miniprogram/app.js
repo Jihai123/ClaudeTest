@@ -3,8 +3,11 @@ App({
   globalData: {
     userInfo: null,
     token: null,
-    // 根据实际部署情况配置API地址
-    apiBaseUrl: 'https://your-domain.com/api' // TODO: 修改为实际的API地址
+    // API地址配置
+    // 本地开发: http://localhost:3000/api
+    // 真机测试: http://你的电脑IP:3000/api (例如: http://192.168.1.100:3000/api)
+    // 生产环境: https://your-domain.com/api
+    apiBaseUrl: 'http://localhost:3000/api'
   },
 
   onLaunch() {
