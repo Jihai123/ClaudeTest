@@ -55,10 +55,30 @@
     </view>
   </view>
 
-  <!-- 智能标签筛选 -->
+  <!-- 国内/国际切换 + 智能标签筛选 -->
   <view class="tags-bar">
     <scroll-view scroll-x class="tags-scroll">
       <view class="tags-container">
+        <!-- 国内/国际切换 -->
+        <view
+          class="tag-item region-tag {{regionFilter === 'domestic' ? 'active' : ''}}"
+          bindtap="onRegionTap"
+          data-region="domestic"
+        >
+          🇨🇳 国内
+        </view>
+        <view
+          class="tag-item region-tag {{regionFilter === 'international' ? 'active' : ''}}"
+          bindtap="onRegionTap"
+          data-region="international"
+        >
+          🌍 国际
+        </view>
+
+        <!-- 分隔线 -->
+        <view class="tag-divider"></view>
+
+        <!-- 智能标签 -->
         <view
           wx:for="{{smartTags}}"
           wx:key="id"
