@@ -130,6 +130,98 @@ const getDimensionColor = (value) => {
   return '#ef4444' // 红色
 }
 
+// 获取情绪化评分信息（根据综合评分）
+const getEmotionalScore = (score) => {
+  if (score >= 85) {
+    return {
+      level: '非常宜居',
+      gradient: 'linear-gradient(135deg, #FFB703 0%, #FFD166 100%)',
+      color: '#FFB703',
+      emoji: '🌟'
+    }
+  } else if (score >= 70) {
+    return {
+      level: '宜居',
+      gradient: 'linear-gradient(135deg, #8ECAE6 0%, #BEE7E8 100%)',
+      color: '#8ECAE6',
+      emoji: '✨'
+    }
+  } else if (score >= 60) {
+    return {
+      level: '尚可',
+      gradient: 'linear-gradient(135deg, #ADB5BD 0%, #CED4DA 100%)',
+      color: '#ADB5BD',
+      emoji: '🌤'
+    }
+  } else {
+    return {
+      level: '慎选',
+      gradient: 'linear-gradient(135deg, #E09F9F 0%, #F1C0C0 100%)',
+      color: '#E09F9F',
+      emoji: '⚠️'
+    }
+  }
+}
+
+// 生成城市一句话描述（基于维度数据）
+const getCityPersonality = (city) => {
+  const descriptions = []
+
+  // 判断生活成本
+  if (city.living_cost && city.living_cost <= 4) {
+    descriptions.push('生活成本低')
+  } else if (city.living_cost >= 7) {
+    descriptions.push('生活成本较高')
+  }
+
+  // 判断空气质量
+  if (city.air_quality && city.air_quality >= 8) {
+    descriptions.push('空气很好')
+  }
+
+  // 判断养老适合度
+  if (city.elderly_care && city.elderly_care >= 8) {
+    descriptions.push('适合养老')
+  }
+
+  // 判断就业机会
+  if (city.employment && city.employment >= 7) {
+    descriptions.push('就业机会多')
+  } else if (city.employment && city.employment <= 4) {
+    descriptions.push('节奏慢')
+  }
+
+  // 判断安全指数
+  if (city.safety && city.safety >= 8) {
+    descriptions.push('安全感强')
+  }
+
+  // 组合描述
+  if (descriptions.length === 0) {
+    return '适合生活的城市'
+  }
+
+  // 生成不同的句式
+  if (descriptions.includes('节奏慢') && descriptions.includes('生活成本低')) {
+    return '节奏慢，适合安心过日子'
+  }
+
+  if (descriptions.includes('空气很好') && descriptions.includes('适合养老')) {
+    return '空气好，很适合养老'
+  }
+
+  if (descriptions.includes('生活成本低') && descriptions.includes('空气很好')) {
+    return '收入不高，但生活不贵'
+  }
+
+  if (descriptions.includes('就业机会多') && descriptions.includes('生活成本较高')) {
+    return '机会多，但成本不低'
+  }
+
+  // 默认组合前两个特点
+  return descriptions.slice(0, 2).join('，')
+}
+
 // 获取维度标签
 const getDimensionLabel = (key) => {
   const labels = {
@@ -187,5 +279,7 @@ module.exports = {
   copyToClipboard,
   getDimensionColor,
   getDimensionLabel,
+  getEmotionalScore,
+  getCityPersonality,
   saveImage
 }
