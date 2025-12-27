@@ -11,6 +11,9 @@ Page({
     totalPages: 1,
     limit: 10,
 
+    // 国内/国际筛选（默认国内）
+    regionFilter: 'domestic',
+
     // 场景化入口
     activeScenario: '',
 
@@ -89,41 +92,143 @@ Page({
     }
   },
 
+  // 智能搜索关键词匹配
+  parseSearchKeywords(query) {
+    const lowerQuery = query.toLowerCase().trim()
+
+    // 关键词映射表
+    const keywordMap = {
+      '看海': { tags: ['coastal'], keywords: ['海边', '沿海', '海滨'] },
+      '海边': { tags: ['coastal'], keywords: ['看海', '沿海', '海滨'] },
+      '沿海': { tags: ['coastal'], keywords: ['看海', '海边', '海滨'] },
+      '养老': { filter: { elderly_care: 7 }, tags: ['elderly'] },
+      '退休': { filter: { elderly_care: 7 }, tags: ['elderly'] },
+      '康养': { filter: { elderly_care: 7, medical_facilities: 7 }, tags: ['elderly', 'medical'] },
+      '旅居': { filter: { air_quality: 7, safety: 7 }, tags: ['vacation'] },
+      '性价比': { filter: { living_cost: 5 }, tags: ['costEffective'] },
+      '便宜': { filter: { living_cost: 5 }, tags: ['costEffective'] },
+      '空气好': { filter: { air_quality: 8 }, tags: ['airQuality'] },
+      '空气': { filter: { air_quality: 7 }, tags: ['airQuality'] },
+      '安全': { filter: { safety: 8 }, tags: ['safety'] },
+      '工作': { filter: { employment: 7 }, tags: ['young'] },
+      '就业': { filter: { employment: 7 }, tags: ['young'] },
+      '数字游民': { filter: { employment: 6, living_cost: 6 }, tags: ['nomad'] },
+      '远程': { filter: { employment: 6 }, tags: ['nomad'] }
+    }
+
+    // 检查是否包含关键词
+    for (const [keyword, config] of Object.entries(keywordMap)) {
+      if (lowerQuery.includes(keyword)) {
+        return config
+      }
+    }
+
+    return null
+  },
+
   // 加载城市列表
   async loadCities() {
     this.setData({ loading: true })
 
     try {
+      // 解析搜索关键词
+      const searchConfig = this.parseSearchKeywords(this.data.searchQuery)
+
       const params = {
-        search: this.data.searchQuery,
+        search: searchConfig ? '' : this.data.searchQuery, // 如果是关键词搜索，不传原始搜索词
         sort: this.data.sortOptions[this.data.sortIndex].value,
         order: this.data.orderOptions[this.data.orderIndex].value,
         page: this.data.currentPage,
-        limit: this.data.limit
+        limit: 100 // 加载更多数据以便前端筛选
       }
 
       const result = await api.getCities(params)
+      let cities = result.cities || []
+
+      // 应用地区筛选（国内/国际）
+      cities = cities.filter(city => {
+        const isInternational = city.country && city.country !== '中国'
+        if (this.data.regionFilter === 'domestic') {
+          return !isInternational
+        } else if (this.data.regionFilter === 'international') {
+          return isInternational
+        }
+        return true
+      })
+
+      // 应用场景筛选
+      if (this.data.activeScenario) {
+        cities = cities.filter(city => {
+          switch (this.data.activeScenario) {
+            case 'nomad': // 数字游民：就业机会好、生活成本适中
+              return (city.employment || 0) >= 6 && (city.living_cost || 0) <= 7
+            case 'vacation': // 避暑避寒：空气好、气候宜人
+              return (city.air_quality || 0) >= 7
+            case 'retirement': // 康养退休：医疗好、空气好、养老友好
+              return (city.elderly_care || 0) >= 6 && (city.medical_facilities || 0) >= 6
+            default:
+              return true
+          }
+        })
+      }
+
+      // 应用标签筛选
+      if (this.data.activeTag !== 'all') {
+        cities = cities.filter(city => {
+          switch (this.data.activeTag) {
+            case 'elderly':
+              return (city.elderly_care || 0) >= 7
+            case 'young':
+              return (city.employment || 0) >= 6
+            case 'costEffective':
+              return (city.living_cost || 0) <= 5 && (city.overall_score || 0) >= 60
+            case 'airQuality':
+              return (city.air_quality || 0) >= 8
+            case 'safety':
+              return (city.safety || 0) >= 8
+            default:
+              return true
+          }
+        })
+      }
+
+      // 应用智能搜索关键词筛选
+      if (searchConfig && searchConfig.filter) {
+        cities = cities.filter(city => {
+          for (const [key, minValue] of Object.entries(searchConfig.filter)) {
+            if (key === 'living_cost') {
+              // 生活成本是反向指标，越低越好
+              if ((city[key] || 10) > minValue) return false
+            } else {
+              if ((city[key] || 0) < minValue) return false
+            }
+          }
+          return true
+        })
+      }
+
+      // 处理沿海城市关键词（特殊处理）
+      if (searchConfig && searchConfig.keywords && searchConfig.keywords.includes('海边')) {
+        // 沿海城市名单（可以从后端获取，这里先硬编码）
+        const coastalCities = ['青岛', '厦门', '大连', '三亚', '珠海', '深圳', '广州', '上海', '宁波', '福州', '烟台', '威海', '日照', '连云港', '南通', '舟山', '台州', '温州', '汕头', '湛江', '北海', '海口']
+        cities = cities.filter(city => coastalCities.includes(city.name))
+      }
+
+      // 如果筛选后为空，给出提示
+      if (cities.length === 0) {
+        util.showToast('没有符合条件的城市，试试其他筛选条件')
+      }
 
       // 处理城市数据
-      const cities = (result.cities || []).map(city => {
+      cities = cities.map(city => {
         const score = city.overall_score || 0
         const emotional = util.getEmotionalScore(score)
         const personality = util.getCityPersonality(city)
         const isInternational = city.country && city.country !== '中国'
-
-        // 动态指标（只显示前3名且>0的）
         const topDimensions = util.getTopDimensions(city)
-
-        // 语义化标签
         const semanticTags = util.getSemanticTags(city)
-
-        // 城市封面图
         const coverImage = util.getCityImage(city.name)
-
-        // 是否已收藏
         const isFavorite = this.data.favorites.includes(city.id)
-
-        // 是否在对比篮子中
         const isComparing = this.data.compareCities.some(c => c.id === city.id)
 
         return {
@@ -146,9 +251,15 @@ Page({
         }
       })
 
+      // 前端分页
+      const totalPages = Math.ceil(cities.length / this.data.limit)
+      const start = (this.data.currentPage - 1) * this.data.limit
+      const end = start + this.data.limit
+      const pagedCities = cities.slice(start, end)
+
       this.setData({
-        cities,
-        totalPages: result.pagination ? result.pagination.pages : 1,
+        cities: pagedCities,
+        totalPages: totalPages || 1,
         loading: false
       })
     } catch (error) {
@@ -156,6 +267,16 @@ Page({
       util.showToast('加载失败，请重试')
       this.setData({ loading: false })
     }
+  },
+
+  // 国内/国际切换
+  onRegionTap(e) {
+    const region = e.currentTarget.dataset.region
+    this.setData({
+      regionFilter: region,
+      currentPage: 1
+    })
+    this.loadCities()
   },
 
   // 场景切换
@@ -166,29 +287,10 @@ Page({
     const newScenario = this.data.activeScenario === scenario ? '' : scenario
 
     this.setData({
-      activeScenario: newScenario
-    })
-
-    // 根据场景筛选城市
-    this.filterByScenario(newScenario)
-  },
-
-  // 根据场景筛选
-  filterByScenario(scenario) {
-    // 重置标签
-    const smartTags = this.data.smartTags.map(tag => ({
-      ...tag,
-      active: tag.id === 'all'
-    }))
-
-    this.setData({
-      smartTags,
-      activeTag: 'all',
+      activeScenario: newScenario,
       currentPage: 1
     })
 
-    // 根据场景设置筛选条件
-    // TODO: 可以扩展为根据不同场景调用不同的API参数
     this.loadCities()
   },
 
@@ -246,91 +348,7 @@ Page({
       currentPage: 1
     })
 
-    this.filterCitiesByTag()
-  },
-
-  // 根据标签筛选城市
-  filterCitiesByTag() {
-    const tagId = this.data.activeTag
-
-    // 如果是"全部"标签，正常加载
-    if (tagId === 'all') {
-      this.loadCities()
-      return
-    }
-
-    // 根据标签类型筛选
-    this.setData({ loading: true })
-
-    api.getCities({
-      search: this.data.searchQuery,
-      sort: this.data.sortOptions[this.data.sortIndex].value,
-      order: this.data.orderOptions[this.data.orderIndex].value,
-      page: this.data.currentPage,
-      limit: this.data.limit
-    }).then(result => {
-      let cities = result.cities || []
-
-      // 根据标签筛选
-      cities = cities.filter(city => {
-        switch (tagId) {
-          case 'elderly':
-            return (city.elderly_care || 0) >= 7
-          case 'young':
-            return (city.employment || 0) >= 7 && (city.living_cost || 0) <= 6
-          case 'costEffective':
-            return (city.living_cost || 0) <= 5 && (city.overall_score || 0) >= 65
-          case 'airQuality':
-            return (city.air_quality || 0) >= 8
-          case 'safety':
-            return (city.safety || 0) >= 8
-          default:
-            return true
-        }
-      })
-
-      // 处理城市数据
-      cities = cities.map(city => {
-        const score = city.overall_score || 0
-        const emotional = util.getEmotionalScore(score)
-        const personality = util.getCityPersonality(city)
-        const isInternational = city.country && city.country !== '中国'
-        const topDimensions = util.getTopDimensions(city)
-        const semanticTags = util.getSemanticTags(city)
-        const coverImage = util.getCityImage(city.name)
-        const isFavorite = this.data.favorites.includes(city.id)
-        const isComparing = this.data.compareCities.some(c => c.id === city.id)
-
-        return {
-          ...city,
-          stars: util.createStars(city.avg_rating || 0),
-          avg_rating: city.avg_rating ? city.avg_rating.toFixed(1) : null,
-          emotionalLevel: emotional.level,
-          emotionalGradient: emotional.gradient,
-          emotionalColor: emotional.color,
-          emoji: emotional.emoji,
-          personality,
-          isInternational,
-          locationText: isInternational ? city.country : city.province,
-          cardStyle: `background: ${emotional.gradient};`,
-          topDimensions,
-          semanticTags,
-          coverImage,
-          isFavorite,
-          isComparing
-        }
-      })
-
-      this.setData({
-        cities,
-        totalPages: Math.ceil(cities.length / this.data.limit),
-        loading: false
-      })
-    }).catch(error => {
-      console.error('筛选城市失败:', error)
-      util.showToast('筛选失败，请重试')
-      this.setData({ loading: false })
-    })
+    this.loadCities()
   },
 
   // 上一页

@@ -170,6 +170,27 @@
   font-weight: 600;
 }
 
+/* 国内/国际切换标签 */
+.tag-item.region-tag {
+  background: rgba(135, 168, 120, 0.1);
+  border: 2rpx solid rgba(135, 168, 120, 0.3);
+  font-weight: 600;
+}
+
+.tag-item.region-tag.active {
+  background: linear-gradient(135deg, #87A878 0%, #6B8E65 100%);
+  border-color: transparent;
+}
+
+/* 标签分隔线 */
+.tag-divider {
+  width: 2rpx;
+  height: 40rpx;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 0 20rpx;
+  align-self: center;
+}
+
 /* ================================
    3. 筛选栏
    ================================ */
