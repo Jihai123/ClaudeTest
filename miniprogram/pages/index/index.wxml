@@ -16,6 +16,23 @@
     </view>
   </view>
 
+  <!-- 智能标签筛选 -->
+  <view class="tags-bar">
+    <scroll-view scroll-x class="tags-scroll">
+      <view class="tags-container">
+        <view
+          wx:for="{{smartTags}}"
+          wx:key="id"
+          class="tag-item {{item.active ? 'active' : ''}}"
+          bindtap="onTagTap"
+          data-id="{{item.id}}"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
   <!-- 筛选和排序 -->
   <view class="filter-bar">
     <picker class="filter-item" mode="selector" range="{{sortOptions}}" range-key="label" value="{{sortIndex}}" bindchange="onSortChange">
@@ -44,12 +61,17 @@
       <!-- 城市头部 -->
       <view class="city-header">
         <view class="city-info">
-          <view class="city-name">{{item.name}}</view>
-          <view class="city-province">{{item.province || '未知省份'}}</view>
+          <view class="city-name-row">
+            <text class="city-name">{{item.name}}</text>
+            <text class="city-emoji">{{item.emoji}}</text>
+            <text wx:if="{{item.isInternational}}" class="location-badge international">{{item.locationText}}</text>
+            <text wx:else class="location-badge">{{item.locationText}}</text>
+          </view>
+          <view class="city-personality">{{item.personality}}</view>
         </view>
-        <view class="city-score">
+        <view class="city-score" style="{{item.cardStyle}}">
           <text class="score-value">{{item.overall_score || 0}}</text>
-          <text class="score-label">分</text>
+          <text class="score-label">{{item.emotionalLevel}}</text>
         </view>
       </view>
 
