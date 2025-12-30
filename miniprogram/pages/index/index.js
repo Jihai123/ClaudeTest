@@ -203,8 +203,8 @@ Page({
   // 获取单个城市信息
   async getCityById(cityId) {
     try {
-      const result = await api.getCity(cityId)
-      return result.city || null
+      const city = await api.getCity(cityId)
+      return city || null
     } catch (error) {
       console.error(`获取城市${cityId}失败:`, error)
       return null

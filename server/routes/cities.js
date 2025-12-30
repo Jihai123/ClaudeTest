@@ -88,6 +88,7 @@ router.get('/', optionalAuth, async (req, res) => {
   try {
     const {
       search,
+      keywords, // 逗号分隔的关键词列表
       sort = 'overall_score',
       order = 'DESC',
       page = 1,
@@ -112,6 +113,18 @@ router.get('/', optionalAuth, async (req, res) => {
     if (search) {
       whereClause += ' AND (c.name LIKE ? OR c.province LIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
+    }
+
+    // 关键词匹配（用于智能搜索）
+    if (keywords) {
+      const keywordList = keywords.split(',').map(k => k.trim()).filter(k => k);
+      if (keywordList.length > 0) {
+        const keywordConditions = keywordList.map(() => 'c.name LIKE ?').join(' OR ');
+        whereClause += ` AND (${keywordConditions})`;
+        keywordList.forEach(keyword => {
+          params.push(`%${keyword}%`);
+        });
+      }
     }
 
     // 高级筛选
@@ -221,14 +234,89 @@ router.get('/', optionalAuth, async (req, res) => {
           params.push(...legacyFeatures);
         }
 
+        // 【新增】维度范围筛选支持
+        // 支持格式: field_min, field_max, field (精确匹配)
+        const dimensionFields = [
+          'living_cost', 'air_quality', 'medical_facilities', 'employment',
+          'safety', 'elderly_care', 'rent_cost', 'climate',
+          'slow_pace', 'medical_access', 'nature', 'population_density',
+          'price_index', 'digital_facilities', 'medical', 'transportation',
+          'internet', 'education', 'actual_level', 'overall_score'
+        ];
+
+        for (const field of dimensionFields) {
+          // 最小值筛选
+          if (filterObj[`${field}_min`] !== undefined) {
+            const minValue = parseFloat(filterObj[`${field}_min`]);
+            if (!isNaN(minValue)) {
+              // overall_score在主表，其他在维度表
+              const tablePrefix = field === 'overall_score' ? 'c' : 'cd';
+              whereClause += ` AND ${tablePrefix}.${field} >= ?`;
+              params.push(minValue);
+            }
+          }
+
+          // 最大值筛选
+          if (filterObj[`${field}_max`] !== undefined) {
+            const maxValue = parseFloat(filterObj[`${field}_max`]);
+            if (!isNaN(maxValue)) {
+              const tablePrefix = field === 'overall_score' ? 'c' : 'cd';
+              whereClause += ` AND ${tablePrefix}.${field} <= ?`;
+              params.push(maxValue);
+            }
+          }
+
+          // 精确匹配（如果没有_min/_max后缀）
+          if (filterObj[field] !== undefined &&
+              filterObj[`${field}_min`] === undefined &&
+              filterObj[`${field}_max`] === undefined) {
+            const exactValue = parseFloat(filterObj[field]);
+            if (!isNaN(exactValue)) {
+              const tablePrefix = field === 'overall_score' ? 'c' : 'cd';
+              whereClause += ` AND ${tablePrefix}.${field} = ?`;
+              params.push(exactValue);
+            }
+          }
+        }
+
+        // 人口范围筛选
+        if (filterObj.population_min !== undefined) {
+          const minPop = parseInt(filterObj.population_min);
+          if (!isNaN(minPop)) {
+            whereClause += ' AND c.population >= ?';
+            params.push(minPop);
+          }
+        }
+
+        if (filterObj.population_max !== undefined) {
+          const maxPop = parseInt(filterObj.population_max);
+          if (!isNaN(maxPop)) {
+            whereClause += ' AND c.population <= ?';
+            params.push(maxPop);
+          }
+        }
+
       } catch (e) {
         console.warn('筛选条件解析失败:', e);
       }
     }
 
     // 根据榜单类型决定排序字段
-    const validSortFields = ['name', 'overall_score', 'layflat_score', 'world_score', 'population', 'created_at'];
+    const validSortFields = [
+      'name', 'overall_score', 'layflat_score', 'world_score', 'population', 'created_at',
+      // 维度字段排序支持
+      'living_cost', 'air_quality', 'medical_facilities', 'employment',
+      'safety', 'elderly_care', 'rent_cost', 'climate'
+    ];
     let sortField = validSortFields.includes(sort) ? sort : 'overall_score';
+
+    // 判断排序字段是在主表还是维度表
+    const dimensionSortFields = [
+      'living_cost', 'air_quality', 'medical_facilities', 'employment',
+      'safety', 'elderly_care', 'rent_cost', 'climate'
+    ];
+    const sortTablePrefix = dimensionSortFields.includes(sortField) ? 'cd' : 'c';
+
     let orderByClause = '';
 
     // 躺平榜使用随机排序（打乱排名）
@@ -240,7 +328,8 @@ router.get('/', optionalAuth, async (req, res) => {
         sortField = 'world_score';
       }
       const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-      orderByClause = `ORDER BY c.${sortField} ${sortOrder}`;
+      // 使用正确的表前缀
+      orderByClause = `ORDER BY ${sortTablePrefix}.${sortField} ${sortOrder}`;
     }
 
     const query = `
