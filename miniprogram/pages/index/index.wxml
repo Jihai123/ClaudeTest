@@ -1,253 +1,144 @@
 <!--pages/index/index.wxml-->
 <view class="container">
-  <!-- 顶部场景入口 - Hero Section -->
-  <view class="hero-section">
-    <text class="hero-title">发现你的理想城市</text>
-    <text class="hero-subtitle">数字游民 · 康养旅居 · 退休生活</text>
-
-    <!-- 搜索栏 -->
-    <view class="search-bar-new">
-      <view class="search-box-new">
-        <icon class="search-icon" type="search" size="16" color="#87A878" />
-        <input
-          class="search-input-new"
-          placeholder="搜索城市或输入你的需求..."
-          value="{{searchQuery}}"
-          bindinput="onSearchInput"
-          confirm-type="search"
-          bindconfirm="onSearchConfirm"
-        />
-        <icon wx:if="{{searchQuery}}" class="clear-icon" type="clear" size="16" color="#999" bindtap="onClearSearch" />
-      </view>
+  <!-- 1. 搜索 + 定位区（最高优先级） -->
+  <view class="search-section">
+    <!-- 搜索框 -->
+    <view class="search-box-main">
+      <icon class="search-icon-main" type="search" size="20" color="#87A878" />
+      <input
+        class="search-input-main"
+        placeholder="输入城市名 / 拼音 / 首字母"
+        value="{{searchQuery}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+        bindconfirm="onSearchConfirm"
+      />
+      <icon wx:if="{{searchQuery}}" class="clear-icon-main" type="clear" size="18" color="#999" bindtap="onClearSearch" />
     </view>
 
-    <!-- 场景化入口磁贴 -->
-    <view class="scenario-tiles">
-      <view
-        class="scenario-tile {{activeScenario === 'nomad' ? 'active' : ''}}"
-        bindtap="onScenarioTap"
-        data-scenario="nomad"
-      >
-        <view class="tile-icon">💻</view>
-        <text class="tile-label">数字游民</text>
-        <text class="tile-desc">网速快·咖啡多</text>
-      </view>
+    <!-- 定位 -->
+    <view class="location-bar" bindtap="onLocationTap">
+      <text class="location-icon">📍</text>
+      <text class="location-text">{{currentLocation || '定位中...'}}</text>
+      <text class="location-arrow">→</text>
+    </view>
+  </view>
 
-      <view
-        class="scenario-tile {{activeScenario === 'vacation' ? 'active' : ''}}"
-        bindtap="onScenarioTap"
-        data-scenario="vacation"
-      >
-        <view class="tile-icon">🏖️</view>
-        <text class="tile-label">避暑避寒</text>
-        <text class="tile-desc">气候宜人·风景好</text>
+  <!-- 2. 快速入口区（条件找城） -->
+  <view class="quick-entry-section">
+    <view class="section-title">快速找城</view>
+    <view class="quick-entry-grid">
+      <view class="entry-item" bindtap="onQuickEntry" data-type="recommend">
+        <text class="entry-icon">🧭</text>
+        <text class="entry-label">我适合住哪</text>
       </view>
-
-      <view
-        class="scenario-tile {{activeScenario === 'retirement' ? 'active' : ''}}"
-        bindtap="onScenarioTap"
-        data-scenario="retirement"
-      >
-        <view class="tile-icon">🏥</view>
-        <text class="tile-label">康养退休</text>
-        <text class="tile-desc">医疗好·空气佳</text>
+      <view class="entry-item" bindtap="onQuickEntry" data-type="lowCost">
+        <text class="entry-icon">💰</text>
+        <text class="entry-label">低生活成本</text>
+      </view>
+      <view class="entry-item" bindtap="onQuickEntry" data-type="elderly">
+        <text class="entry-icon">👵</text>
+        <text class="entry-label">适合养老</text>
+      </view>
+      <view class="entry-item" bindtap="onQuickEntry" data-type="employment">
+        <text class="entry-icon">💼</text>
+        <text class="entry-label">就业机会多</text>
+      </view>
+      <view class="entry-item" bindtap="onQuickEntry" data-type="airQuality">
+        <text class="entry-icon">🌿</text>
+        <text class="entry-label">空气好</text>
+      </view>
+      <view class="entry-item" bindtap="onQuickEntry" data-type="coastal">
+        <text class="entry-icon">🌊</text>
+        <text class="entry-label">沿海城市</text>
       </view>
     </view>
   </view>
 
-  <!-- 国内/国际切换 + 智能标签筛选 -->
-  <view class="tags-bar">
-    <scroll-view scroll-x class="tags-scroll">
-      <view class="tags-container">
-        <!-- 国内/国际切换 -->
+  <!-- 3. 最近访问（如果有） -->
+  <view class="recent-section" wx:if="{{recentCities.length > 0}}">
+    <view class="section-title">最近访问</view>
+    <scroll-view scroll-x class="city-scroll">
+      <view class="city-cards">
         <view
-          class="tag-item region-tag {{regionFilter === 'domestic' ? 'active' : ''}}"
-          bindtap="onRegionTap"
-          data-region="domestic"
-        >
-          🇨🇳 国内
-        </view>
-        <view
-          class="tag-item region-tag {{regionFilter === 'international' ? 'active' : ''}}"
-          bindtap="onRegionTap"
-          data-region="international"
-        >
-          🌍 国际
-        </view>
-
-        <!-- 分隔线 -->
-        <view class="tag-divider"></view>
-
-        <!-- 智能标签 -->
-        <view
-          wx:for="{{smartTags}}"
+          wx:for="{{recentCities}}"
           wx:key="id"
-          class="tag-item {{item.active ? 'active' : ''}}"
-          bindtap="onTagTap"
+          class="city-card-mini"
+          bindtap="onCityTap"
           data-id="{{item.id}}"
         >
-          {{item.label}}
+          <text class="city-card-name">{{item.name}}</text>
+          <view class="city-card-score">
+            <text class="score-number">{{item.overall_score || 0}}</text>
+            <text class="score-unit">分</text>
+          </view>
+          <text class="city-card-tag">{{item.mainTag}}</text>
         </view>
       </view>
     </scroll-view>
   </view>
 
-  <!-- 筛选和排序 -->
-  <view class="filter-bar">
-    <picker class="filter-item" mode="selector" range="{{sortOptions}}" range-key="label" value="{{sortIndex}}" bindchange="onSortChange">
-      <view class="picker-text">
-        <text>{{sortOptions[sortIndex].label}}</text>
-        <text class="arrow">▼</text>
+  <!-- 4. 热门城市 -->
+  <view class="hot-section">
+    <view class="section-header">
+      <text class="section-title">热门城市</text>
+      <text class="section-more" bindtap="onViewMore" data-type="hot">查看更多 →</text>
+    </view>
+    <scroll-view scroll-x class="city-scroll">
+      <view class="city-cards">
+        <view
+          wx:for="{{hotCities}}"
+          wx:key="id"
+          class="city-card-mini"
+          bindtap="onCityTap"
+          data-id="{{item.id}}"
+        >
+          <text class="city-card-name">{{item.name}}</text>
+          <view class="city-card-score">
+            <text class="score-number">{{item.overall_score || 0}}</text>
+            <text class="score-unit">分</text>
+          </view>
+          <text class="city-card-tag">{{item.mainTag}}</text>
+        </view>
       </view>
-    </picker>
-    <picker class="filter-item" mode="selector" range="{{orderOptions}}" range-key="label" value="{{orderIndex}}" bindchange="onOrderChange">
-      <view class="picker-text">
-        <text>{{orderOptions[orderIndex].label}}</text>
-        <text class="arrow">▼</text>
-      </view>
-    </picker>
+    </scroll-view>
   </view>
 
-  <!-- 城市列表 - 重构版 -->
-  <view class="cities-list-new">
-    <view
-      wx:for="{{cities}}"
-      wx:key="id"
-      class="city-card-new"
-      bindtap="onCityTap"
-      data-id="{{item.id}}"
-    >
-      <!-- 城市封面图 -->
-      <view class="city-cover">
-        <image
-          class="cover-image"
-          src="{{item.coverImage || '/images/city-placeholder.jpg'}}"
-          mode="aspectFill"
-          lazy-load
-        />
-        <!-- 毛玻璃评分标签 -->
-        <view class="score-badge-glass" style="{{item.cardStyle}}">
-          <text class="score-value-glass">{{item.overall_score || 0}}</text>
-          <text class="score-label-glass">{{item.emotionalLevel}}</text>
+  <!-- 5. 榜单与推荐区（克制展示） -->
+  <view class="ranking-section">
+    <view class="section-header">
+      <text class="section-title">本月宜居榜单</text>
+      <text class="section-more" bindtap="onViewMore" data-type="ranking">查看完整榜单 →</text>
+    </view>
+    <view class="ranking-list">
+      <view
+        wx:for="{{rankingCities}}"
+        wx:key="id"
+        class="ranking-item"
+        bindtap="onCityTap"
+        data-id="{{item.id}}"
+      >
+        <view class="ranking-number {{index < 3 ? 'top' : ''}}">{{index + 1}}</view>
+        <view class="ranking-info">
+          <text class="ranking-city">{{item.name}}</text>
+          <text class="ranking-province">{{item.province}}</text>
         </view>
-        <!-- 收藏按钮 -->
-        <view class="favorite-btn {{item.isFavorite ? 'active' : ''}}" catchtap="onToggleFavorite" data-id="{{item.id}}">
-          <text class="favorite-icon">{{item.isFavorite ? '❤️' : '🤍'}}</text>
-        </view>
-        <!-- 对比勾选框 -->
-        <view class="compare-checkbox {{item.isComparing ? 'checked' : ''}}" catchtap="onToggleCompare" data-id="{{item.id}}">
-          <text class="checkbox-icon">{{item.isComparing ? '✓' : ''}}</text>
-        </view>
-      </view>
-
-      <!-- 城市信息区 -->
-      <view class="city-content">
-        <!-- 头部：城市名 + 位置 -->
-        <view class="city-header-new">
-          <view class="city-name-section">
-            <text class="city-name-new">{{item.name}}</text>
-            <text class="city-emoji-new">{{item.emoji}}</text>
-          </view>
-          <text class="location-badge-new {{item.isInternational ? 'international' : ''}}">
-            {{item.locationText}}
-          </text>
-        </view>
-
-        <!-- 城市个性描述 -->
-        <text class="city-personality-new">{{item.personality}}</text>
-
-        <!-- 语义化标签（只显示突出优势） -->
-        <view class="semantic-tags" wx:if="{{item.semanticTags && item.semanticTags.length > 0}}">
-          <view
-            wx:for="{{item.semanticTags}}"
-            wx:for-item="tag"
-            wx:key="index"
-            class="semantic-tag"
-            style="background-color: {{tag.color}}15; color: {{tag.color}}; border-color: {{tag.color}}30;"
-          >
-            {{tag.text}}
-          </view>
-        </view>
-
-        <!-- 动态指标展示（只显示前3名且>0的） -->
-        <view class="top-dimensions" wx:if="{{item.topDimensions && item.topDimensions.length > 0}}">
-          <view
-            wx:for="{{item.topDimensions}}"
-            wx:for-item="dim"
-            wx:key="key"
-            class="dimension-bar"
-          >
-            <view class="dimension-info">
-              <text class="dimension-icon">{{dim.icon}}</text>
-              <text class="dimension-label-new">{{dim.label}}</text>
-            </view>
-            <view class="progress-bar">
-              <view class="progress-fill" style="width: {{dim.value * 10}}%; background: {{dim.color}};"></view>
-              <text class="progress-value">{{dim.value}}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 底部：评价信息 -->
-        <view class="city-footer-new">
-          <view class="rating-section" wx:if="{{item.avg_rating}}">
-            <text class="stars-new">{{item.stars}}</text>
-            <text class="rating-value-new">{{item.avg_rating}}</text>
-            <text class="reviews-count-new">{{item.review_count || 0}} 条评价</text>
-          </view>
-          <text wx:else class="no-rating-new">暂无评分 · {{item.review_count || 0}} 条评价</text>
+        <view class="ranking-score">
+          <text class="ranking-score-value">{{item.overall_score || 0}}</text>
+          <text class="ranking-emoji">{{item.emoji}}</text>
         </view>
       </view>
     </view>
   </view>
 
   <!-- 加载中 -->
-  <view wx:if="{{loading}}" class="loading">
+  <view wx:if="{{loading}}" class="loading-simple">
     <text>加载中...</text>
   </view>
 
   <!-- 空状态 -->
-  <view wx:if="{{!loading && cities.length === 0}}" class="empty">
-    <view class="empty-icon">🏙️</view>
+  <view wx:if="{{!loading && hotCities.length === 0}}" class="empty-simple">
+    <text class="empty-icon">🏙️</text>
     <text class="empty-text">暂无城市数据</text>
-  </view>
-
-  <!-- 分页 -->
-  <view wx:if="{{cities.length > 0}}" class="pagination">
-    <button
-      class="page-btn"
-      disabled="{{currentPage === 1}}"
-      bindtap="onPrevPage"
-    >
-      上一页
-    </button>
-    <text class="page-info">{{currentPage}} / {{totalPages}}</text>
-    <button
-      class="page-btn"
-      disabled="{{currentPage === totalPages}}"
-      bindtap="onNextPage"
-    >
-      下一页
-    </button>
-  </view>
-
-  <!-- 浮动对比篮子 -->
-  <view class="compare-basket {{compareCities.length > 0 ? 'visible' : ''}}" wx:if="{{compareCities.length > 0}}">
-    <view class="basket-content">
-      <view class="basket-info">
-        <text class="basket-icon">⚖️</text>
-        <text class="basket-text">已选择 {{compareCities.length}} 个城市</text>
-      </view>
-      <button
-        class="basket-btn"
-        disabled="{{compareCities.length < 2}}"
-        bindtap="onCompareNow"
-      >
-        {{compareCities.length < 2 ? '请再选一个' : '开始对比'}}
-      </button>
-      <view class="basket-clear" bindtap="onClearCompare">
-        <text>✕</text>
-      </view>
-    </view>
   </view>
 </view>
