@@ -1,0 +1,109 @@
+<!--pages/recommend/recommend.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">找到适合你的城市</text>
+    <text class="page-subtitle">回答几个简单问题，为你推荐最匹配的宜居城市</text>
+  </view>
+
+  <!-- 问卷 -->
+  <view class="questionnaire">
+    <!-- 问题1: 预算 -->
+    <view class="question-card">
+      <view class="question-title">
+        <text class="question-number">1</text>
+        <text class="question-text">你的生活成本预算是？</text>
+      </view>
+      <view class="options">
+        <view
+          wx:for="{{budgetOptions}}"
+          wx:key="value"
+          class="option-item {{answers.budget === item.value ? 'selected' : ''}}"
+          bindtap="onSelectOption"
+          data-question="budget"
+          data-value="{{item.value}}"
+        >
+          <text class="option-icon">{{item.icon}}</text>
+          <text class="option-text">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 问题2: 目的 -->
+    <view class="question-card">
+      <view class="question-title">
+        <text class="question-number">2</text>
+        <text class="question-text">你去这个城市主要是为了？</text>
+      </view>
+      <view class="options">
+        <view
+          wx:for="{{purposeOptions}}"
+          wx:key="value"
+          class="option-item {{answers.purpose === item.value ? 'selected' : ''}}"
+          bindtap="onSelectOption"
+          data-question="purpose"
+          data-value="{{item.value}}"
+        >
+          <text class="option-icon">{{item.icon}}</text>
+          <text class="option-text">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 问题3: 环境偏好 -->
+    <view class="question-card">
+      <view class="question-title">
+        <text class="question-number">3</text>
+        <text class="question-text">你更看重哪个环境因素？</text>
+      </view>
+      <view class="options">
+        <view
+          wx:for="{{environmentOptions}}"
+          wx:key="value"
+          class="option-item {{answers.environment === item.value ? 'selected' : ''}}"
+          bindtap="onSelectOption"
+          data-question="environment"
+          data-value="{{item.value}}"
+        >
+          <text class="option-icon">{{item.icon}}</text>
+          <text class="option-text">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 问题4: 城市规模 -->
+    <view class="question-card">
+      <view class="question-title">
+        <text class="question-number">4</text>
+        <text class="question-text">你喜欢什么规模的城市？</text>
+      </view>
+      <view class="options">
+        <view
+          wx:for="{{scaleOptions}}"
+          wx:key="value"
+          class="option-item {{answers.scale === item.value ? 'selected' : ''}}"
+          bindtap="onSelectOption"
+          data-question="scale"
+          data-value="{{item.value}}"
+        >
+          <text class="option-icon">{{item.icon}}</text>
+          <text class="option-text">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 生成推荐按钮 -->
+  <view class="action-bar">
+    <button
+      class="recommend-btn {{canRecommend ? '' : 'disabled'}}"
+      bindtap="onGenerateRecommendation"
+      disabled="{{!canRecommend}}"
+    >
+      {{canRecommend ? '生成推荐' : '请完成所有问题'}}
+    </button>
+    <view wx:if="{{canRecommend}}" class="progress-hint">
+      <text>✓ 已完成 4/4</text>
+    </view>
+  </view>
+</view>

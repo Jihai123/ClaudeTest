@@ -1,7 +1,10 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/city-list/city-list",
     "pages/city-detail/city-detail",
+    "pages/ranking/ranking",
+    "pages/recommend/recommend",
     "pages/city-compare/city-compare",
     "pages/my-reviews/my-reviews"
   ],

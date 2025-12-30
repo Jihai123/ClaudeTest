@@ -1,0 +1,102 @@
+<!--pages/city-list/city-list.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">{{pageTitle}}</text>
+    <text class="result-count" wx:if="{{!loading}}">共 {{totalCount}} 个城市</text>
+  </view>
+
+  <!-- 搜索栏（如果是搜索模式） -->
+  <view class="search-bar" wx:if="{{isSearchMode}}">
+    <view class="search-box">
+      <icon class="search-icon" type="search" size="18" color="#87A878" />
+      <input
+        class="search-input"
+        placeholder="输入城市名 / 拼音 / 首字母"
+        value="{{searchQuery}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+        bindconfirm="onSearchConfirm"
+      />
+      <icon wx:if="{{searchQuery}}" class="clear-icon" type="clear" size="16" color="#999" bindtap="onClearSearch" />
+    </view>
+  </view>
+
+  <!-- 排序选项 -->
+  <view class="sort-bar">
+    <view
+      class="sort-item {{sortField === 'overall_score' ? 'active' : ''}}"
+      bindtap="onSortChange"
+      data-field="overall_score"
+    >
+      <text>综合评分</text>
+      <text class="sort-arrow" wx:if="{{sortField === 'overall_score'}}">{{sortOrder === 'DESC' ? '↓' : '↑'}}</text>
+    </view>
+    <view
+      class="sort-item {{sortField === 'living_cost' ? 'active' : ''}}"
+      bindtap="onSortChange"
+      data-field="living_cost"
+    >
+      <text>生活成本</text>
+      <text class="sort-arrow" wx:if="{{sortField === 'living_cost'}}">{{sortOrder === 'DESC' ? '↓' : '↑'}}</text>
+    </view>
+    <view
+      class="sort-item {{sortField === 'population' ? 'active' : ''}}"
+      bindtap="onSortChange"
+      data-field="population"
+    >
+      <text>人口</text>
+      <text class="sort-arrow" wx:if="{{sortField === 'population'}}">{{sortOrder === 'DESC' ? '↓' : '↑'}}</text>
+    </view>
+  </view>
+
+  <!-- 城市列表 -->
+  <view class="city-list">
+    <view
+      wx:for="{{cities}}"
+      wx:key="id"
+      class="city-item"
+      bindtap="onCityTap"
+      data-id="{{item.id}}"
+    >
+      <!-- 左侧信息 -->
+      <view class="city-item-left">
+        <view class="city-item-header">
+          <text class="city-item-name">{{item.name}}</text>
+          <text class="city-item-location">{{item.province}}</text>
+        </view>
+        <view class="city-item-tags">
+          <text class="city-tag">{{item.mainTag}}</text>
+          <text class="city-tag secondary" wx:if="{{item.secondTag}}">{{item.secondTag}}</text>
+        </view>
+      </view>
+
+      <!-- 右侧评分 -->
+      <view class="city-item-right">
+        <text class="city-score">{{item.overall_score}}</text>
+        <text class="city-emoji">{{item.emoji}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && cities.length === 0}}" class="empty">
+    <text class="empty-icon">🏙️</text>
+    <text class="empty-text">{{emptyText}}</text>
+  </view>
+
+  <!-- 加载更多 -->
+  <view wx:if="{{!loading && hasMore}}" class="load-more" bindtap="onLoadMore">
+    <text>加载更多</text>
+  </view>
+
+  <!-- 已加载全部 -->
+  <view wx:if="{{!loading && cities.length > 0 && !hasMore}}" class="no-more">
+    <text>已加载全部</text>
+  </view>
+</view>

@@ -1,0 +1,91 @@
+<!--pages/ranking/ranking.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">宜居城市榜单</text>
+    <text class="page-subtitle">基于多维度评分的综合排名</text>
+  </view>
+
+  <!-- 榜单类型切换 -->
+  <view class="tab-bar">
+    <view
+      class="tab-item {{activeTab === 'overall' ? 'active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="overall"
+    >
+      <text>综合榜</text>
+    </view>
+    <view
+      class="tab-item {{activeTab === 'cost' ? 'active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="cost"
+    >
+      <text>性价比榜</text>
+    </view>
+    <view
+      class="tab-item {{activeTab === 'elderly' ? 'active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="elderly"
+    >
+      <text>养老榜</text>
+    </view>
+    <view
+      class="tab-item {{activeTab === 'air' ? 'active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="air"
+    >
+      <text>空气质量榜</text>
+    </view>
+  </view>
+
+  <!-- 榜单列表 -->
+  <view class="ranking-list">
+    <view
+      wx:for="{{cities}}"
+      wx:key="id"
+      class="ranking-item {{index < 3 ? 'top-three' : ''}}"
+      bindtap="onCityTap"
+      data-id="{{item.id}}"
+    >
+      <!-- 排名徽章 -->
+      <view class="ranking-badge {{index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}}">
+        <text class="ranking-number">{{index + 1}}</text>
+        <text wx:if="{{index < 3}}" class="ranking-medal">{{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}}</text>
+      </view>
+
+      <!-- 城市信息 -->
+      <view class="ranking-info">
+        <view class="city-header">
+          <text class="city-name">{{item.name}}</text>
+          <text class="city-location">{{item.province}}</text>
+        </view>
+        <view class="city-tags">
+          <text class="city-tag">{{item.mainTag}}</text>
+          <text class="city-tag secondary" wx:if="{{item.secondTag}}">{{item.secondTag}}</text>
+        </view>
+      </view>
+
+      <!-- 评分 -->
+      <view class="ranking-score">
+        <text class="score-value">{{item.displayScore}}</text>
+        <text class="score-label">{{item.scoreLabel}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && cities.length === 0}}" class="empty">
+    <text class="empty-icon">🏆</text>
+    <text class="empty-text">暂无榜单数据</text>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="ranking-footer" wx:if="{{!loading && cities.length > 0}}">
+    <text class="footer-text">榜单每月更新 · 数据来源于多维度城市评估</text>
+  </view>
+</view>

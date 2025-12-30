@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "城市列表",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#F7F8FA",
+  "backgroundTextStyle": "dark"
+}
