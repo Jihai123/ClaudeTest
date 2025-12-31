@@ -25,7 +25,7 @@ const upload = multer({
   }
 });
 
-// 上传图片
+// 上传单张图片
 router.post('/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -65,6 +65,60 @@ router.post('/upload', upload.single('image'), async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message || '图片上传失败'
+    });
+  }
+});
+
+// 上传多张图片（评价图片专用，最多9张）
+router.post('/upload-multiple', upload.array('images', 9), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: '没有上传文件' });
+    }
+
+    const uploadMethod = process.env.IMAGE_UPLOAD_METHOD || 'local';
+    const uploadedImages = [];
+
+    // 逐个上传文件
+    for (const file of req.files) {
+      let imageUrl;
+
+      switch (uploadMethod) {
+        case 'local':
+          imageUrl = await uploadToLocal(file);
+          break;
+        case 'imgbb':
+          imageUrl = await uploadToImgBB(file);
+          break;
+        case 'r2':
+          imageUrl = await uploadToCloudflareR2(file);
+          break;
+        case 'oss':
+          imageUrl = await uploadToAliOSS(file);
+          break;
+        default:
+          imageUrl = await uploadToLocal(file);
+      }
+
+      uploadedImages.push({
+        url: imageUrl,
+        filename: file.originalname,
+        size: file.size
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `成功上传${uploadedImages.length}张图片`,
+      images: uploadedImages,
+      count: uploadedImages.length
+    });
+
+  } catch (error) {
+    console.error('多图上传失败:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || '多图上传失败'
     });
   }
 });

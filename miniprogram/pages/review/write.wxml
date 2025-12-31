@@ -1,0 +1,104 @@
+<!--评价发布页面-->
+<view class="container">
+  <view class="header">
+    <text class="city-name">{{cityName}}</text>
+    <text class="subtitle">分享您的居住体验</text>
+  </view>
+
+  <view class="form">
+    <!-- 总体评分 -->
+    <view class="form-item">
+      <view class="label required">总体评分</view>
+      <view class="rating-stars">
+        <block wx:for="{{[1,2,3,4,5]}}" wx:key="*this">
+          <text class="star {{rating >= item ? 'active' : ''}}"
+                data-rating="{{item}}"
+                bindtap="onRatingChange">★</text>
+        </block>
+        <text class="rating-text">{{rating}}分</text>
+      </view>
+    </view>
+
+    <!-- 六维评分 -->
+    <view class="form-item">
+      <view class="label">细分评分（选填）</view>
+      <view class="dimension-ratings">
+        <view class="dimension-item" wx:for="{{dimensions}}" wx:key="key">
+          <text class="dimension-name">{{item.name}}</text>
+          <slider class="dimension-slider"
+                  min="0" max="5" step="0.5"
+                  value="{{item.value}}"
+                  data-key="{{item.key}}"
+                  bindchange="onDimensionChange"
+                  activeColor="#07c160"
+                  block-size="20"/>
+          <text class="dimension-value">{{item.value}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 居住时长 -->
+    <view class="form-item">
+      <view class="label">居住时长</view>
+      <picker mode="selector" range="{{durationOptions}}" value="{{durationIndex}}" bindchange="onDurationChange">
+        <view class="picker">
+          {{durationOptions[durationIndex]}}
+        </view>
+      </picker>
+    </view>
+
+    <!-- 居住目的 -->
+    <view class="form-item">
+      <view class="label">居住目的</view>
+      <picker mode="selector" range="{{purposeOptions}}" value="{{purposeIndex}}" bindchange="onPurposeChange">
+        <view class="picker">
+          {{purposeOptions[purposeIndex]}}
+        </view>
+      </picker>
+    </view>
+
+    <!-- 文字评价 -->
+    <view class="form-item">
+      <view class="label">文字评价</view>
+      <textarea class="textarea"
+                placeholder="分享您的居住体验、生活感受...（选填）"
+                maxlength="500"
+                value="{{comment}}"
+                bindinput="onCommentInput"/>
+      <view class="char-count">{{comment.length}}/500</view>
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="form-item">
+      <view class="label">上传图片</view>
+      <view class="image-uploader">
+        <block wx:for="{{images}}" wx:key="*this">
+          <view class="image-item">
+            <image src="{{item}}" mode="aspectFill"/>
+            <view class="image-delete" data-index="{{index}}" bindtap="onDeleteImage">×</view>
+          </view>
+        </block>
+        <view class="image-add" wx:if="{{images.length < 9}}" bindtap="onChooseImage">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+      <view class="hint">最多上传9张图片</view>
+    </view>
+
+    <!-- 匿名选项 -->
+    <view class="form-item">
+      <view class="anonymous-option">
+        <switch checked="{{isAnonymous}}" bindchange="onAnonymousChange" color="#07c160"/>
+        <text class="anonymous-text">匿名发布</text>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-container">
+      <button class="submit-btn" bindtap="onSubmit" loading="{{submitting}}">
+        {{submitting ? '发布中...' : '发布评价'}}
+      </button>
+    </view>
+  </view>
+</view>
