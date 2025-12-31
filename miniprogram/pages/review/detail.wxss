@@ -1,0 +1,221 @@
+/* pages/review/detail.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20rpx;
+}
+
+.loading {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+.detail-content {
+  padding-bottom: 40rpx;
+}
+
+/* Card Style */
+.card {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 24rpx;
+  color: #333;
+}
+
+/* User Card */
+.user-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.username {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.review-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.overall-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-radius: 12rpx;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 8rpx;
+}
+
+.star {
+  font-size: 40rpx;
+  color: #ddd;
+}
+
+.star.active {
+  color: #ffb800;
+}
+
+.rating-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #667eea;
+}
+
+/* Info Card */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Content Card */
+.comment {
+  font-size: 30rpx;
+  line-height: 1.8;
+  color: #333;
+  margin-bottom: 24rpx;
+  white-space: pre-wrap;
+}
+
+/* Images Gallery */
+.images-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 200rpx;
+  border-radius: 8rpx;
+  background: #f5f5f5;
+}
+
+/* Dimensions Card */
+.dimension-item {
+  margin-bottom: 24rpx;
+}
+
+.dimension-item:last-child {
+  margin-bottom: 0;
+}
+
+.dimension-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.dimension-name {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.dimension-score {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.dimension-bar {
+  height: 12rpx;
+  background: #f0f0f0;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.dimension-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 6rpx;
+  transition: width 0.3s ease;
+}
+
+/* Actions Card */
+.action-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  cursor: pointer;
+}
+
+.action-item:active {
+  background: #e9ecef;
+}
+
+.action-icon {
+  font-size: 40rpx;
+  margin-right: 12rpx;
+}
+
+.action-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* Empty State */
+.empty {
+  text-align: center;
+  padding: 120rpx 0;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
