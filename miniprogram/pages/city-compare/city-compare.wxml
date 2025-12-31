@@ -6,16 +6,29 @@
   <!-- 城市选择 -->
   <view class="selection-section card">
     <view class="card-title">选择城市</view>
+
+    <!-- 标签切换 -->
+    <view class="tabs">
+      <view class="tab {{cityType === 'china' ? 'active' : ''}}" bindtap="onTabChange" data-type="china">
+        中国城市
+      </view>
+      <view class="tab {{cityType === 'world' ? 'active' : ''}}" bindtap="onTabChange" data-type="world">
+        国际城市
+      </view>
+    </view>
+
     <view class="cities-grid">
-      <label
+      <view
         wx:for="{{availableCities}}"
         wx:key="id"
         class="city-checkbox {{item.selected ? 'selected' : ''}}"
+        bindtap="onCitySelect"
+        data-id="{{item.id}}"
       >
-        <checkbox value="{{item.id}}" checked="{{item.selected}}" bindtap="onCitySelect" data-id="{{item.id}}" />
-        <text>{{item.name}}</text>
-        <text class="city-province">{{item.province}}</text>
-      </label>
+        <view class="checkbox-icon">{{item.selected ? '✓' : ''}}</view>
+        <text class="city-name">{{item.name}}</text>
+        <text class="city-province" wx:if="{{item.province && item.province !== 'null'}}">{{item.province}}</text>
+      </view>
     </view>
 
     <view class="selection-info">

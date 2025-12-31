@@ -44,12 +44,22 @@ App({
 
   // 获取系统信息
   getSystemInfo() {
-    wx.getSystemInfo({
-      success: (res) => {
-        this.globalData.systemInfo = res
-        console.log('系统信息:', res)
+    // 使用新API替代废弃的wx.getSystemInfo
+    try {
+      const deviceInfo = wx.getDeviceInfo()
+      const windowInfo = wx.getWindowInfo()
+      const appBaseInfo = wx.getAppBaseInfo()
+
+      this.globalData.systemInfo = {
+        ...deviceInfo,
+        ...windowInfo,
+        ...appBaseInfo
       }
-    })
+
+      console.log('系统信息:', this.globalData.systemInfo)
+    } catch (e) {
+      console.error('获取系统信息失败:', e)
+    }
   },
 
   // 设置用户信息

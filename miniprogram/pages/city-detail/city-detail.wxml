@@ -9,9 +9,9 @@
         <view class="city-info">
           <view class="city-name">{{city.name}}</view>
           <view class="city-location">
-            <text>{{city.province || '未知省份'}}</text>
-            <text wx:if="{{city.country}}" class="dot">·</text>
-            <text wx:if="{{city.country}}">{{city.country}}</text>
+            <text wx:if="{{city.province && city.province !== 'null'}}">{{city.province}}</text>
+            <text wx:if="{{city.province && city.province !== 'null' && city.country && city.country !== 'null'}}" class="dot">·</text>
+            <text wx:if="{{city.country && city.country !== 'null'}}">{{city.country}}</text>
           </view>
         </view>
         <view class="overall-score">
