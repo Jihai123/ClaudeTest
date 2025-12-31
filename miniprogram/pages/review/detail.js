@@ -49,14 +49,14 @@ Page({
           review.created_at = util.formatTime(new Date(review.created_at))
         }
 
-        // 预计算维度评分宽度（避免 WXML 中计算导致渲染问题）
+        // 预计算维度评分样式（完整的 style 字符串，避免 WXML 拼接）
         const dimensions = {
-          living_cost_width: (review.living_cost_rating || 0) * 20,
-          air_quality_width: (review.air_quality_rating || 0) * 20,
-          medical_width: (review.medical_rating || 0) * 20,
-          employment_width: (review.employment_rating || 0) * 20,
-          safety_width: (review.safety_rating || 0) * 20,
-          elderly_care_width: (review.elderly_care_rating || 0) * 20
+          living_cost_style: `width: ${(review.living_cost_rating || 0) * 20}%`,
+          air_quality_style: `width: ${(review.air_quality_rating || 0) * 20}%`,
+          medical_style: `width: ${(review.medical_rating || 0) * 20}%`,
+          employment_style: `width: ${(review.employment_rating || 0) * 20}%`,
+          safety_style: `width: ${(review.safety_rating || 0) * 20}%`,
+          elderly_care_style: `width: ${(review.elderly_care_rating || 0) * 20}%`
         }
 
         this.setData({
