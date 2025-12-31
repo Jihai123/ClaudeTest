@@ -63,7 +63,7 @@
           <text class="dimension-score">{{review.living_cost_rating}}</text>
         </view>
         <view class="dimension-bar">
-          <view class="dimension-bar-fill" style="width: {{review.living_cost_rating * 20}}%"></view>
+          <view class="dimension-bar-fill" style="width: {{living_cost_width}}%"></view>
         </view>
       </view>
 
@@ -73,7 +73,7 @@
           <text class="dimension-score">{{review.air_quality_rating}}</text>
         </view>
         <view class="dimension-bar">
-          <view class="dimension-bar-fill" style="width: {{review.air_quality_rating * 20}}%"></view>
+          <view class="dimension-bar-fill" style="width: {{air_quality_width}}%"></view>
         </view>
       </view>
 
@@ -83,7 +83,7 @@
           <text class="dimension-score">{{review.medical_rating}}</text>
         </view>
         <view class="dimension-bar">
-          <view class="dimension-bar-fill" style="width: {{review.medical_rating * 20}}%"></view>
+          <view class="dimension-bar-fill" style="width: {{medical_width}}%"></view>
         </view>
       </view>
 
@@ -93,7 +93,7 @@
           <text class="dimension-score">{{review.employment_rating}}</text>
         </view>
         <view class="dimension-bar">
-          <view class="dimension-bar-fill" style="width: {{review.employment_rating * 20}}%"></view>
+          <view class="dimension-bar-fill" style="width: {{employment_width}}%"></view>
         </view>
       </view>
 
@@ -103,7 +103,7 @@
           <text class="dimension-score">{{review.safety_rating}}</text>
         </view>
         <view class="dimension-bar">
-          <view class="dimension-bar-fill" style="width: {{review.safety_rating * 20}}%"></view>
+          <view class="dimension-bar-fill" style="width: {{safety_width}}%"></view>
         </view>
       </view>
 
@@ -113,7 +113,7 @@
           <text class="dimension-score">{{review.elderly_care_rating}}</text>
         </view>
         <view class="dimension-bar">
-          <view class="dimension-bar-fill" style="width: {{review.elderly_care_rating * 20}}%"></view>
+          <view class="dimension-bar-fill" style="width: {{elderly_care_width}}%"></view>
         </view>
       </view>
     </view>
