@@ -151,8 +151,32 @@
         />
         <text class="char-count">{{reviewComment.length}}/500</text>
       </view>
-      <button class="btn btn-primary btn-block" bindtap="onSubmitReview">
-        提交评价
+
+      <!-- 图片上传 -->
+      <view class="form-group">
+        <text class="form-label">上传图片（选填）</text>
+        <view class="image-uploader">
+          <block wx:for="{{reviewImages}}" wx:key="*this">
+            <view class="image-item">
+              <image
+                src="{{item}}"
+                mode="aspectFill"
+                data-index="{{index}}"
+                bindtap="onPreviewImage"
+              />
+              <view class="image-delete" data-index="{{index}}" catchtap="onDeleteImage">×</view>
+            </view>
+          </block>
+          <view class="image-add" wx:if="{{reviewImages.length < 9}}" bindtap="onChooseImage">
+            <text class="add-icon">+</text>
+            <text class="add-text">添加</text>
+          </view>
+        </view>
+        <text class="image-hint">最多上传9张图片</text>
+      </view>
+
+      <button class="btn btn-primary btn-block" bindtap="onSubmitReview" loading="{{submitting}}">
+        {{submitting ? '提交中...' : '提交评价'}}
       </button>
     </view>
   </view>
