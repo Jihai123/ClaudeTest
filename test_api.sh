@@ -41,8 +41,8 @@ test_api "健康检查" "$BASE_URL/health" "status"
 # 2. 获取城市列表
 test_api "获取城市列表" "$BASE_URL/cities?limit=5" "cities"
 
-# 3. 搜索城市
-test_api "搜索城市(北京)" "$BASE_URL/cities?keywords=北京" "cities"
+# 3. 搜索城市 (使用URL编码)
+test_api "搜索城市(北京)" "$BASE_URL/cities?keywords=%E5%8C%97%E4%BA%AC" "cities"
 
 # 4. 获取城市详情
 test_api "获取城市详情(ID=1)" "$BASE_URL/cities/1" "id"
@@ -53,8 +53,8 @@ test_api "按综合评分排序" "$BASE_URL/cities?sort=overall_score&order=DESC
 # 6. 筛选沿海城市
 test_api "筛选沿海城市" "$BASE_URL/cities?filters=%7B%22coastal%22%3Atrue%7D&limit=5" "cities"
 
-# 7. 筛选一线城市
-test_api "筛选一线城市" "$BASE_URL/cities?keywords=北京,上海,广州,深圳&limit=10" "cities"
+# 7. 筛选一线城市 (使用URL编码: 北京,上海,广州,深圳)
+test_api "筛选一线城市" "$BASE_URL/cities?keywords=%E5%8C%97%E4%BA%AC%2C%E4%B8%8A%E6%B5%B7%2C%E5%B9%BF%E5%B7%9E%2C%E6%B7%B1%E5%9C%B3&limit=10" "cities"
 
 # 8. 维度范围筛选(生活成本)
 test_api "维度筛选(生活成本)" "$BASE_URL/cities?filters=%7B%22living_cost_max%22%3A6%7D&limit=5" "cities"
