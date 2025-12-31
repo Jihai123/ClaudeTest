@@ -5,6 +5,32 @@
   margin-bottom: 30rpx;
 }
 
+/* 标签切换 */
+.tabs {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 12rpx;
+  padding: 6rpx;
+  margin-bottom: 20rpx;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: #64748b;
+  border-radius: 8rpx;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  background: white;
+  color: #2563eb;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
 .cities-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -21,6 +47,7 @@
   border: 2rpx solid #e2e8f0;
   border-radius: 12rpx;
   transition: all 0.3s;
+  position: relative;
 }
 
 .city-checkbox.selected {
@@ -28,11 +55,27 @@
   border-color: #2563eb;
 }
 
-.city-checkbox checkbox {
+.checkbox-icon {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #cbd5e1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: white;
   margin-bottom: 12rpx;
+  background: white;
+  transition: all 0.3s;
 }
 
-.city-checkbox text {
+.city-checkbox.selected .checkbox-icon {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.city-name {
   font-size: 28rpx;
   color: #0f172a;
   font-weight: 500;

@@ -4,6 +4,8 @@ const util = require('../../utils/util')
 
 Page({
   data: {
+    cityType: 'china', // china 或 world
+    allCities: [],
     availableCities: [],
     selectedCities: [],
     compareResult: [],
@@ -17,8 +19,8 @@ Page({
 
   onShow() {
     // 页面显示时刷新
-    if (this.data.availableCities.length > 0) {
-      this.loadCities()
+    if (this.data.allCities.length > 0) {
+      this.filterCitiesByType()
     }
   },
 
@@ -27,7 +29,7 @@ Page({
     this.setData({ loading: true })
 
     try {
-      const result = await api.getCities({ limit: 100, sort: 'overall_score', order: 'DESC' })
+      const result = await api.getCities({ limit: 1000, sort: 'overall_score', order: 'DESC' })
 
       const cities = (result.cities || []).map(city => ({
         ...city,
@@ -35,9 +37,11 @@ Page({
       }))
 
       this.setData({
-        availableCities: cities,
+        allCities: cities,
         loading: false
       })
+
+      this.filterCitiesByType()
     } catch (error) {
       console.error('加载城市列表失败:', error)
       util.showToast('加载失败，请重试')
@@ -45,11 +49,41 @@ Page({
     }
   },
 
+  // 根据类型筛选城市
+  filterCitiesByType() {
+    const { cityType, allCities, selectedCities } = this.data
+
+    let filtered = allCities.filter(city => {
+      if (cityType === 'china') {
+        return city.country === '中国' || !city.country || city.country === 'null'
+      } else {
+        return city.country && city.country !== '中国' && city.country !== 'null'
+      }
+    })
+
+    // 保持已选中的状态
+    filtered = filtered.map(city => ({
+      ...city,
+      selected: selectedCities.includes(city.id)
+    }))
+
+    this.setData({
+      availableCities: filtered
+    })
+  },
+
+  // 切换标签
+  onTabChange(e) {
+    const type = e.currentTarget.dataset.type
+    this.setData({ cityType: type })
+    this.filterCitiesByType()
+  },
+
   // 选择城市
   onCitySelect(e) {
     const cityId = parseInt(e.currentTarget.dataset.id)
-    const cities = this.data.availableCities
-    const selectedCities = this.data.selectedCities
+    const cities = [...this.data.availableCities]
+    const selectedCities = [...this.data.selectedCities]
 
     const index = cities.findIndex(c => c.id === cityId)
     if (index === -1) return
@@ -66,11 +100,23 @@ Page({
     cities[index].selected = !isSelected
 
     // 更新已选城市列表
-    const newSelectedCities = isSelected
-      ? selectedCities.filter(id => id !== cityId)
-      : [...selectedCities, cityId]
+    let newSelectedCities
+    if (isSelected) {
+      newSelectedCities = selectedCities.filter(id => id !== cityId)
+    } else {
+      newSelectedCities = [...selectedCities, cityId]
+    }
+
+    // 同步更新allCities中的选中状态
+    const allCities = this.data.allCities.map(city => {
+      if (city.id === cityId) {
+        return { ...city, selected: !isSelected }
+      }
+      return city
+    })
 
     this.setData({
+      allCities: allCities,
       availableCities: cities,
       selectedCities: newSelectedCities
     })
