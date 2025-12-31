@@ -137,11 +137,15 @@ class CityDataImporter {
 
         switch (header.toLowerCase()) {
           case 'name':
+          case 'city':
+          case '城市':
           case '城市名称':
             obj.name = value;
             break;
           case 'province':
+          case 'country':
           case '省份':
+          case '国家':
             obj.province = value;
             break;
           case 'population':
