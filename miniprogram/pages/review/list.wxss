@@ -1,0 +1,266 @@
+/* 评价列表页面样式 */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 头部 */
+.header {
+  background: white;
+  padding: 40rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1rpx solid #eee;
+}
+
+.city-info {
+  flex: 1;
+}
+
+.city-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.stats {
+  display: flex;
+  gap: 20rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.stat-divider {
+  color: #ddd;
+}
+
+.write-btn {
+  width: 160rpx;
+  height: 60rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 28rpx;
+  border-radius: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 排序栏 */
+.sort-bar {
+  background: white;
+  display: flex;
+  padding: 0 40rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.sort-item {
+  flex: 1;
+  text-align: center;
+  padding: 30rpx 0;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+}
+
+.sort-item.active {
+  color: #667eea;
+  font-weight: bold;
+}
+
+.sort-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background: #667eea;
+  border-radius: 2rpx;
+}
+
+/* 评价列表 */
+.review-list {
+  padding: 20rpx;
+}
+
+.review-card {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 评价头部 */
+.review-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.username {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.rating-display {
+  display: flex;
+  align-items: baseline;
+  gap: 5rpx;
+}
+
+.rating-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #ff6b6b;
+}
+
+.rating-star {
+  font-size: 28rpx;
+  color: #ffb800;
+}
+
+/* 评价内容 */
+.review-content {
+  margin-bottom: 20rpx;
+}
+
+.comment {
+  font-size: 30rpx;
+  line-height: 1.6;
+  color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 评价图片 */
+.review-images {
+  display: flex;
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+  overflow-x: auto;
+}
+
+.review-image {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+/* 维度标签 */
+.dimensions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.dimension-tag {
+  padding: 8rpx 16rpx;
+  background: #f0f0f0;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 评价底部 */
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.tag {
+  padding: 6rpx 12rpx;
+  background: #f7f7f7;
+  border-radius: 6rpx;
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 10rpx;
+}
+
+.actions {
+  display: flex;
+  gap: 30rpx;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.icon {
+  font-size: 28rpx;
+}
+
+/* 空状态 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+  background: white;
+  border-radius: 16rpx;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.empty-btn {
+  width: 300rpx;
+  height: 80rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}
+
+/* 加载状态 */
+.loading,
+.no-more {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 28rpx;
+  color: #999;
+}

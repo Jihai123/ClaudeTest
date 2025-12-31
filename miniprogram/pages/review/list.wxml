@@ -1,0 +1,106 @@
+<!--评价列表页面-->
+<view class="container">
+  <!-- 头部统计 -->
+  <view class="header">
+    <view class="city-info">
+      <text class="city-name">{{cityName}}</text>
+      <view class="stats">
+        <text class="stat-item">{{totalReviews}}条评价</text>
+        <text class="stat-divider">|</text>
+        <text class="stat-item">平均{{avgRating}}分</text>
+      </view>
+    </view>
+    <button class="write-btn" bindtap="goToWrite">写评价</button>
+  </view>
+
+  <!-- 排序选项 -->
+  <view class="sort-bar">
+    <view class="sort-item {{sortType === 'latest' ? 'active' : ''}}" data-type="latest" bindtap="onSortChange">
+      最新
+    </view>
+    <view class="sort-item {{sortType === 'helpful' ? 'active' : ''}}" data-type="helpful" bindtap="onSortChange">
+      最有用
+    </view>
+    <view class="sort-item {{sortType === 'rating' ? 'active' : ''}}" data-type="rating" bindtap="onSortChange">
+      评分最高
+    </view>
+  </view>
+
+  <!-- 评价列表 -->
+  <view class="review-list">
+    <block wx:for="{{reviews}}" wx:key="id">
+      <view class="review-card" bindtap="goToDetail" data-id="{{item.id}}">
+        <!-- 用户信息 -->
+        <view class="review-header">
+          <image class="avatar" src="{{item.avatar_url || '/images/default-avatar.png'}}"/>
+          <view class="user-info">
+            <text class="username">{{item.username}}</text>
+            <text class="time">{{item.created_at}}</text>
+          </view>
+          <view class="rating-display">
+            <text class="rating-value">{{item.rating}}</text>
+            <text class="rating-star">★</text>
+          </view>
+        </view>
+
+        <!-- 评价内容 -->
+        <view class="review-content" wx:if="{{item.comment}}">
+          <text class="comment">{{item.comment}}</text>
+        </view>
+
+        <!-- 图片 -->
+        <view class="review-images" wx:if="{{item.images && item.images.length > 0}}">
+          <block wx:for="{{item.images}}" wx:for-item="image" wx:key="*this">
+            <image class="review-image" src="{{image}}" mode="aspectFill"/>
+          </block>
+        </view>
+
+        <!-- 维度评分 -->
+        <view class="dimensions" wx:if="{{item.hasD dimensions}}">
+          <view class="dimension-tag" wx:if="{{item.living_cost_rating}}">
+            生活成本 {{item.living_cost_rating}}
+          </view>
+          <view class="dimension-tag" wx:if="{{item.air_quality_rating}}">
+            空气质量 {{item.air_quality_rating}}
+          </view>
+          <view class="dimension-tag" wx:if="{{item.medical_rating}}">
+            医疗 {{item.medical_rating}}
+          </view>
+        </view>
+
+        <!-- 底部操作栏 -->
+        <view class="review-footer">
+          <view class="tag" wx:if="{{item.living_duration}}">
+            {{item.living_duration}}
+          </view>
+          <view class="tag" wx:if="{{item.living_purpose}}">
+            {{item.living_purpose}}
+          </view>
+          <view class="actions">
+            <view class="action-item" data-id="{{item.id}}" catchtap="onToggleHelpful">
+              <text class="icon">👍</text>
+              <text class="count">{{item.helpful_count || 0}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{!loading && reviews.length === 0}}">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">还没有评价</text>
+      <button class="empty-btn" bindtap="goToWrite">成为第一个评价的人</button>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 没有更多 -->
+    <view class="no-more" wx:if="{{!loading && !hasMore && reviews.length > 0}}">
+      <text>没有更多了</text>
+    </view>
+  </view>
+</view>

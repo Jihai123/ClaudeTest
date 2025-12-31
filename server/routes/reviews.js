@@ -160,7 +160,24 @@ router.get('/city/:cityId', optionalAuth, async (req, res) => {
 // 创建评价（需要登录）
 router.post('/', verifyToken, validateReview, async (req, res) => {
   try {
-    const { city_id, rating, comment } = sanitizeObject(req.body);
+    const {
+      city_id,
+      rating,
+      comment,
+      living_duration,
+      living_purpose,
+      residence_years,
+      is_anonymous = false,
+      // 六维评分
+      living_cost_rating,
+      air_quality_rating,
+      medical_rating,
+      employment_rating,
+      safety_rating,
+      elderly_care_rating,
+      // 图片
+      images = []
+    } = sanitizeObject(req.body);
 
     // 检查城市是否存在
     const city = await db.get('SELECT * FROM cities WHERE id = ?', [city_id]);
@@ -179,9 +196,22 @@ router.post('/', verifyToken, validateReview, async (req, res) => {
     }
 
     // 创建评价
+    const imagesJson = JSON.stringify(images);
     const result = await db.run(
-      'INSERT INTO reviews (city_id, user_id, rating, comment) VALUES (?, ?, ?, ?)',
-      [city_id, req.user.id, rating, comment || null]
+      `INSERT INTO reviews (
+        city_id, user_id, rating, comment,
+        living_duration, living_purpose, residence_years,
+        is_anonymous, images,
+        living_cost_rating, air_quality_rating, medical_rating,
+        employment_rating, safety_rating, elderly_care_rating
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        city_id, req.user.id, rating, comment || null,
+        living_duration, living_purpose, residence_years,
+        is_anonymous, imagesJson,
+        living_cost_rating, air_quality_rating, medical_rating,
+        employment_rating, safety_rating, elderly_care_rating
+      ]
     );
 
     // 计算并返回新的综合评分
@@ -211,11 +241,46 @@ router.put('/:id', verifyToken, validateId, validateReview, async (req, res) => 
       return res.status(403).json({ error: '无权限修改此评价' });
     }
 
-    const { rating, comment } = sanitizeObject(req.body);
+    const {
+      rating,
+      comment,
+      living_duration,
+      living_purpose,
+      residence_years,
+      living_cost_rating,
+      air_quality_rating,
+      medical_rating,
+      employment_rating,
+      safety_rating,
+      elderly_care_rating,
+      images
+    } = sanitizeObject(req.body);
+
+    const imagesJson = images ? JSON.stringify(images) : review.images;
 
     await db.run(
-      'UPDATE reviews SET rating = ?, comment = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [rating, comment || null, req.params.id]
+      `UPDATE reviews SET
+        rating = ?,
+        comment = ?,
+        living_duration = ?,
+        living_purpose = ?,
+        residence_years = ?,
+        living_cost_rating = ?,
+        air_quality_rating = ?,
+        medical_rating = ?,
+        employment_rating = ?,
+        safety_rating = ?,
+        elderly_care_rating = ?,
+        images = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?`,
+      [
+        rating, comment || null,
+        living_duration, living_purpose, residence_years,
+        living_cost_rating, air_quality_rating, medical_rating,
+        employment_rating, safety_rating, elderly_care_rating,
+        imagesJson, req.params.id
+      ]
     );
 
     // 计算并返回新的综合评分
@@ -332,10 +397,146 @@ router.get('/user/me', verifyToken, async (req, res) => {
       [req.user.id]
     );
 
+    // 解析images字段
+    reviews.forEach(review => {
+      if (review.images) {
+        try {
+          review.images = JSON.parse(review.images);
+        } catch (e) {
+          review.images = [];
+        }
+      } else {
+        review.images = [];
+      }
+    });
+
     res.json({ reviews });
   } catch (error) {
     console.error('获取用户评价失败:', error);
     res.status(500).json({ error: '获取用户评价失败' });
+  }
+});
+
+// 标记评价"有用"或"没用"（需要登录）
+router.post('/:id/helpful', verifyToken, validateId, async (req, res) => {
+  try {
+    const review = await db.get('SELECT * FROM reviews WHERE id = ?', [req.params.id]);
+
+    if (!review) {
+      return res.status(404).json({ error: '评价不存在' });
+    }
+
+    const { is_helpful } = req.body;
+
+    if (typeof is_helpful !== 'boolean') {
+      return res.status(400).json({ error: 'is_helpful必须为布尔值' });
+    }
+
+    // 检查是否已经标记过
+    const existing = await db.get(
+      'SELECT * FROM review_helpful WHERE review_id = ? AND user_id = ?',
+      [req.params.id, req.user.id]
+    );
+
+    if (existing) {
+      // 更新标记
+      await db.run(
+        'UPDATE review_helpful SET is_helpful = ? WHERE review_id = ? AND user_id = ?',
+        [is_helpful, req.params.id, req.user.id]
+      );
+    } else {
+      // 新增标记
+      await db.run(
+        'INSERT INTO review_helpful (review_id, user_id, is_helpful) VALUES (?, ?, ?)',
+        [req.params.id, req.user.id, is_helpful]
+      );
+    }
+
+    // 重新计算helpful_count（只统计is_helpful=true的数量）
+    const countResult = await db.get(
+      'SELECT COUNT(*) as count FROM review_helpful WHERE review_id = ? AND is_helpful = 1',
+      [req.params.id]
+    );
+
+    await db.run(
+      'UPDATE reviews SET helpful_count = ? WHERE id = ?',
+      [countResult.count, req.params.id]
+    );
+
+    res.json({
+      message: '标记成功',
+      helpful_count: countResult.count
+    });
+
+  } catch (error) {
+    console.error('标记失败:', error);
+    res.status(500).json({ error: '标记失败' });
+  }
+});
+
+// 获取城市评价统计信息
+router.get('/city/:cityId/stats', async (req, res) => {
+  try {
+    const { cityId } = req.params;
+
+    // 获取各项统计
+    const stats = {};
+
+    // 总评价数
+    const countResult = await db.get(
+      'SELECT COUNT(*) as count FROM reviews WHERE city_id = ? AND status = ?',
+      [cityId, 'approved']
+    );
+    stats.total_reviews = countResult.count;
+
+    // 平均总分
+    const avgRating = await db.get(
+      'SELECT AVG(rating) as avg FROM reviews WHERE city_id = ? AND status = ?',
+      [cityId, 'approved']
+    );
+    stats.avg_rating = avgRating.avg ? parseFloat(avgRating.avg.toFixed(1)) : 0;
+
+    // 六维平均分
+    const dimensionAvg = await db.get(`
+      SELECT
+        AVG(living_cost_rating) as avg_living_cost,
+        AVG(air_quality_rating) as avg_air_quality,
+        AVG(medical_rating) as avg_medical,
+        AVG(employment_rating) as avg_employment,
+        AVG(safety_rating) as avg_safety,
+        AVG(elderly_care_rating) as avg_elderly_care
+      FROM reviews
+      WHERE city_id = ? AND status = ?
+    `, [cityId, 'approved']);
+
+    stats.dimension_avg = {
+      living_cost: dimensionAvg.avg_living_cost ? parseFloat(dimensionAvg.avg_living_cost.toFixed(1)) : null,
+      air_quality: dimensionAvg.avg_air_quality ? parseFloat(dimensionAvg.avg_air_quality.toFixed(1)) : null,
+      medical: dimensionAvg.avg_medical ? parseFloat(dimensionAvg.avg_medical.toFixed(1)) : null,
+      employment: dimensionAvg.avg_employment ? parseFloat(dimensionAvg.avg_employment.toFixed(1)) : null,
+      safety: dimensionAvg.avg_safety ? parseFloat(dimensionAvg.avg_safety.toFixed(1)) : null,
+      elderly_care: dimensionAvg.avg_elderly_care ? parseFloat(dimensionAvg.avg_elderly_care.toFixed(1)) : null
+    };
+
+    // 评分分布
+    const distribution = await db.query(`
+      SELECT rating, COUNT(*) as count
+      FROM reviews
+      WHERE city_id = ? AND status = ?
+      GROUP BY rating
+      ORDER BY rating DESC
+    `, [cityId, 'approved']);
+
+    stats.rating_distribution = distribution;
+
+    res.json({
+      success: true,
+      data: stats
+    });
+
+  } catch (error) {
+    console.error('获取统计信息失败:', error);
+    res.status(500).json({ error: '获取统计信息失败' });
   }
 });
 

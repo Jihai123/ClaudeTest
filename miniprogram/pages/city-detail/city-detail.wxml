@@ -74,9 +74,12 @@
     <view class="reviews-section card">
       <view class="section-header">
         <text class="card-title">全部评价</text>
-        <button wx:if="{{userInfo}}" class="btn-small btn-primary" bindtap="onWriteReview">
-          写评价
-        </button>
+        <view class="header-actions">
+          <text class="view-all-link" bindtap="onViewAllReviews">查看全部 ></text>
+          <button wx:if="{{userInfo}}" class="btn-small btn-primary" bindtap="onWriteReview">
+            写评价
+          </button>
+        </view>
       </view>
 
       <view wx:if="{{reviews.length > 0}}" class="reviews-list">

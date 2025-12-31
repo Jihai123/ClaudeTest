@@ -115,6 +115,13 @@ Page({
     }
   },
 
+  // 查看全部评价
+  onViewAllReviews() {
+    wx.navigateTo({
+      url: `/pages/review/list?cityId=${this.data.cityId}&cityName=${this.data.city.name}`
+    })
+  },
+
   // 写评价
   onWriteReview() {
     if (!this.data.userInfo) {

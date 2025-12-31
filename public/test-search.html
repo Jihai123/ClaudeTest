@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关键词搜索功能测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+        .success {
+            color: #059669;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .city-list {
+            margin-top: 10px;
+        }
+        .city-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f3f4f6;
+            border-radius: 4px;
+        }
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status.fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 关键词搜索功能测试</h1>
+
+        <!-- 测试1: 单个关键词 -->
+        <div class="test-section">
+            <h3>测试1: 单个关键词搜索</h3>
+            <input type="text" id="keyword1" value="北京" placeholder="输入城市名称">
+            <button onclick="testSingleKeyword()">搜索</button>
+            <div id="result1" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 测试2: 多个关键词 -->
+        <div class="test-section">
+            <h3>测试2: 多关键词搜索（逗号分隔）</h3>
+            <input type="text" id="keyword2" value="北京,上海,广州,深圳" placeholder="多个城市用逗号分隔">
+            <button onclick="testMultipleKeywords()">搜索</button>
+            <div id="result2" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 测试3: 英文关键词 -->
+        <div class="test-section">
+            <h3>测试3: 英文关键词搜索</h3>
+            <input type="text" id="keyword3" value="Beijing" placeholder="输入英文城市名">
+            <button onclick="testEnglishKeyword()">搜索</button>
+            <div id="result3" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 自动化测试 -->
+        <div class="test-section">
+            <h3>自动化测试套件</h3>
+            <button onclick="runAllTests()">运行所有测试</button>
+            <div id="autoTestResult" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        async function testSingleKeyword() {
+            const keyword = document.getElementById('keyword1').value;
+            const resultDiv = document.getElementById('result1');
+
+            try {
+                const response = await fetch(`${API_BASE}/cities?keywords=${encodeURIComponent(keyword)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✓ 搜索成功</div>
+                        <p>找到 ${data.pagination.total} 个城市</p>
+                        <div class="city-list">
+                            ${data.cities.slice(0, 5).map(city => `
+                                <div class="city-item">
+                                    ${city.name} - ${city.province}
+                                    ${city.tags ? city.tags.map(t => `<span class="status pass">${t.tag_name}</span>`).join('') : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">✗ 搜索失败: ${data.error}</div>`;
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">✗ 网络错误: ${error.message}</div>`;
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        async function testMultipleKeywords() {
+            const keywords = document.getElementById('keyword2').value;
+            const resultDiv = document.getElementById('result2');
+
+            try {
+                const response = await fetch(`${API_BASE}/cities?keywords=${encodeURIComponent(keywords)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✓ 多关键词搜索成功</div>
+                        <p>搜索关键词: ${keywords}</p>
+                        <p>找到 ${data.pagination.total} 个城市</p>
+                        <div class="city-list">
+                            ${data.cities.map(city => `
+                                <div class="city-item">
+                                    ${city.name} - ${city.province}
+                                    <span class="status pass">overall_score: ${city.overall_score}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">✗ 搜索失败: ${data.error}</div>`;
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">✗ 网络错误: ${error.message}</div>`;
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        async function testEnglishKeyword() {
+            const keyword = document.getElementById('keyword3').value;
+            const resultDiv = document.getElementById('result3');
+
+            try {
+                const response = await fetch(`${API_BASE}/cities?keywords=${encodeURIComponent(keyword)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="${data.pagination.total > 0 ? 'success' : 'error'}">
+                            ${data.pagination.total > 0 ? '✓' : '✗'} 英文搜索${data.pagination.total > 0 ? '成功' : '失败'}
+                        </div>
+                        <p>找到 ${data.pagination.total} 个城市</p>
+                        ${data.cities.length > 0 ? `
+                            <div class="city-list">
+                                ${data.cities.map(city => `
+                                    <div class="city-item">${city.name} (${city.name_en || 'N/A'})</div>
+                                `).join('')}
+                            </div>
+                        ` : '<p>提示: 当前数据库中可能没有英文名称字段数据</p>'}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">✗ 搜索失败: ${data.error}</div>`;
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">✗ 网络错误: ${error.message}</div>`;
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        async function runAllTests() {
+            const resultDiv = document.getElementById('autoTestResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>正在运行测试...</p>';
+
+            const tests = [
+                { name: '单关键词(北京)', keywords: '北京', expectMin: 1 },
+                { name: '单关键词(上海)', keywords: '上海', expectMin: 1 },
+                { name: '多关键词(北京,上海)', keywords: '北京,上海', expectMin: 2 },
+                { name: '一线城市', keywords: '北京,上海,广州,深圳', expectMin: 4 },
+                { name: '部分匹配(海)', keywords: '海', expectMin: 1 },
+            ];
+
+            let passed = 0;
+            let failed = 0;
+            let results = [];
+
+            for (const test of tests) {
+                try {
+                    const response = await fetch(`${API_BASE}/cities?keywords=${encodeURIComponent(test.keywords)}`);
+                    const data = await response.json();
+
+                    const success = response.ok && data.pagination.total >= test.expectMin;
+                    if (success) {
+                        passed++;
+                        results.push(`<div><span class="status pass">PASS</span> ${test.name} - 找到 ${data.pagination.total} 个城市</div>`);
+                    } else {
+                        failed++;
+                        results.push(`<div><span class="status fail">FAIL</span> ${test.name} - 预期至少 ${test.expectMin}，实际 ${data.pagination?.total || 0}</div>`);
+                    }
+                } catch (error) {
+                    failed++;
+                    results.push(`<div><span class="status fail">ERROR</span> ${test.name} - ${error.message}</div>`);
+                }
+            }
+
+            resultDiv.innerHTML = `
+                <h4>测试完成</h4>
+                <p><strong>通过: ${passed}/${tests.length}</strong> | 失败: ${failed}</p>
+                <div class="city-list">${results.join('')}</div>
+            `;
+        }
+    </script>
+</body>
+</html>

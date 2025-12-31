@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "宜居城市榜单",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#F7F8FA",
+  "backgroundTextStyle": "dark"
+}
