@@ -1,0 +1,135 @@
+<!--pages/review/detail.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+  <view wx:if="{{!loading && review}}" class="detail-content">
+    <!-- User Info Card -->
+    <view class="card user-card">
+      <view class="user-header">
+        <image class="avatar" src="{{review.avatar_url || '/images/default-avatar.png'}}" mode="aspectFill"/>
+        <view class="user-info">
+          <view class="username">{{review.is_anonymous ? '匿名用户' : review.username}}</view>
+          <view class="review-date">{{review.created_at}}</view>
+        </view>
+      </view>
+
+      <view class="overall-rating">
+        <view class="rating-stars">
+          <block wx:for="{{[1,2,3,4,5]}}" wx:key="*this">
+            <text class="star {{review.rating >= item ? 'active' : ''}}">★</text>
+          </block>
+        </view>
+        <text class="rating-value">{{review.rating}}</text>
+      </view>
+    </view>
+
+    <!-- Living Info -->
+    <view class="card info-card" wx:if="{{review.living_duration || review.living_purpose}}">
+      <view class="info-row">
+        <text class="info-label">居住时长</text>
+        <text class="info-value">{{review.living_duration || '未知'}}</text>
+      </view>
+      <view class="info-row" wx:if="{{review.living_purpose}}">
+        <text class="info-label">居住目的</text>
+        <text class="info-value">{{review.living_purpose}}</text>
+      </view>
+    </view>
+
+    <!-- Review Content -->
+    <view class="card content-card">
+      <view class="comment">{{review.comment}}</view>
+
+      <!-- Images Gallery -->
+      <view class="images-gallery" wx:if="{{review.images && review.images.length > 0}}">
+        <image
+          wx:for="{{review.images}}"
+          wx:key="index"
+          class="gallery-image"
+          src="{{item}}"
+          mode="aspectFill"
+          data-index="{{index}}"
+          bindtap="onPreviewImage"
+        />
+      </view>
+    </view>
+
+    <!-- Dimension Ratings -->
+    <view class="card dimensions-card">
+      <view class="card-title">维度评分</view>
+
+      <view class="dimension-item" wx:if="{{review.living_cost_rating}}">
+        <view class="dimension-header">
+          <text class="dimension-name">生活成本</text>
+          <text class="dimension-score">{{review.living_cost_rating}}</text>
+        </view>
+        <view class="dimension-bar">
+          <view class="dimension-bar-fill" style="width: {{review.living_cost_rating * 20}}%"></view>
+        </view>
+      </view>
+
+      <view class="dimension-item" wx:if="{{review.air_quality_rating}}">
+        <view class="dimension-header">
+          <text class="dimension-name">空气质量</text>
+          <text class="dimension-score">{{review.air_quality_rating}}</text>
+        </view>
+        <view class="dimension-bar">
+          <view class="dimension-bar-fill" style="width: {{review.air_quality_rating * 20}}%"></view>
+        </view>
+      </view>
+
+      <view class="dimension-item" wx:if="{{review.medical_rating}}">
+        <view class="dimension-header">
+          <text class="dimension-name">医疗设施</text>
+          <text class="dimension-score">{{review.medical_rating}}</text>
+        </view>
+        <view class="dimension-bar">
+          <view class="dimension-bar-fill" style="width: {{review.medical_rating * 20}}%"></view>
+        </view>
+      </view>
+
+      <view class="dimension-item" wx:if="{{review.employment_rating}}">
+        <view class="dimension-header">
+          <text class="dimension-name">就业机会</text>
+          <text class="dimension-score">{{review.employment_rating}}</text>
+        </view>
+        <view class="dimension-bar">
+          <view class="dimension-bar-fill" style="width: {{review.employment_rating * 20}}%"></view>
+        </view>
+      </view>
+
+      <view class="dimension-item" wx:if="{{review.safety_rating}}">
+        <view class="dimension-header">
+          <text class="dimension-name">安全指数</text>
+          <text class="dimension-score">{{review.safety_rating}}</text>
+        </view>
+        <view class="dimension-bar">
+          <view class="dimension-bar-fill" style="width: {{review.safety_rating * 20}}%"></view>
+        </view>
+      </view>
+
+      <view class="dimension-item" wx:if="{{review.elderly_care_rating}}">
+        <view class="dimension-header">
+          <text class="dimension-name">适合养老</text>
+          <text class="dimension-score">{{review.elderly_care_rating}}</text>
+        </view>
+        <view class="dimension-bar">
+          <view class="dimension-bar-fill" style="width: {{review.elderly_care_rating * 20}}%"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Actions -->
+    <view class="card actions-card">
+      <view class="action-item" bindtap="onToggleHelpful">
+        <text class="action-icon">{{isHelpful ? '👍' : '👍🏻'}}</text>
+        <text class="action-text">有用 ({{review.helpful_count || 0}})</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Error State -->
+  <view wx:if="{{!loading && !review}}" class="empty">
+    <view class="empty-icon">😕</view>
+    <text class="empty-text">评价不存在或已被删除</text>
+  </view>
+</view>

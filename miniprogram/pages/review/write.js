@@ -242,12 +242,19 @@ Page({
   // 提交评价到服务器
   submitReview(data) {
     return new Promise((resolve, reject) => {
+      const token = wx.getStorageSync('token');
+      if (!token) {
+        reject(new Error('请先登录'));
+        return;
+      }
+
       wx.request({
         url: `${app.globalData.apiBaseUrl}/reviews`,
         method: 'POST',
         data: data,
         header: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         success: (res) => {
           if (res.statusCode === 201 && res.data.success) {
@@ -260,6 +267,15 @@ Page({
           reject(err);
         }
       });
+    });
+  },
+
+  // 预览图片
+  onPreviewImage(e) {
+    const index = e.currentTarget.dataset.index;
+    wx.previewImage({
+      current: this.data.images[index],
+      urls: this.data.images
     });
   }
 });

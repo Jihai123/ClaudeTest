@@ -50,13 +50,20 @@
 
         <!-- 图片 -->
         <view class="review-images" wx:if="{{item.images && item.images.length > 0}}">
-          <block wx:for="{{item.images}}" wx:for-item="image" wx:key="*this">
-            <image class="review-image" src="{{image}}" mode="aspectFill"/>
+          <block wx:for="{{item.images}}" wx:for-item="image" wx:for-index="imgIndex" wx:key="*this">
+            <image
+              class="review-image"
+              src="{{image}}"
+              mode="aspectFill"
+              data-index="{{imgIndex}}"
+              data-review-index="{{index}}"
+              catchtap="onPreviewImage"
+            />
           </block>
         </view>
 
         <!-- 维度评分 -->
-        <view class="dimensions" wx:if="{{item.hasD dimensions}}">
+        <view class="dimensions">
           <view class="dimension-tag" wx:if="{{item.living_cost_rating}}">
             生活成本 {{item.living_cost_rating}}
           </view>

@@ -74,8 +74,13 @@
       <view class="image-uploader">
         <block wx:for="{{images}}" wx:key="*this">
           <view class="image-item">
-            <image src="{{item}}" mode="aspectFill"/>
-            <view class="image-delete" data-index="{{index}}" bindtap="onDeleteImage">×</view>
+            <image
+              src="{{item}}"
+              mode="aspectFill"
+              data-index="{{index}}"
+              bindtap="onPreviewImage"
+            />
+            <view class="image-delete" data-index="{{index}}" catchtap="onDeleteImage">×</view>
           </view>
         </block>
         <view class="image-add" wx:if="{{images.length < 9}}" bindtap="onChooseImage">

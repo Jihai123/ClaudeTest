@@ -184,10 +184,20 @@ Page({
   // 标记有用API
   markHelpful(reviewId, isHelpful) {
     return new Promise((resolve, reject) => {
+      const token = wx.getStorageSync('token');
+      if (!token) {
+        reject(new Error('请先登录'));
+        return;
+      }
+
       wx.request({
         url: `${app.globalData.apiBaseUrl}/reviews/${reviewId}/helpful`,
         method: 'POST',
         data: { is_helpful: isHelpful },
+        header: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         success: (res) => {
           if (res.statusCode === 200) {
             resolve(res.data);
@@ -197,6 +207,18 @@ Page({
         },
         fail: reject
       });
+    });
+  },
+
+  // 预览图片
+  onPreviewImage(e) {
+    const index = e.currentTarget.dataset.index;
+    const reviewIndex = e.currentTarget.dataset.reviewIndex;
+    const images = this.data.reviews[reviewIndex].images;
+
+    wx.previewImage({
+      current: images[index],
+      urls: images
     });
   },
 
