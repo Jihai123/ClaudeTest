@@ -130,9 +130,9 @@ async function importCityTags() {
 
           if (!existing) {
             await db.run(
-              `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name_cn, is_primary)
-               VALUES (?, ?, ?, ?, ?)`,
-              [city.id, 'city_tier', tier, tier + '城市', 1]
+              `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name, tag_name_cn, is_primary)
+               VALUES (?, ?, ?, ?, ?, ?)`,
+              [city.id, 'city_tier', tier, tier + '城市', tier + '城市', 1]
             );
             count++;
             totalAdded++;
@@ -164,9 +164,9 @@ async function importCityTags() {
 
         if (!existing) {
           await db.run(
-            `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name_cn, is_primary)
-             VALUES (?, ?, ?, ?, ?)`,
-            [city.id, 'coastal', 'true', '沿海城市', 1]
+            `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name, tag_name_cn, is_primary)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [city.id, 'coastal', 'true', '沿海城市', '沿海城市', 1]
           );
           coastalCount++;
           totalAdded++;
@@ -195,9 +195,9 @@ async function importCityTags() {
 
         if (!existing) {
           await db.run(
-            `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name_cn, is_primary)
-             VALUES (?, ?, ?, ?, ?)`,
-            [city.id, 'capital', 'true', '省会城市', 1]
+            `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name, tag_name_cn, is_primary)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [city.id, 'capital', 'true', '省会城市', '省会城市', 1]
           );
           capitalCount++;
           totalAdded++;
@@ -226,9 +226,9 @@ async function importCityTags() {
 
         if (!existing) {
           await db.run(
-            `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name_cn, is_primary)
-             VALUES (?, ?, ?, ?, ?)`,
-            [city.id, 'separately_planned', 'true', '计划单列市', 1]
+            `INSERT INTO city_tags (city_id, tag_key, tag_value, tag_name, tag_name_cn, is_primary)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [city.id, 'separately_planned', 'true', '计划单列市', '计划单列市', 1]
           );
           plannedCount++;
           totalAdded++;
