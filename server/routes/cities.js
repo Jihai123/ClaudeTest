@@ -144,9 +144,12 @@ router.get('/', optionalAuth, async (req, res) => {
           params.push(filterObj.country);
         }
 
-        // 海边城市
-        if (filterObj.seaside) {
-          whereClause += ' AND c.distance_to_sea < 10';
+        // 【重构】沿海城市筛选 - 使用标签
+        if (filterObj.coastal || filterObj.seaside) {
+          whereClause += ` AND c.id IN (
+            SELECT DISTINCT city_id FROM city_tags
+            WHERE tag_key = 'coastal' AND tag_value = 'true'
+          )`;
         }
 
         // 【新增】租金区间筛选

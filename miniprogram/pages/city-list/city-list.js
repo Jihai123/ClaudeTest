@@ -125,10 +125,9 @@ Page({
         }
       }
 
-      // 处理沿海城市
+      // 【重构】处理沿海城市 - 使用数据库标签
       if (this.data.isCoastal) {
-        const coastalCities = ['青岛', '厦门', '大连', '三亚', '珠海', '烟台', '威海', '宁波', '舟山', '福州', '泉州', '汕头', '湛江', '北海', '秦皇岛', '连云港', '南通', '温州', '台州', '深圳', '广州', '上海']
-        params.keywords = coastalCities.join(',')
+        filters.coastal = true
       }
 
       // 添加筛选参数
@@ -170,19 +169,25 @@ Page({
     }
 
     const keywordMap = {
-      '看海': { keywords: ['海边', '沿海', '海滨'], coastal: true },
-      '海边': { keywords: ['海边', '沿海', '海滨'], coastal: true },
-      '沿海': { keywords: ['海边', '沿海', '海滨'], coastal: true },
+      // 【重构】沿海城市 - 使用数据库标签
+      '看海': { coastal: true },
+      '海边': { coastal: true },
+      '沿海': { coastal: true },
+      // 养老相关
       '养老': { filter: { elderly_care_min: 7 } },
       '退休': { filter: { elderly_care_min: 7 } },
+      // 旅居相关
       '旅居': { filter: { air_quality_min: 7, safety_min: 7 } },
+      // 成本相关
       '性价比': { filter: { living_cost_max: 5 } },
       '便宜': { filter: { living_cost_max: 5 } },
       '低成本': { filter: { living_cost_max: 5 } },
+      // 工作相关
       '数字游民': { filter: { employment_min: 6, living_cost_max: 7 } },
       '远程工作': { filter: { employment_min: 6 } },
       '工作': { filter: { employment_min: 6 } },
       '就业': { filter: { employment_min: 7 } },
+      // 环境相关
       '空气好': { filter: { air_quality_min: 8 } },
       '空气': { filter: { air_quality_min: 7 } },
       '安全': { filter: { safety_min: 8 } },
