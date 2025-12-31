@@ -49,9 +49,20 @@ Page({
           review.created_at = util.formatTime(new Date(review.created_at))
         }
 
+        // 预计算维度评分宽度（避免 WXML 中计算导致渲染问题）
+        const dimensions = {
+          living_cost_width: (review.living_cost_rating || 0) * 20,
+          air_quality_width: (review.air_quality_rating || 0) * 20,
+          medical_width: (review.medical_rating || 0) * 20,
+          employment_width: (review.employment_rating || 0) * 20,
+          safety_width: (review.safety_rating || 0) * 20,
+          elderly_care_width: (review.elderly_care_rating || 0) * 20
+        }
+
         this.setData({
           review: review,
-          loading: false
+          loading: false,
+          ...dimensions
         })
 
         // 检查当前用户是否标记过有用
