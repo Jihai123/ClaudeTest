@@ -37,6 +37,43 @@
       </view>
     </view>
 
+    <!-- 城市印象图片墙 -->
+    <view class="city-images-section card">
+      <view class="section-header">
+        <view class="section-title-row">
+          <text class="section-icon">📷</text>
+          <text class="card-title">城市印象</text>
+        </view>
+        <button class="btn-small btn-primary" bindtap="onUploadCityImage">
+          上传图片
+        </button>
+      </view>
+
+      <!-- 有图片时显示图片列表 -->
+      <view wx:if="{{cityImages && cityImages.length > 0}}" class="city-images-grid">
+        <view
+          wx:for="{{cityImages}}"
+          wx:key="id"
+          class="city-image-item"
+          data-url="{{item.image_url}}"
+          data-urls="{{cityImageUrls}}"
+          bindtap="onPreviewCityImage"
+        >
+          <image src="{{item.thumbnail_url || item.image_url}}" mode="aspectFill" />
+        </view>
+      </view>
+
+      <!-- 没有图片时显示空状态 -->
+      <view wx:else class="city-images-empty">
+        <text class="empty-icon">📷</text>
+        <text class="empty-title">暂无图片</text>
+        <text class="empty-desc">成为第一个上传这座城市图片的人</text>
+        <button class="btn-primary btn-upload" bindtap="onUploadCityImage">
+          上传城市印象
+        </button>
+      </view>
+    </view>
+
     <!-- 维度评分 -->
     <view class="dimensions-section card">
       <view class="card-title">各项评分</view>

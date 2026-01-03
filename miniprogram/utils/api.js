@@ -94,6 +94,19 @@ class API {
     return this.post('/cities/compare', { city_ids: cityIds })
   }
 
+  // ===== 城市图片相关API =====
+
+  // 上传城市印象图片
+  uploadCityImage(cityId, imageUrl, altText = '') {
+    return this.post('/images', {
+      city_id: cityId,
+      image_url: imageUrl,
+      thumbnail_url: imageUrl,
+      alt_text: altText,
+      image_type: 'user'
+    })
+  }
+
   // ===== 评价相关API =====
 
   // 获取城市评价

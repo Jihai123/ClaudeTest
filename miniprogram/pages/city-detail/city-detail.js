@@ -15,7 +15,9 @@ Page({
     reviewRating: 5,
     reviewComment: '',
     reviewImages: [],    // 评价图片列表
-    submitting: false    // 提交状态
+    submitting: false,   // 提交状态
+    cityImages: [],      // 城市印象图片列表
+    cityImageUrls: []    // 城市图片URL数组（用于预览）
   },
 
   onLoad(options) {
@@ -85,9 +87,15 @@ Page({
         barStyle: `width: ${item.value * 10}%; background-color: ${item.color}`
       }))
 
+      // 处理城市印象图片
+      const cityImages = city.images || []
+      const cityImageUrls = cityImages.map(img => img.image_url)
+
       this.setData({
         city: processedCity,
         dimensions,
+        cityImages,
+        cityImageUrls,
         loading: false
       })
 
@@ -345,6 +353,93 @@ Page({
       current: current,
       urls: urls
     })
+  },
+
+  // 预览城市印象图片
+  onPreviewCityImage(e) {
+    const url = e.currentTarget.dataset.url
+    const urls = this.data.cityImageUrls
+    wx.previewImage({
+      current: url,
+      urls: urls
+    })
+  },
+
+  // 上传城市印象图片
+  onUploadCityImage() {
+    // 使用新 API wx.chooseMedia
+    if (wx.chooseMedia) {
+      wx.chooseMedia({
+        count: 9,
+        mediaType: ['image'],
+        sourceType: ['album', 'camera'],
+        sizeType: ['compressed'],
+        success: (res) => {
+          wx.showLoading({ title: '上传中...' })
+          const tempFilePaths = res.tempFiles.map(file => file.tempFilePath)
+          this.uploadCityImages(tempFilePaths)
+        },
+        fail: (err) => {
+          console.error('选择图片失败:', err)
+          if (err.errMsg && !err.errMsg.includes('cancel')) {
+            util.showToast('选择图片失败')
+          }
+        }
+      })
+    } else {
+      // 降级使用旧 API
+      wx.chooseImage({
+        count: 9,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+          wx.showLoading({ title: '上传中...' })
+          this.uploadCityImages(res.tempFilePaths)
+        },
+        fail: (err) => {
+          console.error('选择图片失败:', err)
+          if (err.errMsg && !err.errMsg.includes('cancel')) {
+            util.showToast('选择图片失败')
+          }
+        }
+      })
+    }
+  },
+
+  // 上传城市图片到服务器
+  async uploadCityImages(filePaths) {
+    let successCount = 0
+
+    try {
+      for (const filePath of filePaths) {
+        // 上传图片文件
+        const uploadRes = await this.uploadSingleImage(filePath)
+
+        if (uploadRes.success && uploadRes.url) {
+          // 将图片关联到城市
+          try {
+            await api.uploadCityImage(this.data.cityId, uploadRes.url)
+            successCount++
+          } catch (err) {
+            console.error('关联城市图片失败:', err)
+          }
+        }
+      }
+
+      wx.hideLoading()
+
+      if (successCount > 0) {
+        util.showToast(`成功上传${successCount}张图片`, 'success')
+        // 重新加载城市数据以刷新图片列表
+        this.loadCityDetail()
+      } else {
+        util.showToast('上传失败，请重试')
+      }
+    } catch (error) {
+      wx.hideLoading()
+      util.showToast('上传失败')
+      console.error('上传城市图片失败:', error)
+    }
   },
 
   // 分享
