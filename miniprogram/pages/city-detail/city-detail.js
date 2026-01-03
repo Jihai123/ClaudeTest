@@ -140,19 +140,51 @@ Page({
     })
   },
 
-  // 选择图片
+  // 选择图片（兼容新旧版本微信）
   onChooseImage() {
     const remainingCount = 9 - this.data.reviewImages.length
 
-    wx.chooseImage({
-      count: remainingCount,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        wx.showLoading({ title: '上传中...' })
-        this.uploadImages(res.tempFilePaths)
-      }
-    })
+    // 优先使用新 API wx.chooseMedia（微信基础库 2.10.0+）
+    if (wx.chooseMedia) {
+      wx.chooseMedia({
+        count: remainingCount,
+        mediaType: ['image'],
+        sourceType: ['album', 'camera'],
+        sizeType: ['compressed'],
+        success: (res) => {
+          wx.showLoading({ title: '上传中...' })
+          const tempFilePaths = res.tempFiles.map(file => file.tempFilePath)
+          this.uploadImages(tempFilePaths)
+        },
+        fail: (err) => {
+          console.error('选择图片失败:', err)
+          if (err.errMsg && err.errMsg.includes('cancel')) {
+            // 用户取消选择，不提示
+          } else {
+            util.showToast('选择图片失败')
+          }
+        }
+      })
+    } else {
+      // 降级使用旧 API wx.chooseImage
+      wx.chooseImage({
+        count: remainingCount,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+          wx.showLoading({ title: '上传中...' })
+          this.uploadImages(res.tempFilePaths)
+        },
+        fail: (err) => {
+          console.error('选择图片失败:', err)
+          if (err.errMsg && err.errMsg.includes('cancel')) {
+            // 用户取消选择，不提示
+          } else {
+            util.showToast('选择图片失败')
+          }
+        }
+      })
+    }
   },
 
   // 上传图片到服务器
