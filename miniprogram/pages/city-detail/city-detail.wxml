@@ -101,6 +101,21 @@
           <view wx:if="{{item.comment}}" class="review-content">
             {{item.comment}}
           </view>
+          <!-- 评价图片展示 -->
+          <view wx:if="{{item.images && item.images.length > 0}}" class="review-images">
+            <image
+              wx:for="{{item.images}}"
+              wx:for-item="img"
+              wx:for-index="imgIndex"
+              wx:key="*this"
+              src="{{img}}"
+              mode="aspectFill"
+              class="review-image"
+              data-urls="{{item.images}}"
+              data-current="{{img}}"
+              bindtap="onPreviewReviewImage"
+            />
+          </view>
           <view class="review-actions">
             <view class="action-btn" bindtap="onLikeReview" data-id="{{item.id}}">
               <text class="icon">{{item.user_liked ? '❤️' : '🤍'}}</text>

@@ -305,6 +305,16 @@ Page({
     }
   },
 
+  // 预览评价列表中的图片
+  onPreviewReviewImage(e) {
+    const urls = e.currentTarget.dataset.urls
+    const current = e.currentTarget.dataset.current
+    wx.previewImage({
+      current: current,
+      urls: urls
+    })
+  },
+
   // 分享
   onShareAppMessage() {
     return {

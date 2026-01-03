@@ -231,6 +231,21 @@
   margin-bottom: 16rpx;
 }
 
+/* 评价图片展示 */
+.review-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.review-image {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 8rpx;
+  background: #f1f5f9;
+}
+
 .review-actions {
   display: flex;
   gap: 30rpx;
