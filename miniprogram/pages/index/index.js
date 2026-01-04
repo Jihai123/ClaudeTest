@@ -110,15 +110,17 @@ Page({
         return
 
       case 'lowCost':
-        // 低生活成本：living_cost <= 5
+        // 低生活成本：躺平榜城市，月租<=800元
         filterParams = {
           title: '低生活成本城市',
-          filter: JSON.stringify({ living_cost_max: 5 })
+          list_type: 'china_layflat',
+          sort: 'avg_rent',
+          order: 'ASC'
         }
         break
 
       case 'elderly':
-        // 适合养老：elderly_care >= 7
+        // 适合养老：elderly_care >= 7 或有养老标签
         filterParams = {
           title: '适合养老城市',
           filter: JSON.stringify({ elderly_care_min: 7 })
@@ -126,26 +128,28 @@ Page({
         break
 
       case 'employment':
-        // 就业机会多：employment >= 7
+        // 就业机会多：一二线城市（中国综合榜）
         filterParams = {
           title: '就业机会多的城市',
-          filter: JSON.stringify({ employment_min: 7 })
+          list_type: 'china_general',
+          sort: 'overall_score',
+          order: 'DESC'
         }
         break
 
       case 'airQuality':
-        // 空气好：air_quality >= 8
+        // 空气好：air_quality >= 7
         filterParams = {
           title: '空气质量好的城市',
-          filter: JSON.stringify({ air_quality_min: 8 })
+          filter: JSON.stringify({ air_quality_min: 7 })
         }
         break
 
       case 'coastal':
-        // 沿海城市：特殊处理
+        // 沿海宜居：有沿海标签的城市
         filterParams = {
-          title: '沿海城市',
-          coastal: 'true'
+          title: '沿海宜居城市',
+          filter: JSON.stringify({ coastal: true })
         }
         break
     }

@@ -148,7 +148,7 @@ router.get('/', optionalAuth, async (req, res) => {
         if (filterObj.coastal || filterObj.seaside) {
           whereClause += ` AND c.id IN (
             SELECT DISTINCT city_id FROM city_tags
-            WHERE tag_key = 'coastal' AND tag_value = 'true'
+            WHERE tag_key = 'coastal'
           )`;
         }
 
