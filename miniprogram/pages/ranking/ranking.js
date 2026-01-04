@@ -56,9 +56,9 @@ Page({
   getRankingParams() {
     const { activeTab } = this.data
 
-    // 基础参数
+    // 基础参数 - 设置较大的limit以获取所有城市
     const params = {
-      limit: 50
+      limit: 500
     }
 
     // 根据榜单类型设置筛选和排序
