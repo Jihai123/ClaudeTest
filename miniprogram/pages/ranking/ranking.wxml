@@ -6,35 +6,28 @@
     <text class="page-subtitle">基于多维度评分的综合排名</text>
   </view>
 
-  <!-- 榜单类型切换 -->
+  <!-- 榜单类型切换 - 三个主榜单 -->
   <view class="tab-bar">
     <view
-      class="tab-item {{activeTab === 'overall' ? 'active' : ''}}"
+      class="tab-item {{activeTab === 'world' ? 'active' : ''}}"
       bindtap="onTabChange"
-      data-tab="overall"
+      data-tab="world"
     >
-      <text>综合榜</text>
+      <text>🌍 世界榜</text>
     </view>
     <view
-      class="tab-item {{activeTab === 'cost' ? 'active' : ''}}"
+      class="tab-item {{activeTab === 'china' ? 'active' : ''}}"
       bindtap="onTabChange"
-      data-tab="cost"
+      data-tab="china"
     >
-      <text>性价比榜</text>
+      <text>🏙️ 中国综合榜</text>
     </view>
     <view
-      class="tab-item {{activeTab === 'elderly' ? 'active' : ''}}"
+      class="tab-item {{activeTab === 'layflat' ? 'active' : ''}}"
       bindtap="onTabChange"
-      data-tab="elderly"
+      data-tab="layflat"
     >
-      <text>养老榜</text>
-    </view>
-    <view
-      class="tab-item {{activeTab === 'air' ? 'active' : ''}}"
-      bindtap="onTabChange"
-      data-tab="air"
-    >
-      <text>空气质量榜</text>
+      <text>🏖️ 旅居城市榜</text>
     </view>
   </view>
 
@@ -57,7 +50,7 @@
       <view class="ranking-info">
         <view class="city-header">
           <text class="city-name">{{item.name}}</text>
-          <text class="city-location">{{item.province}}</text>
+          <text class="city-location">{{item.province || item.country}}</text>
         </view>
         <view class="city-tags">
           <text class="city-tag">{{item.mainTag}}</text>

@@ -4,7 +4,7 @@ const util = require('../../utils/util')
 
 Page({
   data: {
-    activeTab: 'overall',
+    activeTab: 'china',  // 默认显示中国综合榜
     cities: [],
     loading: false
   },
@@ -58,38 +58,29 @@ Page({
 
     // 基础参数
     const params = {
-      limit: 50,
-      filters: JSON.stringify({ country: '中国' })
+      limit: 50
     }
 
-    // 根据榜单类型设置排序
+    // 根据榜单类型设置筛选和排序
     switch (activeTab) {
-      case 'overall':
-        // 综合榜 - 按综合评分排序
+      case 'world':
+        // 世界城市排行榜
+        params.list_type = 'world'
+        params.sort = 'world_score'
+        params.order = 'DESC'
+        break
+
+      case 'china':
+        // 中国综合宜居城市排行榜
+        params.list_type = 'china_general'
         params.sort = 'overall_score'
         params.order = 'DESC'
         break
 
-      case 'cost':
-        // 性价比榜 - 生活成本低且综合评分高
-        params.sort = 'living_cost'
-        params.order = 'ASC'
-        // 筛选综合评分>=70的城市
-        params.filters = JSON.stringify({
-          country: '中国',
-          overall_score_min: 70
-        })
-        break
-
-      case 'elderly':
-        // 养老榜 - 按养老友好度排序
-        params.sort = 'elderly_care'
-        params.order = 'DESC'
-        break
-
-      case 'air':
-        // 空气质量榜 - 按空气质量排序
-        params.sort = 'air_quality'
+      case 'layflat':
+        // 旅居城市排行榜（躺平榜）
+        params.list_type = 'china_layflat'
+        params.sort = 'layflat_score'
         params.order = 'DESC'
         break
     }
@@ -100,7 +91,6 @@ Page({
   // 处理城市数据
   processCityData(city, index) {
     const { activeTab } = this.data
-    const score = city.overall_score || 0
 
     // 获取标签
     const topDimensions = util.getTopDimensions(city)
@@ -111,28 +101,33 @@ Page({
     let displayScore, scoreLabel
 
     switch (activeTab) {
-      case 'overall':
-        displayScore = score.toFixed(0)
+      case 'world':
+        displayScore = (city.world_score || 0).toFixed(1)
+        scoreLabel = '宜居指数'
+        break
+
+      case 'china':
+        displayScore = (city.overall_score || 0).toFixed(1)
         scoreLabel = '综合评分'
         break
 
-      case 'cost':
-        displayScore = (city.living_cost || 0).toFixed(1)
-        scoreLabel = '生活成本'
-        break
-
-      case 'elderly':
-        displayScore = (city.elderly_care || 0).toFixed(1)
-        scoreLabel = '养老友好'
-        break
-
-      case 'air':
-        displayScore = (city.air_quality || 0).toFixed(1)
-        scoreLabel = '空气质量'
+      case 'layflat':
+        displayScore = (city.layflat_score || 0).toFixed(1)
+        scoreLabel = '躺平指数'
+        // 旅居榜显示月租金作为第二标签
+        if (city.avg_rent) {
+          return {
+            ...city,
+            mainTag: `月租${city.avg_rent}元`,
+            secondTag: mainTag,
+            displayScore,
+            scoreLabel
+          }
+        }
         break
 
       default:
-        displayScore = score.toFixed(0)
+        displayScore = (city.overall_score || 0).toFixed(1)
         scoreLabel = '综合评分'
     }
 

@@ -13,6 +13,7 @@ Page({
     searchQuery: '',
     filters: {},
     isCoastal: false,
+    listType: '',  // 榜单类型: world, china_general, china_layflat
 
     // 排序
     sortField: 'overall_score',
@@ -60,6 +61,11 @@ Page({
       }
     }
 
+    // 榜单类型
+    if (options.list_type) {
+      updates.listType = options.list_type
+    }
+
     // 沿海城市
     if (options.coastal === 'true') {
       updates.isCoastal = true
@@ -68,6 +74,9 @@ Page({
     // 排序
     if (options.sort) {
       updates.sortField = options.sort
+    }
+    if (options.order) {
+      updates.sortOrder = options.order
     }
 
     this.setData(updates)
@@ -97,11 +106,16 @@ Page({
         order: this.data.sortOrder
       }
 
+      // 如果指定了榜单类型，添加到参数
+      if (this.data.listType) {
+        params.list_type = this.data.listType
+      }
+
       // 构建筛选条件
       const filters = { ...this.data.filters }
 
-      // 默认只显示中国城市
-      if (!filters.country) {
+      // 只有非世界榜才默认显示中国城市
+      if (!filters.country && this.data.listType !== 'world') {
         filters.country = '中国'
       }
 
@@ -223,20 +237,39 @@ Page({
 
   // 处理城市数据
   processCityData(city) {
-    const score = city.overall_score || 0
+    // 根据榜单类型选择正确的评分
+    let score = city.overall_score || 0
+    let scoreLabel = '综合评分'
+
+    if (this.data.listType === 'world' || city.list_type === 'world') {
+      score = city.world_score || city.overall_score || 0
+      scoreLabel = '宜居指数'
+    } else if (this.data.listType === 'china_layflat' || city.list_type === 'china_layflat') {
+      score = city.layflat_score || city.overall_score || 0
+      scoreLabel = '躺平指数'
+    }
+
     const emotional = util.getEmotionalScore(score)
 
     // 获取前2个标签
     const topDimensions = util.getTopDimensions(city)
-    const mainTag = topDimensions.length > 0 ? topDimensions[0].label : '宜居城市'
+    let mainTag = topDimensions.length > 0 ? topDimensions[0].label : '宜居城市'
     const secondTag = topDimensions.length > 1 ? topDimensions[1].label : ''
+
+    // 躺平榜显示月租金
+    if ((this.data.listType === 'china_layflat' || city.list_type === 'china_layflat') && city.avg_rent) {
+      mainTag = `月租${city.avg_rent}元`
+    }
 
     return {
       ...city,
+      display_score: score.toFixed(1),
       overall_score: score.toFixed(0),
+      scoreLabel,
       emoji: emotional.emoji,
       mainTag,
-      secondTag
+      secondTag,
+      location: city.province || city.country || ''
     }
   },
 

@@ -50,7 +50,7 @@
       </view>
       <view class="entry-item" bindtap="onQuickEntry" data-type="coastal">
         <text class="entry-icon">🌊</text>
-        <text class="entry-label">沿海城市</text>
+        <text class="entry-label">沿海宜居</text>
       </view>
     </view>
   </view>
