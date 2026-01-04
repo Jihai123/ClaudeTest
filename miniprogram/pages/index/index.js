@@ -128,11 +128,10 @@ Page({
         break
 
       case 'employment':
-        // 就业机会多：一二线城市（中国综合榜）
+        // 就业机会多：按就业评分排序
         filterParams = {
           title: '就业机会多的城市',
-          list_type: 'china_general',
-          sort: 'overall_score',
+          sort: 'employment',
           order: 'DESC'
         }
         break
