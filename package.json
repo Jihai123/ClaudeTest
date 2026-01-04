@@ -26,27 +26,27 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
+    "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
+    "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
-    "helmet": "^7.1.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
-    "cheerio": "^1.0.0-rc.12",
-    "axios": "^1.6.2",
-    "dotenv": "^16.3.1",
+    "form-data": "^4.0.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.7.0",
-    "form-data": "^4.0.0"
+    "sqlite3": "^5.1.7"
   },
   "optionalDependencies": {
-    "aws-sdk": "^2.1519.0",
-    "ali-oss": "^6.18.1"
+    "ali-oss": "^6.18.1",
+    "aws-sdk": "^2.1519.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2"
   }
 }
