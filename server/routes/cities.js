@@ -386,7 +386,13 @@ router.get('/', optionalAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('获取城市列表失败:', error);
-    res.status(500).json({ error: '获取城市列表失败' });
+    console.error('请求参数:', req.query);
+    console.error('错误详情:', error.message);
+    res.status(500).json({
+      error: '获取城市列表失败',
+      message: error.message,
+      detail: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 

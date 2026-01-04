@@ -63,7 +63,8 @@
       <view class="city-item-left">
         <view class="city-item-header">
           <text class="city-item-name">{{item.name}}</text>
-          <text class="city-item-location">{{item.province}}</text>
+          <text class="city-item-location" wx:if="{{item.province && item.province !== 'null'}}">{{item.province}}</text>
+          <text class="city-item-location" wx:elif="{{item.country && item.country !== '中国'}}">{{item.country}}</text>
         </view>
         <view class="city-item-tags">
           <text class="city-tag">{{item.mainTag}}</text>
