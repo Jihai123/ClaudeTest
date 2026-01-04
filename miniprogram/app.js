@@ -42,23 +42,39 @@ App({
     }
   },
 
-  // 获取系统信息
+  // 获取系统信息（兼容新旧版本微信）
   getSystemInfo() {
-    // 使用新API替代废弃的wx.getSystemInfo
     try {
-      const deviceInfo = wx.getDeviceInfo()
-      const windowInfo = wx.getWindowInfo()
-      const appBaseInfo = wx.getAppBaseInfo()
+      // 优先使用新 API（微信基础库 2.20.1+）
+      if (wx.getDeviceInfo && wx.getWindowInfo && wx.getAppBaseInfo) {
+        const deviceInfo = wx.getDeviceInfo()
+        const windowInfo = wx.getWindowInfo()
+        const appBaseInfo = wx.getAppBaseInfo()
 
-      this.globalData.systemInfo = {
-        ...deviceInfo,
-        ...windowInfo,
-        ...appBaseInfo
+        this.globalData.systemInfo = {
+          ...deviceInfo,
+          ...windowInfo,
+          ...appBaseInfo
+        }
+      } else {
+        // 降级使用旧 API（兼容旧版本微信）
+        wx.getSystemInfo({
+          success: (res) => {
+            this.globalData.systemInfo = res
+            console.log('系统信息(旧API):', res)
+          },
+          fail: (err) => {
+            console.error('获取系统信息失败:', err)
+          }
+        })
+        return
       }
 
       console.log('系统信息:', this.globalData.systemInfo)
     } catch (e) {
       console.error('获取系统信息失败:', e)
+      // 最后的降级方案
+      this.globalData.systemInfo = {}
     }
   },
 

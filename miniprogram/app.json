@@ -11,6 +11,21 @@
     "pages/review/list",
     "pages/review/detail"
   ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于定位您当前所在城市"
+    },
+    "scope.writePhotosAlbum": {
+      "desc": "用于保存图片到相册"
+    },
+    "scope.camera": {
+      "desc": "用于拍摄城市图片"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation",
+    "getLocation"
+  ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#2563eb",

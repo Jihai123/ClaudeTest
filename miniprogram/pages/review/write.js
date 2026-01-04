@@ -97,23 +97,48 @@ Page({
     });
   },
 
-  // 选择图片
+  // 选择图片（兼容新旧版本微信）
   onChooseImage() {
     const remainingCount = 9 - this.data.images.length;
 
-    wx.chooseImage({
-      count: remainingCount,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        const tempFilePaths = res.tempFilePaths;
-
-        wx.showLoading({ title: '上传中...' });
-
-        // 上传图片到服务器
-        this.uploadImages(tempFilePaths);
-      }
-    });
+    // 优先使用新 API wx.chooseMedia（微信基础库 2.10.0+）
+    if (wx.chooseMedia) {
+      wx.chooseMedia({
+        count: remainingCount,
+        mediaType: ['image'],
+        sourceType: ['album', 'camera'],
+        sizeType: ['compressed'],
+        success: (res) => {
+          const tempFilePaths = res.tempFiles.map(file => file.tempFilePath);
+          wx.showLoading({ title: '上传中...' });
+          this.uploadImages(tempFilePaths);
+        },
+        fail: (err) => {
+          console.error('选择图片失败:', err);
+          if (err.errMsg && !err.errMsg.includes('cancel')) {
+            wx.showToast({ title: '选择图片失败', icon: 'none' });
+          }
+        }
+      });
+    } else {
+      // 降级使用旧 API wx.chooseImage
+      wx.chooseImage({
+        count: remainingCount,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+          const tempFilePaths = res.tempFilePaths;
+          wx.showLoading({ title: '上传中...' });
+          this.uploadImages(tempFilePaths);
+        },
+        fail: (err) => {
+          console.error('选择图片失败:', err);
+          if (err.errMsg && !err.errMsg.includes('cancel')) {
+            wx.showToast({ title: '选择图片失败', icon: 'none' });
+          }
+        }
+      });
+    }
   },
 
   // 上传图片到服务器

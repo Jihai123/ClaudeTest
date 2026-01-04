@@ -94,6 +94,19 @@ class API {
     return this.post('/cities/compare', { city_ids: cityIds })
   }
 
+  // ===== 城市图片相关API =====
+
+  // 上传城市印象图片
+  uploadCityImage(cityId, imageUrl, altText = '') {
+    return this.post('/images', {
+      city_id: cityId,
+      image_url: imageUrl,
+      thumbnail_url: imageUrl,
+      alt_text: altText,
+      image_type: 'user'
+    })
+  }
+
   // ===== 评价相关API =====
 
   // 获取城市评价
@@ -101,9 +114,14 @@ class API {
     return this.get(`/reviews/city/${cityId}`, params)
   }
 
-  // 创建评价
-  createReview(cityId, rating, comment) {
-    return this.post('/reviews', { city_id: cityId, rating, comment })
+  // 创建评价（支持图片）
+  createReview(cityId, rating, comment, images = []) {
+    return this.post('/reviews', {
+      city_id: cityId,
+      rating,
+      comment,
+      images: images.length > 0 ? images : undefined
+    })
   }
 
   // 更新评价
