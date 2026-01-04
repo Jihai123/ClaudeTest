@@ -50,7 +50,8 @@
       <view class="ranking-info">
         <view class="city-header">
           <text class="city-name">{{item.name}}</text>
-          <text class="city-location">{{item.province || item.country}}</text>
+          <text class="city-location" wx:if="{{item.province && item.province !== 'null'}}">{{item.province}}</text>
+          <text class="city-location" wx:elif="{{item.country && item.country !== '中国'}}">{{item.country}}</text>
         </view>
         <view class="city-tags">
           <text class="city-tag">{{item.mainTag}}</text>
