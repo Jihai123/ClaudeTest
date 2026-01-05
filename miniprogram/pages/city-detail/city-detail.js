@@ -227,7 +227,7 @@ Page({
   uploadSingleImage(filePath) {
     return new Promise((resolve, reject) => {
       wx.uploadFile({
-        url: `${app.globalData.apiBaseUrl}/upload/upload`,
+        url: `${app.globalData.apiBaseUrl}/upload`,
         filePath: filePath,
         name: 'image',
         success: (res) => {
