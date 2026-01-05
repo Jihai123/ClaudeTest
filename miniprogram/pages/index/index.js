@@ -110,7 +110,7 @@ Page({
         return
 
       case 'lowCost':
-        // 低生活成本：躺平榜城市，月租<=800元
+        // 低生活成本：躺平榜城市，按月租排序
         filterParams = {
           title: '低生活成本城市',
           list_type: 'china_layflat',
@@ -120,27 +120,33 @@ Page({
         break
 
       case 'elderly':
-        // 适合养老：elderly_care >= 7 或有养老标签
+        // 适合养老：elderly_care >= 6，不限榜单类型以获取更多城市
+        // 同时查询 china_general 和 china_layflat
         filterParams = {
           title: '适合养老城市',
-          filter: JSON.stringify({ elderly_care_min: 7 })
+          sort: 'elderly_care',
+          order: 'DESC',
+          filter: JSON.stringify({ elderly_care_min: 6 })
         }
         break
 
       case 'employment':
-        // 就业机会多：按就业评分排序
+        // 就业机会多：按就业评分排序，主要是大城市
         filterParams = {
           title: '就业机会多的城市',
           sort: 'employment',
-          order: 'DESC'
+          order: 'DESC',
+          filter: JSON.stringify({ employment_min: 6 })
         }
         break
 
       case 'airQuality':
-        // 空气好：air_quality >= 7
+        // 空气好：air_quality >= 6.5，按评分排序
         filterParams = {
           title: '空气质量好的城市',
-          filter: JSON.stringify({ air_quality_min: 7 })
+          sort: 'air_quality',
+          order: 'DESC',
+          filter: JSON.stringify({ air_quality_min: 6.5 })
         }
         break
 
