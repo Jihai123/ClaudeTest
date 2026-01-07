@@ -26,7 +26,7 @@ class API {
         data,
         header,
         success: (res) => {
-          if (res.statusCode === 200) {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
             resolve(res.data)
           } else {
             const error = res.data.error || res.data.message || '请求失败'

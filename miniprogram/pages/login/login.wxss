@@ -13,35 +13,61 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60rpx 0 80rpx;
+  padding: 40rpx 0 60rpx;
 }
 
 .logo {
-  width: 160rpx;
-  height: 160rpx;
+  width: 140rpx;
+  height: 140rpx;
   background: #ffffff;
-  border-radius: 40rpx;
+  border-radius: 35rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.1);
-  margin-bottom: 32rpx;
+  margin-bottom: 24rpx;
 }
 
 .logo-icon {
-  font-size: 80rpx;
+  font-size: 70rpx;
 }
 
 .title {
-  font-size: 48rpx;
+  font-size: 44rpx;
   font-weight: bold;
   color: #333;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
 }
 
 .subtitle {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* Tab切换 */
+.tab-switch {
+  display: flex;
+  background: #f5f5f5;
+  border-radius: 16rpx;
+  padding: 8rpx;
+  margin-bottom: 40rpx;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  border-radius: 12rpx;
   font-size: 28rpx;
   color: #666;
+  transition: all 0.3s;
+}
+
+.tab-item.active {
+  background: #ffffff;
+  color: #333;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
 }
 
 /* 登录区域 */
@@ -49,40 +75,39 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .login-tips {
   background: #ffffff;
   border-radius: 24rpx;
-  padding: 40rpx;
+  padding: 32rpx;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 60rpx;
+  margin-bottom: 48rpx;
   box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.05);
 }
 
 .login-tips > text {
   display: block;
-  font-size: 30rpx;
+  font-size: 28rpx;
   color: #333;
   font-weight: 500;
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .tip-item {
   display: flex;
   align-items: center;
-  padding: 16rpx 0;
+  padding: 12rpx 0;
 }
 
 .tip-icon {
-  font-size: 36rpx;
-  margin-right: 20rpx;
+  font-size: 32rpx;
+  margin-right: 16rpx;
 }
 
 .tip-item text:last-child {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #666;
 }
 
@@ -111,8 +136,77 @@
 }
 
 .btn-icon {
-  font-size: 40rpx;
+  font-size: 36rpx;
   margin-right: 12rpx;
+}
+
+/* 账号密码登录 */
+.password-login {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 24rpx;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  height: 96rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+
+.input-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.input {
+  flex: 1;
+  height: 100%;
+  font-size: 30rpx;
+}
+
+.toggle-password {
+  font-size: 36rpx;
+  padding: 10rpx;
+}
+
+.password-login-btn {
+  width: 100%;
+  height: 96rpx;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 500;
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  margin-top: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(37, 99, 235, 0.3);
+}
+
+.password-login-btn::after {
+  border: none;
+}
+
+.password-login-btn.loading {
+  opacity: 0.7;
+}
+
+.form-tips {
+  margin-top: 24rpx;
+  text-align: right;
+}
+
+.form-tips .link {
+  font-size: 26rpx;
+  color: #2563eb;
 }
 
 /* 隐私提示 */
@@ -120,6 +214,7 @@
   margin-top: 32rpx;
   font-size: 24rpx;
   color: #999;
+  text-align: center;
 }
 
 .privacy-tips .link {
