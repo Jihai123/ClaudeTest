@@ -31,19 +31,30 @@
   <view class="login-area">
     <!-- 微信登录 -->
     <view class="wechat-login" wx:if="{{loginType === 'wechat'}}">
-      <view class="login-tips">
-        <text>登录后可以：</text>
-        <view class="tip-item">
-          <text class="tip-icon">📷</text>
-          <text>上传城市印象图片</text>
+      <!-- 头像和昵称输入（可选） -->
+      <view class="profile-setup">
+        <text class="setup-title">设置个人信息（可选）</text>
+
+        <!-- 头像选择 -->
+        <view class="avatar-picker">
+          <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <image wx:if="{{wxAvatarUrl}}" class="avatar-img" src="{{wxAvatarUrl}}" mode="aspectFill"/>
+            <view wx:else class="avatar-placeholder">
+              <text>📷</text>
+              <text class="avatar-hint">点击选头像</text>
+            </view>
+          </button>
         </view>
-        <view class="tip-item">
-          <text class="tip-icon">✍️</text>
-          <text>发表城市评价</text>
-        </view>
-        <view class="tip-item">
-          <text class="tip-icon">❤️</text>
-          <text>收藏喜欢的城市</text>
+
+        <!-- 昵称输入 -->
+        <view class="nickname-input">
+          <input
+            type="nickname"
+            class="input"
+            placeholder="点击输入昵称"
+            value="{{wxNickname}}"
+            bindinput="onNicknameInput"
+          />
         </view>
       </view>
 
@@ -56,6 +67,10 @@
         <text wx:if="{{loading}}">登录中...</text>
         <text wx:else>微信一键登录</text>
       </button>
+
+      <view class="wechat-tips">
+        <text>无需填写信息，可直接点击登录</text>
+      </view>
     </view>
 
     <!-- 账号密码登录 -->

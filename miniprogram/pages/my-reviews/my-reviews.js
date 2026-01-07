@@ -101,12 +101,10 @@ Page({
     }
   },
 
-  // 显示登录弹窗
+  // 跳转到登录页面（支持微信登录和账号登录）
   onLogin() {
-    this.setData({
-      showLoginModal: true,
-      loginUsername: '',
-      loginPassword: ''
+    wx.navigateTo({
+      url: '/pages/login/login'
     })
   },
 
