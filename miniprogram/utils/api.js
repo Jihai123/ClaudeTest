@@ -160,6 +160,11 @@ class API {
   login(username, password) {
     return this.post('/auth/login', { username, password })
   }
+
+  // 微信登录
+  wechatLogin(code, userInfo) {
+    return this.post('/auth/wechat-login', { code, userInfo })
+  }
 }
 
 // 导出API实例
