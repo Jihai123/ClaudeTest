@@ -367,6 +367,24 @@ Page({
 
   // 上传城市印象图片
   onUploadCityImage() {
+    // 检查用户是否已登录
+    const app = getApp()
+    if (!app.globalData.token) {
+      wx.showModal({
+        title: '提示',
+        content: '上传图片需要先登录，是否前往登录？',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+
     // 使用新 API wx.chooseMedia
     if (wx.chooseMedia) {
       wx.chooseMedia({
