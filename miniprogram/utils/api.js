@@ -98,7 +98,7 @@ class API {
 
   // 上传城市印象图片
   uploadCityImage(cityId, imageUrl, altText = '') {
-    return this.post('/images', {
+    return this.post('/images/upload', {
       city_id: cityId,
       image_url: imageUrl,
       thumbnail_url: imageUrl,
