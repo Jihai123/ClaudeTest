@@ -5,20 +5,18 @@ const api = require('../../utils/api')
 Page({
   data: {
     loading: false,
-    canUseGetUserProfile: false,
     // 登录方式: 'wechat' | 'password'
     loginType: 'wechat',
     // 表单数据
     username: '',
     password: '',
-    showPassword: false
+    showPassword: false,
+    // 微信登录时的用户信息
+    wxNickname: '',
+    wxAvatarUrl: ''
   },
 
   onLoad() {
-    // 检查是否支持 getUserProfile
-    if (typeof wx.getUserProfile === 'function') {
-      this.setData({ canUseGetUserProfile: true })
-    }
   },
 
   // 切换登录方式
@@ -40,6 +38,17 @@ Page({
   // 切换密码显示
   togglePassword() {
     this.setData({ showPassword: !this.data.showPassword })
+  },
+
+  // 选择头像（微信新API）
+  onChooseAvatar(e) {
+    const avatarUrl = e.detail.avatarUrl
+    this.setData({ wxAvatarUrl: avatarUrl })
+  },
+
+  // 输入昵称
+  onNicknameInput(e) {
+    this.setData({ wxNickname: e.detail.value })
   },
 
   // 用户名密码登录
@@ -104,22 +113,11 @@ Page({
         throw new Error('获取登录凭证失败')
       }
 
-      // 2. 尝试获取用户信息（可选）
-      let userInfo = null
-      if (this.data.canUseGetUserProfile) {
-        try {
-          const profileRes = await new Promise((resolve, reject) => {
-            wx.getUserProfile({
-              desc: '用于完善用户资料',
-              success: resolve,
-              fail: reject
-            })
-          })
-          userInfo = profileRes.userInfo
-        } catch (e) {
-          // 用户拒绝授权，继续登录流程
-          console.log('用户拒绝授权用户信息')
-        }
+      // 2. 构造用户信息（使用用户填写的昵称和头像）
+      const { wxNickname, wxAvatarUrl } = this.data
+      const userInfo = {
+        nickName: wxNickname || '',
+        avatarUrl: wxAvatarUrl || ''
       }
 
       // 3. 调用服务器登录接口
