@@ -9,7 +9,8 @@
     "pages/my-reviews/my-reviews",
     "pages/review/write",
     "pages/review/list",
-    "pages/review/detail"
+    "pages/review/detail",
+    "pages/login/login"
   ],
   "permission": {
     "scope.userLocation": {

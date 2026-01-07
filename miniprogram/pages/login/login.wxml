@@ -1,0 +1,54 @@
+<!--pages/login/login.wxml-->
+<view class="login-container">
+  <!-- 顶部装饰 -->
+  <view class="header">
+    <view class="logo">
+      <text class="logo-icon">🏠</text>
+    </view>
+    <text class="title">宜居城市</text>
+    <text class="subtitle">发现你的理想居住地</text>
+  </view>
+
+  <!-- 登录区域 -->
+  <view class="login-area">
+    <view class="login-tips">
+      <text>登录后可以：</text>
+      <view class="tip-item">
+        <text class="tip-icon">📷</text>
+        <text>上传城市印象图片</text>
+      </view>
+      <view class="tip-item">
+        <text class="tip-icon">✍️</text>
+        <text>发表城市评价</text>
+      </view>
+      <view class="tip-item">
+        <text class="tip-icon">❤️</text>
+        <text>收藏喜欢的城市</text>
+      </view>
+    </view>
+
+    <!-- 微信登录按钮 -->
+    <button
+      class="wechat-login-btn {{loading ? 'loading' : ''}}"
+      bindtap="onWechatLogin"
+      disabled="{{loading}}"
+    >
+      <text class="btn-icon" wx:if="{{!loading}}">💚</text>
+      <text wx:if="{{loading}}">登录中...</text>
+      <text wx:else>微信一键登录</text>
+    </button>
+
+    <!-- 提示信息 -->
+    <view class="privacy-tips">
+      <text>登录即表示同意</text>
+      <text class="link">用户协议</text>
+      <text>和</text>
+      <text class="link">隐私政策</text>
+    </view>
+  </view>
+
+  <!-- 跳过登录 -->
+  <view class="skip-area" bindtap="onBack">
+    <text>暂不登录</text>
+  </view>
+</view>
