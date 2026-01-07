@@ -105,10 +105,13 @@ router.post('/wechat-login', async (req, res) => {
       // 创建新用户
       const nickname = userInfo?.nickName || '微信用户' + openid.substring(0, 6);
       const avatar = userInfo?.avatarUrl || '';
+      // 为微信用户生成默认的email和password（占位用）
+      const defaultEmail = `wx_${openid.substring(0, 16)}@wechat.placeholder`;
+      const defaultPassword = await bcrypt.hash(openid + Date.now(), 10);
 
       const result = await db.run(
-        'INSERT INTO users (username, wechat_openid, avatar, role) VALUES (?, ?, ?, ?)',
-        [nickname, openid, avatar, 'user']
+        'INSERT INTO users (username, email, password, wechat_openid, avatar, role) VALUES (?, ?, ?, ?, ?, ?)',
+        [nickname, defaultEmail, defaultPassword, openid, avatar, 'user']
       );
 
       user = {

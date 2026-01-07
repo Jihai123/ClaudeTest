@@ -9,36 +9,100 @@
     <text class="subtitle">发现你的理想居住地</text>
   </view>
 
+  <!-- 登录方式切换 -->
+  <view class="tab-switch">
+    <view
+      class="tab-item {{loginType === 'wechat' ? 'active' : ''}}"
+      bindtap="switchLoginType"
+      data-type="wechat"
+    >
+      <text>微信登录</text>
+    </view>
+    <view
+      class="tab-item {{loginType === 'password' ? 'active' : ''}}"
+      bindtap="switchLoginType"
+      data-type="password"
+    >
+      <text>账号登录</text>
+    </view>
+  </view>
+
   <!-- 登录区域 -->
   <view class="login-area">
-    <view class="login-tips">
-      <text>登录后可以：</text>
-      <view class="tip-item">
-        <text class="tip-icon">📷</text>
-        <text>上传城市印象图片</text>
+    <!-- 微信登录 -->
+    <view class="wechat-login" wx:if="{{loginType === 'wechat'}}">
+      <view class="login-tips">
+        <text>登录后可以：</text>
+        <view class="tip-item">
+          <text class="tip-icon">📷</text>
+          <text>上传城市印象图片</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">✍️</text>
+          <text>发表城市评价</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">❤️</text>
+          <text>收藏喜欢的城市</text>
+        </view>
       </view>
-      <view class="tip-item">
-        <text class="tip-icon">✍️</text>
-        <text>发表城市评价</text>
+
+      <button
+        class="wechat-login-btn {{loading ? 'loading' : ''}}"
+        bindtap="onWechatLogin"
+        disabled="{{loading}}"
+      >
+        <text class="btn-icon" wx:if="{{!loading}}">💚</text>
+        <text wx:if="{{loading}}">登录中...</text>
+        <text wx:else>微信一键登录</text>
+      </button>
+    </view>
+
+    <!-- 账号密码登录 -->
+    <view class="password-login" wx:if="{{loginType === 'password'}}">
+      <view class="form-group">
+        <view class="input-wrapper">
+          <text class="input-icon">👤</text>
+          <input
+            class="input"
+            placeholder="用户名或邮箱"
+            value="{{username}}"
+            bindinput="onUsernameInput"
+          />
+        </view>
       </view>
-      <view class="tip-item">
-        <text class="tip-icon">❤️</text>
-        <text>收藏喜欢的城市</text>
+
+      <view class="form-group">
+        <view class="input-wrapper">
+          <text class="input-icon">🔒</text>
+          <input
+            class="input"
+            placeholder="密码"
+            password="{{!showPassword}}"
+            value="{{password}}"
+            bindinput="onPasswordInput"
+          />
+          <text class="toggle-password" bindtap="togglePassword">
+            {{showPassword ? '🙈' : '👁️'}}
+          </text>
+        </view>
+      </view>
+
+      <button
+        class="password-login-btn {{loading ? 'loading' : ''}}"
+        bindtap="onPasswordLogin"
+        disabled="{{loading}}"
+      >
+        <text wx:if="{{loading}}">登录中...</text>
+        <text wx:else>登 录</text>
+      </button>
+
+      <view class="form-tips">
+        <text class="link">忘记密码？</text>
       </view>
     </view>
 
-    <!-- 微信登录按钮 -->
-    <button
-      class="wechat-login-btn {{loading ? 'loading' : ''}}"
-      bindtap="onWechatLogin"
-      disabled="{{loading}}"
-    >
-      <text class="btn-icon" wx:if="{{!loading}}">💚</text>
-      <text wx:if="{{loading}}">登录中...</text>
-      <text wx:else>微信一键登录</text>
-    </button>
-
-    <!-- 提示信息 -->
+    <!-- 隐私提示 -->
     <view class="privacy-tips">
       <text>登录即表示同意</text>
       <text class="link">用户协议</text>

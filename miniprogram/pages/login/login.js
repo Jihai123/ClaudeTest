@@ -5,13 +5,83 @@ const api = require('../../utils/api')
 Page({
   data: {
     loading: false,
-    canUseGetUserProfile: false
+    canUseGetUserProfile: false,
+    // 登录方式: 'wechat' | 'password'
+    loginType: 'wechat',
+    // 表单数据
+    username: '',
+    password: '',
+    showPassword: false
   },
 
   onLoad() {
     // 检查是否支持 getUserProfile
     if (typeof wx.getUserProfile === 'function') {
       this.setData({ canUseGetUserProfile: true })
+    }
+  },
+
+  // 切换登录方式
+  switchLoginType(e) {
+    const type = e.currentTarget.dataset.type
+    this.setData({ loginType: type })
+  },
+
+  // 输入用户名
+  onUsernameInput(e) {
+    this.setData({ username: e.detail.value })
+  },
+
+  // 输入密码
+  onPasswordInput(e) {
+    this.setData({ password: e.detail.value })
+  },
+
+  // 切换密码显示
+  togglePassword() {
+    this.setData({ showPassword: !this.data.showPassword })
+  },
+
+  // 用户名密码登录
+  async onPasswordLogin() {
+    const { username, password } = this.data
+
+    if (!username.trim()) {
+      wx.showToast({ title: '请输入用户名', icon: 'none' })
+      return
+    }
+    if (!password) {
+      wx.showToast({ title: '请输入密码', icon: 'none' })
+      return
+    }
+
+    if (this.data.loading) return
+    this.setData({ loading: true })
+
+    try {
+      const result = await api.login(username, password)
+
+      // 保存登录状态
+      app.setUserInfo(result.user, result.token)
+
+      wx.showToast({
+        title: '登录成功',
+        icon: 'success',
+        duration: 1500
+      })
+
+      setTimeout(() => {
+        wx.navigateBack()
+      }, 1500)
+
+    } catch (error) {
+      console.error('登录失败:', error)
+      wx.showToast({
+        title: error.message || '用户名或密码错误',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ loading: false })
     }
   },
 
