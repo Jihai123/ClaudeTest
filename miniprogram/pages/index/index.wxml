@@ -1,6 +1,6 @@
 <!--pages/index/index.wxml-->
 <view class="container">
-  <!-- 1. 搜索 + 定位区（最高优先级） -->
+  <!-- 1. 搜索区 -->
   <view class="search-section">
     <!-- 搜索框 -->
     <view class="search-box-main">
@@ -14,13 +14,6 @@
         bindconfirm="onSearchConfirm"
       />
       <icon wx:if="{{searchQuery}}" class="clear-icon-main" type="clear" size="18" color="#999" bindtap="onClearSearch" />
-    </view>
-
-    <!-- 定位 -->
-    <view class="location-bar" bindtap="onLocationTap">
-      <text class="location-icon">📍</text>
-      <text class="location-text">{{currentLocation || '定位中...'}}</text>
-      <text class="location-arrow">→</text>
     </view>
   </view>
 

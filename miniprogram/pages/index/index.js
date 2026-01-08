@@ -6,7 +6,6 @@ Page({
   data: {
     // 搜索
     searchQuery: '',
-    currentLocation: '定位中...',
 
     // 核心数据
     recentCities: [],   // 最近访问（1-3个）
@@ -19,7 +18,6 @@ Page({
 
   onLoad() {
     // 加载所有初始数据
-    this.getCurrentLocation()
     this.loadRecentCities()
     this.loadHotCities()
     this.loadRankingCities()
@@ -28,40 +26,6 @@ Page({
   onShow() {
     // 页面显示时刷新最近访问
     this.loadRecentCities()
-  },
-
-  // ================================
-  // 定位功能
-  // ================================
-
-  getCurrentLocation() {
-    wx.getLocation({
-      type: 'gcj02',
-      success: (res) => {
-        // 这里应该调用逆地理编码API将坐标转换为城市名
-        // 暂时先显示简单提示
-        this.setData({
-          currentLocation: '正在定位...'
-        })
-
-        // 模拟定位结果（实际应该调用地理编码API）
-        setTimeout(() => {
-          this.setData({
-            currentLocation: '当前位置'
-          })
-        }, 1000)
-      },
-      fail: () => {
-        this.setData({
-          currentLocation: '定位失败，点击重试'
-        })
-      }
-    })
-  },
-
-  onLocationTap() {
-    // 重新获取定位
-    this.getCurrentLocation()
   },
 
   // ================================
