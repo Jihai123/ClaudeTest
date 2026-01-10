@@ -262,11 +262,6 @@ def main():
 
     args = parser.parse_args()
 
-    # 更新全局配置
-    global MIN_WIDTH, MAX_IMAGES_PER_CITY
-    MIN_WIDTH = args.min_width
-    MAX_IMAGES_PER_CITY = args.max_per_city
-
     filter_runner = ImageFilter(args)
     filter_runner.run()
 
