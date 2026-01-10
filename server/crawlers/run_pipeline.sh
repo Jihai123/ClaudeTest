@@ -164,9 +164,9 @@ step1_export_cities() {
     cd "$SCRIPT_DIR"
 
     if [[ -n "$DRY_RUN" ]]; then
-        log_warn "[DRY-RUN] 将执行: python3 export_cities.py"
+        log_warn "[DRY-RUN] 将执行: python3 -u export_cities.py"
     else
-        python3 export_cities.py
+        python3 -u export_cities.py
     fi
 
     log_success "城市列表导出完成"
@@ -180,8 +180,8 @@ step2_crawl_images() {
 
     cd "$SCRIPT_DIR"
 
-    # 构建命令
-    CMD="python3 batch_crawl.py"
+    # 构建命令 (-u 无缓冲输出)
+    CMD="python3 -u batch_crawl.py"
     CMD="$CMD --downloader $DOWNLOADER_PATH"
     CMD="$CMD --engine $ENGINE"
     CMD="$CMD --max-number $MAX_NUMBER"
@@ -215,7 +215,7 @@ step3_filter_images() {
 
     cd "$SCRIPT_DIR"
 
-    CMD="python3 filter_images.py"
+    CMD="python3 -u filter_images.py"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD --dry-run"
 
     log_info "执行命令: $CMD"
@@ -223,7 +223,7 @@ step3_filter_images() {
     if [[ -n "$DRY_RUN" ]]; then
         log_warn "[DRY-RUN] 将执行上述命令"
     else
-        $CMD
+        eval $CMD
     fi
 
     log_success "图片筛选完成"
@@ -245,7 +245,7 @@ step4_import() {
         fi
     fi
 
-    CMD="python3 import_to_db.py"
+    CMD="python3 -u import_to_db.py"
     [[ -n "$SKIP_UPLOAD" ]] && CMD="$CMD $SKIP_UPLOAD"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD --dry-run"
 
@@ -254,7 +254,7 @@ step4_import() {
     if [[ -n "$DRY_RUN" ]]; then
         log_warn "[DRY-RUN] 将执行上述命令"
     else
-        $CMD
+        eval $CMD
     fi
 
     log_success "数据导入完成"
