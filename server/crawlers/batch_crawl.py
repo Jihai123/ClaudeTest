@@ -18,16 +18,17 @@ OUTPUT_DIR = Path(__file__).parent / 'raw_images'
 LOG_FILE = Path(__file__).parent / 'crawl_log.json'
 
 # 默认参数
-DEFAULT_ENGINE = 'Google'  # Google, Baidu, Bing
+DEFAULT_ENGINE = 'Bing'  # Bing效果最好，Google国内不可用
 DEFAULT_DRIVER = 'api'
 DEFAULT_MAX_NUMBER = 10  # 每个城市爬取的图片数量
 DEFAULT_DELAY = 2  # 每个城市之间的延迟（秒）
+DEFAULT_CONDA_ENV = 'img'  # conda环境名称
 
-# 搜索关键词模板
+# 搜索关键词模板（接地气：街头、小巷、生活气息）
 SEARCH_TEMPLATES = [
-    '{city}风景',
-    '{city}城市景观',
-    '{city}地标',
+    '{city}街头小巷',
+    '{city}生活街景',
+    '{city}城市风光',
 ]
 
 def load_cities():
@@ -64,7 +65,7 @@ def crawl_city_images(city, args):
         args: 命令行参数
 
     Returns:
-        bool: 是否成功
+        (bool, int): (是否成功, 图片数量)
     """
     city_id = city['id']
     city_name = city['name']
@@ -73,42 +74,42 @@ def crawl_city_images(city, args):
     # 创建输出目录
     city_output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 构建搜索关键词
+    # 构建搜索关键词（接地气）
     keyword = SEARCH_TEMPLATES[0].format(city=city_name)
 
     print(f"\n[{city_id}] 正在爬取: {city_name}")
     print(f"    关键词: {keyword}")
     print(f"    输出目录: {city_output_dir}")
 
-    # 构建命令
-    cmd = [
-        'python', args.downloader,
-        keyword,
-        '--engine', args.engine,
-        '--driver', args.driver,
-        '--max-number', str(args.max_number),
-        '--output', str(city_output_dir)
-    ]
+    # 使用shell命令，激活conda环境后执行
+    shell_cmd = f'''
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate {args.conda_env}
+python "{args.downloader}" "{keyword}" --engine {args.engine} --driver {args.driver} --max-number {args.max_number} --output "{city_output_dir}"
+'''
 
     try:
         # 执行爬取
         result = subprocess.run(
-            cmd,
+            shell_cmd,
+            shell=True,
+            executable='/bin/bash',
             capture_output=True,
             text=True,
             timeout=120  # 2分钟超时
         )
 
-        if result.returncode == 0:
-            # 统计下载的图片数量
-            images = list(city_output_dir.glob('*.jpg')) + \
-                     list(city_output_dir.glob('*.jpeg')) + \
-                     list(city_output_dir.glob('*.png')) + \
-                     list(city_output_dir.glob('*.webp'))
+        # 统计下载的图片数量（不管返回码，都检查实际下载了多少）
+        images = list(city_output_dir.glob('*.jpg')) + \
+                 list(city_output_dir.glob('*.jpeg')) + \
+                 list(city_output_dir.glob('*.png')) + \
+                 list(city_output_dir.glob('*.webp'))
+
+        if len(images) > 0:
             print(f"    成功下载 {len(images)} 张图片")
             return True, len(images)
         else:
-            print(f"    爬取失败: {result.stderr}")
+            print(f"    爬取失败: {result.stderr[:200] if result.stderr else '无图片'}")
             return False, 0
 
     except subprocess.TimeoutExpired:
@@ -241,6 +242,10 @@ def main():
     parser.add_argument('--dry-run',
                         action='store_true',
                         help='试运行，不实际爬取')
+
+    parser.add_argument('--conda-env',
+                        default=DEFAULT_CONDA_ENV,
+                        help=f'Conda环境名称 (默认: {DEFAULT_CONDA_ENV})')
 
     args = parser.parse_args()
     batch_crawl(args)

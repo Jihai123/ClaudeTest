@@ -14,6 +14,19 @@ from datetime import datetime
 import hashlib
 import uuid
 
+# 加载.env文件
+def load_env():
+    env_file = Path(__file__).parent.parent.parent / '.env'
+    if env_file.exists():
+        with open(env_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+
+load_env()
+
 try:
     import boto3
     from botocore.config import Config
@@ -22,17 +35,25 @@ except ImportError:
     exit(1)
 
 # 配置
-FILTERED_DIR = Path(__file__).parent / 'filtered_images'
-CITIES_FILE = Path(__file__).parent / 'cities.json'
-IMPORT_LOG = Path(__file__).parent / 'import_log.json'
-DB_PATH = os.environ.get('DB_PATH', str(Path(__file__).parent.parent.parent / 'database.sqlite'))
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+FILTERED_DIR = SCRIPT_DIR / 'filtered_images'
+CITIES_FILE = SCRIPT_DIR / 'cities.json'
+IMPORT_LOG = SCRIPT_DIR / 'import_log.json'
+
+# 数据库路径 - 使用绝对路径
+_db_path = os.environ.get('DB_PATH', './database.sqlite')
+if _db_path.startswith('./'):
+    DB_PATH = str(PROJECT_ROOT / _db_path[2:])
+else:
+    DB_PATH = _db_path
 
 # 从环境变量读取R2配置
 R2_ACCOUNT_ID = os.environ.get('R2_ACCOUNT_ID')
 R2_ACCESS_KEY_ID = os.environ.get('R2_ACCESS_KEY_ID')
 R2_SECRET_ACCESS_KEY = os.environ.get('R2_SECRET_ACCESS_KEY')
 R2_BUCKET_NAME = os.environ.get('R2_BUCKET_NAME')
-R2_PUBLIC_DOMAIN = os.environ.get('R2_PUBLIC_DOMAIN')
+R2_PUBLIC_DOMAIN = os.environ.get('R2_PUBLIC_DOMAIN', '')
 
 class R2Uploader:
     def __init__(self):

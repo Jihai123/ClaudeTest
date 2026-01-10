@@ -26,7 +26,7 @@ DOWNLOADER_PATH="${DOWNLOADER_PATH:-image_downloader.py}"
 STEP=""
 DRY_RUN=""
 LIMIT=""
-ENGINE="Google"
+ENGINE="Bing"  # Bing效果最好，Google国内不可用
 MAX_NUMBER=10
 
 # 颜色输出
