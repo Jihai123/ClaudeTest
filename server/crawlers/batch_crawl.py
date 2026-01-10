@@ -20,15 +20,18 @@ LOG_FILE = Path(__file__).parent / 'crawl_log.json'
 # 默认参数
 DEFAULT_ENGINE = 'Bing'  # Bing效果最好，Google国内不可用
 DEFAULT_DRIVER = 'api'
-DEFAULT_MAX_NUMBER = 10  # 每个城市爬取的图片数量
+DEFAULT_MAX_NUMBER = 5   # 每个城市爬取的图片数量（5张足够）
 DEFAULT_DELAY = 2  # 每个城市之间的延迟（秒）
 DEFAULT_CONDA_ENV = 'img'  # conda环境名称
 
-# 搜索关键词模板（接地气：街头、小巷、生活气息）
+# 搜索关键词模板（多样化：街头小巷、高楼大厦、当地美景）
+# 每个城市会轮流使用不同关键词，确保图片多样性
 SEARCH_TEMPLATES = [
-    '{city}街头小巷',
-    '{city}生活街景',
-    '{city}城市风光',
+    '{city}街头小巷 生活',      # 接地气的生活气息
+    '{city}城市风光 地标',      # 标志性建筑
+    '{city}自然风景 美景',      # 自然景观
+    '{city}老街古巷',           # 历史文化
+    '{city}夜景',               # 城市夜景
 ]
 
 def load_cities():
@@ -74,8 +77,9 @@ def crawl_city_images(city, args):
     # 创建输出目录
     city_output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 构建搜索关键词（接地气）
-    keyword = SEARCH_TEMPLATES[0].format(city=city_name)
+    # 构建搜索关键词（轮流使用不同模板，确保多样性）
+    template_index = city_id % len(SEARCH_TEMPLATES)
+    keyword = SEARCH_TEMPLATES[template_index].format(city=city_name)
 
     print(f"\n[{city_id}] 正在爬取: {city_name}")
     print(f"    关键词: {keyword}")
