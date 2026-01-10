@@ -37,8 +37,8 @@ SEARCH_TEMPLATES = [
 def load_cities():
     """加载城市列表"""
     if not CITIES_FILE.exists():
-        print(f"错误: 城市列表文件不存在: {CITIES_FILE}")
-        print("请先运行: python export_cities.py")
+        print(f"错误: 城市列表文件不存在: {CITIES_FILE}", flush=True)
+        print("请先运行: python export_cities.py", flush=True)
         return []
 
     with open(CITIES_FILE, 'r', encoding='utf-8') as f:
@@ -81,9 +81,9 @@ def crawl_city_images(city, args):
     template_index = city_id % len(SEARCH_TEMPLATES)
     keyword = SEARCH_TEMPLATES[template_index].format(city=city_name)
 
-    print(f"\n[{city_id}] 正在爬取: {city_name}")
-    print(f"    关键词: {keyword}")
-    print(f"    输出目录: {city_output_dir}")
+    print(f"\n[{city_id}] 正在爬取: {city_name}", flush=True)
+    print(f"    关键词: {keyword}", flush=True)
+    print(f"    输出目录: {city_output_dir}", flush=True)
 
     # 使用shell命令，激活conda环境后执行
     shell_cmd = f'''
@@ -110,17 +110,17 @@ python "{args.downloader}" "{keyword}" --engine {args.engine} --driver {args.dri
                  list(city_output_dir.glob('*.webp'))
 
         if len(images) > 0:
-            print(f"    成功下载 {len(images)} 张图片")
+            print(f"    成功下载 {len(images)} 张图片", flush=True)
             return True, len(images)
         else:
-            print(f"    爬取失败: {result.stderr[:200] if result.stderr else '无图片'}")
+            print(f"    爬取失败: {result.stderr[:200] if result.stderr else '无图片'}", flush=True)
             return False, 0
 
     except subprocess.TimeoutExpired:
-        print(f"    超时!")
+        print(f"    超时!", flush=True)
         return False, 0
     except Exception as e:
-        print(f"    错误: {e}")
+        print(f"    错误: {e}", flush=True)
         return False, 0
 
 def batch_crawl(args):
@@ -136,32 +136,32 @@ def batch_crawl(args):
     if args.only_missing:
         # 只爬取图片不足的城市
         cities = [c for c in cities if c['image_count'] < 3]
-        print(f"筛选出 {len(cities)} 个图片不足的城市")
+        print(f"筛选出 {len(cities)} 个图片不足的城市", flush=True)
 
     if args.skip_completed:
         # 跳过已完成的
         cities = [c for c in cities if c['id'] not in completed_ids]
-        print(f"跳过已完成的城市后，剩余 {len(cities)} 个")
+        print(f"跳过已完成的城市后，剩余 {len(cities)} 个", flush=True)
 
     if args.list_type:
         # 按榜单类型筛选
         cities = [c for c in cities if c['list_type'] == args.list_type]
-        print(f"筛选 {args.list_type} 榜单，共 {len(cities)} 个城市")
+        print(f"筛选 {args.list_type} 榜单，共 {len(cities)} 个城市", flush=True)
 
     if args.limit:
         cities = cities[:args.limit]
-        print(f"限制为前 {args.limit} 个城市")
+        print(f"限制为前 {args.limit} 个城市", flush=True)
 
-    print(f"\n即将爬取 {len(cities)} 个城市的图片")
-    print(f"使用引擎: {args.engine}")
-    print(f"每城市图片数: {args.max_number}")
-    print(f"输出目录: {OUTPUT_DIR}")
-    print("-" * 50)
+    print(f"\n即将爬取 {len(cities)} 个城市的图片", flush=True)
+    print(f"使用引擎: {args.engine}", flush=True)
+    print(f"每城市图片数: {args.max_number}", flush=True)
+    print(f"输出目录: {OUTPUT_DIR}", flush=True)
+    print("-" * 50, flush=True)
 
     if args.dry_run:
-        print("\n[试运行模式] 以下城市将被爬取:")
+        print("\n[试运行模式] 以下城市将被爬取:", flush=True)
         for city in cities:
-            print(f"  - [{city['id']}] {city['name']} ({city['province'] or city['country']})")
+            print(f"  - [{city['id']}] {city['name']} ({city['province'] or city['country']})", flush=True)
         return
 
     # 开始爬取
@@ -170,7 +170,7 @@ def batch_crawl(args):
     total_images = 0
 
     for i, city in enumerate(cities, 1):
-        print(f"\n进度: {i}/{len(cities)}")
+        print(f"\n进度: {i}/{len(cities)}", flush=True)
 
         success, image_count = crawl_city_images(city, args)
 
@@ -194,12 +194,12 @@ def batch_crawl(args):
             time.sleep(args.delay)
 
     # 输出统计
-    print("\n" + "=" * 50)
-    print("爬取完成!")
-    print(f"成功: {success_count} 个城市")
-    print(f"失败: {fail_count} 个城市")
-    print(f"共下载: {total_images} 张图片")
-    print(f"日志文件: {LOG_FILE}")
+    print("\n" + "=" * 50, flush=True)
+    print("爬取完成!", flush=True)
+    print(f"成功: {success_count} 个城市", flush=True)
+    print(f"失败: {fail_count} 个城市", flush=True)
+    print(f"共下载: {total_images} 张图片", flush=True)
+    print(f"日志文件: {LOG_FILE}", flush=True)
 
 def main():
     parser = argparse.ArgumentParser(description='批量爬取城市图片')
