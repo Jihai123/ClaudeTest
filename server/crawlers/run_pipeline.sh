@@ -22,12 +22,17 @@ PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 CONDA_ENV="img"
 DOWNLOADER_PATH="${DOWNLOADER_PATH:-image_downloader.py}"
 
+# 加载.env文件
+if [[ -f "$PROJECT_ROOT/.env" ]]; then
+    export $(grep -v '^#' "$PROJECT_ROOT/.env" | xargs)
+fi
+
 # 默认参数
 STEP=""
 DRY_RUN=""
 LIMIT=""
 ENGINE="Bing"  # Bing效果最好，Google国内不可用
-MAX_NUMBER=10
+MAX_NUMBER=5   # 每城市5张图片足够
 
 # 颜色输出
 RED='\033[0;31m'
