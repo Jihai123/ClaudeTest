@@ -30,7 +30,13 @@ load_env()
 # 配置
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
-DB_PATH = os.environ.get('DB_PATH', str(PROJECT_ROOT / 'database.sqlite'))
+
+# 数据库路径 - 使用绝对路径
+_db_path = os.environ.get('DB_PATH', './database.sqlite')
+if _db_path.startswith('./'):
+    DB_PATH = str(PROJECT_ROOT / _db_path[2:])
+else:
+    DB_PATH = _db_path
 
 # R2配置
 R2_ACCOUNT_ID = os.environ.get('R2_ACCOUNT_ID')
