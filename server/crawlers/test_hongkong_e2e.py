@@ -26,7 +26,7 @@ HONGKONG_NAME = "香港"
 TEST_RAW_DIR = SCRIPT_DIR / 'test_raw'
 TEST_FILTERED_DIR = SCRIPT_DIR / 'test_filtered'
 
-def step1_crawl_images(downloader_path, max_number=5):
+def step1_crawl_images(downloader_path, max_number=5, engine='Bing', conda_env='img'):
     """步骤1: 爬取香港图片"""
     print("\n" + "="*50)
     print("步骤1: 爬取香港图片")
@@ -39,22 +39,32 @@ def step1_crawl_images(downloader_path, max_number=5):
     keyword = f"{HONGKONG_NAME}风景"
     print(f"搜索关键词: {keyword}")
     print(f"输出目录: {city_dir}")
+    print(f"搜索引擎: {engine}")
+    print(f"Conda环境: {conda_env}")
 
-    cmd = [
-        'python', downloader_path,
-        keyword,
-        '--engine', 'Google',
-        '--driver', 'api',
-        '--max-number', str(max_number),
-        '--output', str(city_dir)
-    ]
+    # 使用shell命令，先激活conda环境
+    shell_cmd = f'''
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate {conda_env}
+python "{downloader_path}" "{keyword}" --engine {engine} --driver api --max-number {max_number} --output "{city_dir}"
+'''
 
-    print(f"执行命令: {' '.join(cmd)}")
+    print(f"执行命令:\n  conda activate {conda_env}")
+    print(f"  python {downloader_path} \"{keyword}\" --engine {engine} --driver api --max-number {max_number} --output {city_dir}")
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        result = subprocess.run(
+            shell_cmd,
+            shell=True,
+            executable='/bin/bash',
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
         if result.returncode != 0:
             print(f"警告: 爬取可能有问题: {result.stderr}")
+        if result.stdout:
+            print(f"输出: {result.stdout}")
     except Exception as e:
         print(f"错误: {e}")
         return False
@@ -237,6 +247,11 @@ def main():
                         help='跳过爬取步骤（使用已有图片）')
     parser.add_argument('--max-number', '-n', type=int, default=5,
                         help='爬取图片数量')
+    parser.add_argument('--engine', '-e', default='Bing',
+                        choices=['Google', 'Bing', 'Baidu'],
+                        help='搜索引擎 (默认: Bing)')
+    parser.add_argument('--conda-env', default='img',
+                        help='Conda环境名称 (默认: img)')
 
     args = parser.parse_args()
 
@@ -248,7 +263,7 @@ def main():
 
     # 步骤1: 爬取
     if not args.skip_crawl:
-        if not step1_crawl_images(args.downloader, args.max_number):
+        if not step1_crawl_images(args.downloader, args.max_number, args.engine, args.conda_env):
             print("\n步骤1失败，但继续尝试后续步骤...")
     else:
         print("\n跳过步骤1（爬取）")
