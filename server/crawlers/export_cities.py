@@ -9,9 +9,30 @@ import json
 import os
 from pathlib import Path
 
-# 数据库路径
-DB_PATH = os.environ.get('DB_PATH', str(Path(__file__).parent.parent.parent / 'database.sqlite'))
-OUTPUT_FILE = Path(__file__).parent / 'cities.json'
+# 加载.env文件
+def load_env():
+    env_file = Path(__file__).parent.parent.parent / '.env'
+    if env_file.exists():
+        with open(env_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+
+load_env()
+
+# 配置
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+OUTPUT_FILE = SCRIPT_DIR / 'cities.json'
+
+# 数据库路径 - 使用绝对路径
+_db_path = os.environ.get('DB_PATH', './database.sqlite')
+if _db_path.startswith('./'):
+    DB_PATH = str(PROJECT_ROOT / _db_path[2:])
+else:
+    DB_PATH = _db_path
 
 def export_cities():
     """导出城市列表"""
