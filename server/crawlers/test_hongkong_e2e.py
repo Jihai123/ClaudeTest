@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 香港城市图片端到端测试
-完整流程：爬取 → 筛选 → 导入数据库 → 验证API
+完整流程：爬取 → 筛选 → 上传R2 → 导入数据库 → 验证API
 """
 
 import os
@@ -10,13 +10,34 @@ import json
 import sqlite3
 import subprocess
 import argparse
+import uuid
 from pathlib import Path
 from datetime import datetime
+
+# 加载.env文件
+def load_env():
+    env_file = Path(__file__).parent.parent.parent / '.env'
+    if env_file.exists():
+        with open(env_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+
+load_env()
 
 # 配置
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
 DB_PATH = os.environ.get('DB_PATH', str(PROJECT_ROOT / 'database.sqlite'))
+
+# R2配置
+R2_ACCOUNT_ID = os.environ.get('R2_ACCOUNT_ID')
+R2_ACCESS_KEY_ID = os.environ.get('R2_ACCESS_KEY_ID')
+R2_SECRET_ACCESS_KEY = os.environ.get('R2_SECRET_ACCESS_KEY')
+R2_BUCKET_NAME = os.environ.get('R2_BUCKET_NAME')
+R2_PUBLIC_DOMAIN = os.environ.get('R2_PUBLIC_DOMAIN', '')
 
 # 香港城市ID
 HONGKONG_CITY_ID = 2
@@ -36,7 +57,8 @@ def step1_crawl_images(downloader_path, max_number=5, engine='Bing', conda_env='
     city_dir = TEST_RAW_DIR / str(HONGKONG_CITY_ID)
     city_dir.mkdir(parents=True, exist_ok=True)
 
-    keyword = f"{HONGKONG_NAME}风景"
+    # 接地气的搜索关键词：街头、小巷、生活气息
+    keyword = f"{HONGKONG_NAME}街头小巷"
     print(f"搜索关键词: {keyword}")
     print(f"输出目录: {city_dir}")
     print(f"搜索引擎: {engine}")
@@ -126,11 +148,71 @@ def step2_filter_images():
     return len(passed) > 0
 
 
+def upload_to_r2(file_path):
+    """上传文件到R2，返回公开URL"""
+    try:
+        import boto3
+        from botocore.config import Config
+    except ImportError:
+        print("错误: 请安装 boto3: pip install boto3")
+        return None
+
+    if not all([R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME]):
+        print("错误: R2配置不完整")
+        return None
+
+    s3 = boto3.client(
+        's3',
+        endpoint_url=f'https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com',
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        config=Config(signature_version='s3v4', s3={'addressing_style': 'path'})
+    )
+
+    # 生成唯一文件名
+    ext = Path(file_path).suffix
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    random_str = uuid.uuid4().hex[:8]
+    key = f"city_images/{HONGKONG_CITY_ID}/{timestamp}_{random_str}{ext}"
+
+    # 获取MIME类型
+    import mimetypes
+    content_type = mimetypes.guess_type(str(file_path))[0] or 'image/jpeg'
+
+    # 上传
+    with open(file_path, 'rb') as f:
+        s3.put_object(
+            Bucket=R2_BUCKET_NAME,
+            Key=key,
+            Body=f,
+            ContentType=content_type
+        )
+
+    # 构建公开URL
+    if R2_PUBLIC_DOMAIN:
+        domain = R2_PUBLIC_DOMAIN.replace('https://', '').replace('http://', '')
+        return f"https://{domain}/{key}"
+    else:
+        return f"https://{R2_BUCKET_NAME}.{R2_ACCOUNT_ID}.r2.cloudflarestorage.com/{key}"
+
+
 def step3_import_to_db():
-    """步骤3: 导入数据库（本地路径模式）"""
+    """步骤3: 上传R2并导入数据库"""
     print("\n" + "="*50)
-    print("步骤3: 导入数据库")
+    print("步骤3: 上传R2并导入数据库")
     print("="*50)
+
+    # 检查R2配置
+    print(f"R2配置检查:")
+    print(f"  Account ID: {'✓' if R2_ACCOUNT_ID else '✗'}")
+    print(f"  Access Key: {'✓' if R2_ACCESS_KEY_ID else '✗'}")
+    print(f"  Secret Key: {'✓' if R2_SECRET_ACCESS_KEY else '✗'}")
+    print(f"  Bucket: {R2_BUCKET_NAME or '✗'}")
+    print(f"  Public Domain: {R2_PUBLIC_DOMAIN or '(使用默认)'}")
+
+    if not all([R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME]):
+        print("\n错误: R2配置不完整，请检查.env文件")
+        return False
 
     city_filtered_dir = TEST_FILTERED_DIR / str(HONGKONG_CITY_ID)
     images = list(city_filtered_dir.glob('*.*'))
@@ -144,19 +226,18 @@ def step3_import_to_db():
 
     imported = 0
     for img_path in images:
-        # 使用本地路径（测试用）
-        # 实际生产环境会上传到R2
-        image_url = f"/uploads/city_images/{HONGKONG_CITY_ID}/{img_path.name}"
-        alt_text = f"{HONGKONG_NAME}风景图"
+        print(f"\n处理: {img_path.name}")
 
-        # 检查是否已存在
-        cursor.execute(
-            'SELECT id FROM city_images WHERE city_id = ? AND image_url = ?',
-            [HONGKONG_CITY_ID, image_url]
-        )
-        if cursor.fetchone():
-            print(f"  跳过(已存在): {img_path.name}")
+        # 上传到R2
+        print(f"  上传到R2...")
+        image_url = upload_to_r2(img_path)
+        if not image_url:
+            print(f"  上传失败，跳过")
             continue
+
+        print(f"  URL: {image_url}")
+
+        alt_text = f"{HONGKONG_NAME}街景"
 
         # 插入记录
         cursor.execute('''
@@ -171,19 +252,19 @@ def step3_import_to_db():
             alt_text,
             'crawled',
             '[]',
-            'crawler_test',
+            'crawler',
             20,
             'approved',
             datetime.now().isoformat()
         ])
 
-        print(f"  导入: {img_path.name} -> {image_url}")
+        print(f"  导入数据库: ✓")
         imported += 1
 
     conn.commit()
     conn.close()
 
-    print(f"\n导入完成: {imported} 张图片")
+    print(f"\n导入完成: {imported} 张图片已上传到R2并写入数据库")
     return imported > 0
 
 
@@ -226,14 +307,14 @@ def step4_verify():
     print("验证完成！")
     print("="*50)
     print(f"""
-下一步：
-1. 启动服务器: cd {PROJECT_ROOT} && npm start
-2. 访问API验证: curl http://localhost:3000/api/cities/{HONGKONG_CITY_ID}
-3. 在小程序中打开香港城市详情页查看图片
+✅ 图片已上传到R2并导入数据库
 
-注意：当前使用的是本地路径，小程序可能无法直接显示。
-生产环境请配置R2上传，运行:
-  python import_to_db.py  (不带 --local-only)
+验证方法：
+1. 访问API: curl https://你的域名/api/cities/{HONGKONG_CITY_ID}
+2. 打开小程序 → 搜索"香港" → 查看城市详情页的图片
+3. 打开网站 → 香港城市详情页
+
+如果图片显示正常，说明整个流程已打通！
 """)
     return True
 
