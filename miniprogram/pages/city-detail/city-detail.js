@@ -7,6 +7,7 @@ Page({
   data: {
     cityId: null,
     city: {},
+    cityTags: [],        // 城市标签
     dimensions: [],
     reviews: [],
     loading: true,
@@ -35,12 +36,22 @@ Page({
     try {
       const city = await api.getCity(this.data.cityId)
 
+      // 根据榜单类型选择显示的评分
+      let displayScore = city.overall_score || 0
+      if (city.list_type === 'china_layflat') {
+        displayScore = city.layflat_score || city.overall_score || 0
+      } else if (city.list_type === 'world') {
+        displayScore = city.world_score || city.overall_score || 0
+      }
+
       // 处理数据
       const processedCity = {
         ...city,
+        display_score: displayScore,
         population_text: city.population ? util.formatNumber(city.population) : '未知',
         gdp_text: city.gdp ? `${util.formatNumber(city.gdp)}亿元` : '未知',
         area_text: city.area ? `${util.formatNumber(city.area)} km²` : '未知',
+        house_price_text: city.house_price ? util.formatNumber(city.house_price) : null,
         stars: city.review_stats?.avg_rating ? util.createStars(city.review_stats.avg_rating) : ''
       }
 
@@ -91,8 +102,12 @@ Page({
       const cityImages = city.images || []
       const cityImageUrls = cityImages.map(img => img.image_url)
 
+      // 处理城市标签
+      const cityTags = city.tags || []
+
       this.setData({
         city: processedCity,
+        cityTags,
         dimensions,
         cityImages,
         cityImageUrls,

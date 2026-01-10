@@ -13,15 +13,45 @@
             <text wx:if="{{city.province && city.province !== 'null' && city.country && city.country !== 'null'}}" class="dot">·</text>
             <text wx:if="{{city.country && city.country !== 'null'}}">{{city.country}}</text>
           </view>
+          <!-- 一句话总结 -->
+          <view wx:if="{{city.slogan}}" class="city-slogan">{{city.slogan}}</view>
         </view>
         <view class="overall-score">
-          <text class="score-value">{{city.overall_score || 0}}</text>
+          <text class="score-value">{{city.display_score || 0}}</text>
           <text class="score-label">综合评分</text>
+        </view>
+      </view>
+
+      <!-- 城市标签 -->
+      <view wx:if="{{cityTags && cityTags.length > 0}}" class="city-tags">
+        <view wx:for="{{cityTags}}" wx:key="id" class="city-tag {{item.is_primary ? 'primary' : ''}}">
+          <text wx:if="{{item.tag_icon}}" class="tag-icon">{{item.tag_icon}}</text>
+          <text class="tag-name">{{item.tag_name}}</text>
         </view>
       </view>
 
       <!-- 基本信息 -->
       <view class="basic-info">
+        <view wx:if="{{city.city_tier}}" class="info-item">
+          <text class="info-label">城市等级</text>
+          <text class="info-value">{{city.city_tier}}</text>
+        </view>
+        <view wx:if="{{city.district}}" class="info-item">
+          <text class="info-label">区域</text>
+          <text class="info-value">{{city.district}}</text>
+        </view>
+        <view wx:if="{{city.avg_rent}}" class="info-item">
+          <text class="info-label">租金</text>
+          <text class="info-value highlight">¥{{city.avg_rent}}/月</text>
+        </view>
+        <view wx:if="{{city.house_price}}" class="info-item">
+          <text class="info-label">房价</text>
+          <text class="info-value">¥{{city.house_price_text}}/㎡</text>
+        </view>
+        <view wx:if="{{city.climate}}" class="info-item full-width">
+          <text class="info-label">气候</text>
+          <text class="info-value">{{city.climate}}</text>
+        </view>
         <view wx:if="{{city.population}}" class="info-item">
           <text class="info-label">人口</text>
           <text class="info-value">{{city.population_text}}</text>
@@ -34,6 +64,24 @@
           <text class="info-label">面积</text>
           <text class="info-value">{{city.area_text}}</text>
         </view>
+      </view>
+    </view>
+
+    <!-- 城市评价与备注 -->
+    <view wx:if="{{city.evaluation || city.notes}}" class="city-evaluation card">
+      <view wx:if="{{city.evaluation}}" class="evaluation-item">
+        <view class="evaluation-label">
+          <text class="label-icon">📝</text>
+          <text>城市评价</text>
+        </view>
+        <view class="evaluation-content">{{city.evaluation}}</view>
+      </view>
+      <view wx:if="{{city.notes}}" class="evaluation-item">
+        <view class="evaluation-label">
+          <text class="label-icon">📌</text>
+          <text>备注</text>
+        </view>
+        <view class="evaluation-content notes">{{city.notes}}</view>
       </view>
     </view>
 
