@@ -31,16 +31,25 @@ app.use(cors({
   credentials: true
 }));
 
-// 速率限制
+// 速率限制 - 普通API
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  message: '请求过于频繁，请稍后再试'
+  message: { error: '请求过于频繁，请稍后再试' }
+});
+
+// 速率限制 - 管理员API（更宽松）
+const adminLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1分钟
+  max: 200, // 每分钟200次请求
+  message: { error: '请求过于频繁，请稍后再试' }
 });
 
 // 基础路径配置（支持 nginx 代理环境）
 const BASE_PATH = process.env.BASE_PATH || '';
 
+// 对管理员路由使用更宽松的限制
+app.use(`${BASE_PATH}/api/admin`, adminLimiter);
 app.use(`${BASE_PATH}/api/`, limiter);
 
 // 解析JSON和URL编码数据
