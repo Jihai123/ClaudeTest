@@ -260,7 +260,10 @@
   </div>
 
   <script>
-    const API_BASE = '/api';
+    // 自动检测 BASE_PATH（支持 /yiju 等子路径部署）
+    const pathParts = window.location.pathname.split('/');
+    const basePath = pathParts.length > 2 ? '/' + pathParts[1] : '';
+    const API_BASE = basePath + '/api';
     let token = localStorage.getItem('adminToken');
     let currentUser = null;
     let selectedImages = new Set();
