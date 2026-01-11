@@ -307,6 +307,7 @@ router.get('/', optionalAuth, async (req, res) => {
     // 根据榜单类型决定排序字段
     const validSortFields = [
       'name', 'overall_score', 'layflat_score', 'world_score', 'population', 'created_at',
+      'avg_rent', 'house_price',  // 主表字段
       // 维度字段排序支持
       'living_cost', 'air_quality', 'medical_facilities', 'employment',
       'safety', 'elderly_care', 'rent_cost', 'climate'
@@ -322,8 +323,11 @@ router.get('/', optionalAuth, async (req, res) => {
 
     let orderByClause = '';
 
-    // 躺平榜使用随机排序（打乱排名）
-    if (list_type === 'china_layflat') {
+    // 躺平榜：如果用户没有指定排序字段，则使用随机排序
+    // 如果用户指定了排序字段（如avg_rent），则使用指定的排序
+    const userSpecifiedSort = req.query.sort && req.query.sort !== 'overall_score';
+
+    if (list_type === 'china_layflat' && !userSpecifiedSort) {
       orderByClause = 'ORDER BY RANDOM()';
     } else {
       // 如果指定了榜单类型，使用对应的评分字段
