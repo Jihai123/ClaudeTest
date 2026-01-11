@@ -74,41 +74,45 @@ Page({
         return
 
       case 'lowCost':
-        // 低生活成本：所有有月租数据的城市，按月租排序
+        // 低生活成本：月租<=1500的城市，按月租排序
         filterParams = {
           title: '低成本生活城市',
           sort: 'avg_rent',
           order: 'ASC',
-          limit: 500  // 获取所有数据
+          filter: JSON.stringify({ rent: '0-1500' }),  // 月租1500以下
+          limit: 500
         }
         break
 
       case 'elderly':
-        // 适合养老：按养老评分排序，不设最低门槛以显示更多城市
+        // 适合养老：养老评分>=5的城市（约112个）
         filterParams = {
           title: '适合养老城市',
           sort: 'elderly_care',
           order: 'DESC',
+          filter: JSON.stringify({ elderly_care_min: 5 }),
           limit: 500
         }
         break
 
       case 'employment':
-        // 就业机会多：按就业评分排序
+        // 就业机会多：就业评分>=5的城市（约216个）
         filterParams = {
           title: '就业机会多的城市',
           sort: 'employment',
           order: 'DESC',
+          filter: JSON.stringify({ employment_min: 5 }),
           limit: 500
         }
         break
 
       case 'airQuality':
-        // 空气好：按空气质量评分排序
+        // 空气好：空气质量>=7的城市（约50个优质城市）
         filterParams = {
           title: '空气质量好的城市',
           sort: 'air_quality',
           order: 'DESC',
+          filter: JSON.stringify({ air_quality_min: 7 }),
           limit: 500
         }
         break
