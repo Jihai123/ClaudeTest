@@ -117,20 +117,20 @@ async function upgradeData() {
     console.log('[5/5] 检查并添加缺失的沿海城市...');
 
     const coastalCitiesToAdd = [
-      { name: '三亚', province: '海南省', population: 800000, gdp: 825.96, area: 1919.58 },
-      { name: '烟台', province: '山东省', population: 7102000, gdp: 9515.86, area: 13745.95 },
-      { name: '宁波', province: '浙江省', population: 9540000, gdp: 15704.28, area: 9816 },
-      { name: '舟山', province: '浙江省', population: 1210000, gdp: 1738.74, area: 22200 },
-      { name: '福州', province: '福建省', population: 8290000, gdp: 12308.23, area: 11968 },
-      { name: '泉州', province: '福建省', population: 8790000, gdp: 11304.17, area: 11245 },
-      { name: '汕头', province: '广东省', population: 5640000, gdp: 3117.02, area: 2248.39 },
-      { name: '湛江', province: '广东省', population: 8350000, gdp: 3559.09, area: 13225.44 },
-      { name: '北海', province: '广西壮族自治区', population: 1860000, gdp: 1650.44, area: 3337 },
-      { name: '秦皇岛', province: '河北省', population: 3240000, gdp: 1802.15, area: 7813 },
-      { name: '连云港', province: '江苏省', population: 4600000, gdp: 3765.37, area: 7615 },
-      { name: '南通', province: '江苏省', population: 7730000, gdp: 11379.09, area: 8001 },
-      { name: '温州', province: '浙江省', population: 9670000, gdp: 8029.32, area: 12110 },
-      { name: '台州', province: '浙江省', population: 6640000, gdp: 5786.19, area: 10050 }
+      { name: '三亚', province: '海南', population: 800000, gdp: 825.96, area: 1919.58 },
+      { name: '烟台', province: '山东', population: 7102000, gdp: 9515.86, area: 13745.95 },
+      { name: '宁波', province: '浙江', population: 9540000, gdp: 15704.28, area: 9816 },
+      { name: '舟山', province: '浙江', population: 1210000, gdp: 1738.74, area: 22200 },
+      { name: '福州', province: '福建', population: 8290000, gdp: 12308.23, area: 11968 },
+      { name: '泉州', province: '福建', population: 8790000, gdp: 11304.17, area: 11245 },
+      { name: '汕头', province: '广东', population: 5640000, gdp: 3117.02, area: 2248.39 },
+      { name: '湛江', province: '广东', population: 8350000, gdp: 3559.09, area: 13225.44 },
+      { name: '北海', province: '广西', population: 1860000, gdp: 1650.44, area: 3337 },
+      { name: '秦皇岛', province: '河北', population: 3240000, gdp: 1802.15, area: 7813 },
+      { name: '连云港', province: '江苏', population: 4600000, gdp: 3765.37, area: 7615 },
+      { name: '南通', province: '江苏', population: 7730000, gdp: 11379.09, area: 8001 },
+      { name: '温州', province: '浙江', population: 9670000, gdp: 8029.32, area: 12110 },
+      { name: '台州', province: '浙江', population: 6640000, gdp: 5786.19, area: 10050 }
     ];
 
     let addedCount = 0;
