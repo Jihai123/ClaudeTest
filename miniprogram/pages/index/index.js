@@ -74,43 +74,42 @@ Page({
         return
 
       case 'lowCost':
-        // 低生活成本：躺平榜城市，按月租排序
+        // 低生活成本：所有有月租数据的城市，按月租排序
         filterParams = {
-          title: '低生活成本城市',
-          list_type: 'china_layflat',
+          title: '低成本生活城市',
           sort: 'avg_rent',
-          order: 'ASC'
+          order: 'ASC',
+          limit: 500  // 获取所有数据
         }
         break
 
       case 'elderly':
-        // 适合养老：elderly_care >= 6，不限榜单类型以获取更多城市
-        // 同时查询 china_general 和 china_layflat
+        // 适合养老：按养老评分排序，不设最低门槛以显示更多城市
         filterParams = {
           title: '适合养老城市',
           sort: 'elderly_care',
           order: 'DESC',
-          filter: JSON.stringify({ elderly_care_min: 6 })
+          limit: 500
         }
         break
 
       case 'employment':
-        // 就业机会多：按就业评分排序，主要是大城市
+        // 就业机会多：按就业评分排序
         filterParams = {
           title: '就业机会多的城市',
           sort: 'employment',
           order: 'DESC',
-          filter: JSON.stringify({ employment_min: 6 })
+          limit: 500
         }
         break
 
       case 'airQuality':
-        // 空气好：air_quality >= 6.5，按评分排序
+        // 空气好：按空气质量评分排序
         filterParams = {
           title: '空气质量好的城市',
           sort: 'air_quality',
           order: 'DESC',
-          filter: JSON.stringify({ air_quality_min: 6.5 })
+          limit: 500
         }
         break
 
@@ -118,7 +117,8 @@ Page({
         // 沿海宜居：有沿海标签的城市
         filterParams = {
           title: '沿海宜居城市',
-          filter: JSON.stringify({ coastal: true })
+          filter: JSON.stringify({ coastal: true }),
+          limit: 500
         }
         break
     }
@@ -240,15 +240,26 @@ Page({
     this.setData({ loading: true })
 
     try {
-      // 获取综合评分最高的前5名国内城市
+      // 从宜居城市榜(china_general)获取城市，然后随机选5个
       const result = await api.getCities({
+        list_type: 'china_general',
         sort: 'overall_score',
         order: 'DESC',
-        limit: 5,
-        filters: JSON.stringify({ country: '中国' })
+        limit: 100  // 获取足够多的城市用于随机
       })
 
-      const cities = result.cities || []
+      let cities = result.cities || []
+
+      // 随机打乱并取前5个
+      if (cities.length > 5) {
+        // Fisher-Yates 洗牌算法
+        for (let i = cities.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [cities[i], cities[j]] = [cities[j], cities[i]]
+        }
+        cities = cities.slice(0, 5)
+      }
+
       const processedCities = cities.map(city => this.processCityData(city))
 
       this.setData({

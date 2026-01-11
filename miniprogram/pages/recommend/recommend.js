@@ -67,69 +67,88 @@ Page({
 
     const { answers } = this.data
 
-    // 构建筛选条件
+    // 构建筛选条件和排序
     const filters = {}
+    let sort = 'overall_score'  // 默认排序
+    let order = 'DESC'
+    let listType = ''  // 默认不限榜单类型
 
-    // 1. 根据预算设置生活成本筛选
+    // 1. 根据预算设置 - 影响榜单类型和排序
     switch (answers.budget) {
       case 'low':
-        filters.living_cost_max = 5
+        // 低预算优先躺平榜，按月租排序
+        listType = 'china_layflat'
+        sort = 'avg_rent'
+        order = 'ASC'
         break
       case 'medium':
-        filters.living_cost_max = 7
+        // 中等预算，按生活成本排序
+        sort = 'living_cost'
+        order = 'ASC'
         break
       case 'high':
-        // 不限制
-        break
       case 'flexible':
-        // 不限制
+        // 高预算/灵活，按综合评分
+        sort = 'overall_score'
+        order = 'DESC'
         break
     }
 
-    // 2. 根据目的设置维度筛选
+    // 2. 根据目的设置排序优先级
     switch (answers.purpose) {
       case 'work':
-        filters.employment_min = 6
+        sort = 'employment'
+        order = 'DESC'
         break
       case 'elderly':
-        filters.elderly_care_min = 7
+        sort = 'elderly_care'
+        order = 'DESC'
         break
       case 'travel':
-        filters.air_quality_min = 7
-        filters.safety_min = 7
+        sort = 'air_quality'
+        order = 'DESC'
         break
       case 'settle':
-        filters.overall_score_min = 75
+        sort = 'overall_score'
+        order = 'DESC'
         break
     }
 
-    // 3. 根据环境偏好设置筛选
+    // 3. 根据环境偏好可能覆盖排序
     switch (answers.environment) {
       case 'air':
-        filters.air_quality_min = 8
+        sort = 'air_quality'
+        order = 'DESC'
         break
       case 'safety':
-        filters.safety_min = 8
+        sort = 'safety'
+        order = 'DESC'
         break
       case 'climate':
-        // 气候舒适度暂时无法精确筛选
+        // 气候舒适度使用climate_score
+        sort = 'climate'
+        order = 'DESC'
         break
       case 'scenery':
-        // 自然风光暂时无法精确筛选
+        // 自然风光相关，保持原排序
         break
     }
 
-    // 4. 根据城市规模设置筛选
+    // 4. 根据城市规模设置城市等级筛选（使用city_tier代替population）
     switch (answers.scale) {
       case 'large':
-        filters.population_min = 5000000 // 500万以上
+        // 一线/新一线城市
+        filters.tier = '一线'
         break
       case 'medium':
-        filters.population_min = 1000000 // 100万以上
-        filters.population_max = 5000000 // 500万以下
+        // 二三线城市
+        filters.tier = '二线'
         break
       case 'small':
-        filters.population_max = 1000000 // 100万以下
+        // 小城市，优先躺平榜
+        if (!listType) {
+          listType = 'china_layflat'
+        }
         break
       case 'any':
         // 不限制
@@ -149,7 +168,17 @@ Page({
     // 跳转到城市列表页
     const params = {
       title: title,
-      filter: JSON.stringify(filters)
+      sort: sort,
+      order: order,
+      limit: 500  // 获取足够多的城市
+    }
+
+    if (listType) {
+      params.list_type = listType
+    }
+
+    if (Object.keys(filters).length > 0) {
+      params.filter = JSON.stringify(filters)
     }
 
     const queryString = Object.keys(params)

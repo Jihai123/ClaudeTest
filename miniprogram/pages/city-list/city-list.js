@@ -79,6 +79,11 @@ Page({
       updates.sortOrder = options.order
     }
 
+    // 自定义分页大小（用于显示更多城市）
+    if (options.limit) {
+      updates.pageSize = parseInt(options.limit) || 20
+    }
+
     this.setData(updates)
   },
 
