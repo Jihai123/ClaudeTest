@@ -14,8 +14,8 @@
     .login-box h1 { text-align: center; margin-bottom: 30px; color: #1e293b; }
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; margin-bottom: 8px; color: #475569; font-weight: 500; }
-    .form-group input { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
-    .form-group input:focus { outline: none; border-color: #667eea; }
+    .form-group input, .form-group select { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
     .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500; transition: all 0.2s; }
     .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 100%; }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
@@ -23,6 +23,7 @@
     .btn-danger:hover { background: #dc2626; }
     .btn-success { background: #10b981; color: white; }
     .btn-success:hover { background: #059669; }
+    .btn-warning { background: #f59e0b; color: white; }
     .btn-sm { padding: 6px 12px; font-size: 14px; }
     .error-msg { color: #ef4444; text-align: center; margin-top: 16px; }
 
@@ -36,7 +37,7 @@
     .btn-logout:hover { background: rgba(255,255,255,0.3); }
 
     /* 标签页 */
-    .tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; padding: 0 30px; }
+    .tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; padding: 0 30px; flex-wrap: wrap; }
     .tab { padding: 16px 24px; cursor: pointer; border-bottom: 3px solid transparent; color: #64748b; font-weight: 500; transition: all 0.2s; }
     .tab:hover { color: #667eea; }
     .tab.active { color: #667eea; border-bottom-color: #667eea; }
@@ -48,7 +49,7 @@
 
     /* 卡片 */
     .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .card-header { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+    .card-header { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
     .card-header h2 { font-size: 18px; color: #1e293b; }
     .card-body { padding: 20px; }
 
@@ -65,52 +66,61 @@
     th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
     th { background: #f8fafc; color: #64748b; font-weight: 600; font-size: 14px; }
     tr:hover { background: #f8fafc; }
+    .actions-cell { white-space: nowrap; }
+    .actions-cell .btn { margin-right: 4px; }
 
     /* 图片网格 */
     .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-    .image-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .image-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; }
+    .image-card .checkbox { position: absolute; top: 8px; left: 8px; z-index: 1; width: 20px; height: 20px; cursor: pointer; }
     .image-card img { width: 100%; height: 150px; object-fit: cover; cursor: pointer; }
     .image-card img:hover { opacity: 0.9; }
     .image-info { padding: 12px; }
     .image-info .city-name { font-weight: 600; color: #1e293b; margin-bottom: 4px; }
     .image-info .meta { font-size: 12px; color: #94a3b8; }
-    .image-actions { padding: 12px; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
+    .image-actions { padding: 12px; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; flex-wrap: wrap; }
 
     /* 状态标签 */
-    .status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
     .status-pending { background: #fef3c7; color: #92400e; }
     .status-approved { background: #d1fae5; color: #065f46; }
     .status-rejected { background: #fee2e2; color: #991b1b; }
 
     /* 分页 */
-    .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
-    .pagination button { padding: 8px 16px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; }
-    .pagination button:hover { background: #f8fafc; }
-    .pagination button.active { background: #667eea; color: white; border-color: #667eea; }
-    .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+    .page-btn { padding: 8px 16px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; }
+    .page-btn:hover { background: #f8fafc; }
+    .page-btn.active { background: #667eea; color: white; border-color: #667eea; }
+    .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* 筛选 */
-    .filters { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-    .filters select, .filters input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; }
+    .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .filters select, .filters input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; min-width: 120px; }
 
     /* 批量操作 */
-    .batch-actions { display: flex; gap: 12px; align-items: center; }
+    .batch-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .batch-actions .selected-count { color: #64748b; font-size: 14px; }
 
     /* 模态框 */
-    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
     .modal.show { display: flex; }
-    .modal-content { background: white; border-radius: 12px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal-content { background: white; border-radius: 12px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
     .modal-header { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
     .modal-header h3 { font-size: 18px; }
-    .modal-close { font-size: 24px; cursor: pointer; color: #94a3b8; }
+    .modal-close { font-size: 24px; cursor: pointer; color: #94a3b8; background: none; border: none; }
     .modal-body { padding: 20px; }
     .modal-footer { padding: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    /* 图片预览模态框 */
+    .preview-modal { background: rgba(0,0,0,0.9); }
+    .preview-modal .modal-content { background: transparent; max-width: 90vw; max-height: 90vh; }
+    .preview-modal img { max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 8px; }
+    .preview-modal .modal-close { position: absolute; top: 20px; right: 20px; color: white; font-size: 36px; }
 
     /* 加载 */
     .loading { text-align: center; padding: 40px; color: #64748b; }
     .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
-    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; display: block; }
   </style>
 </head>
 <body>
@@ -121,11 +131,11 @@
       <form id="loginForm">
         <div class="form-group">
           <label>用户名 / 邮箱</label>
-          <input type="text" id="email" required placeholder="请输入用户名或邮箱">
+          <input type="text" id="loginUsername" required placeholder="请输入用户名或邮箱">
         </div>
         <div class="form-group">
           <label>密码</label>
-          <input type="password" id="password" required placeholder="请输入密码">
+          <input type="password" id="loginPassword" required placeholder="请输入密码">
         </div>
         <button type="submit" class="btn btn-primary">登录</button>
         <p class="error-msg" id="loginError"></p>
@@ -139,14 +149,15 @@
       <h1>宜居城市管理后台</h1>
       <div class="header-actions">
         <span id="adminName"></span>
-        <button class="btn btn-logout" onclick="logout()">退出登录</button>
+        <button class="btn btn-logout" id="logoutBtn">退出登录</button>
       </div>
     </header>
 
-    <div class="tabs">
+    <div class="tabs" id="tabsContainer">
       <div class="tab active" data-tab="dashboard">数据概览</div>
       <div class="tab" data-tab="reviews">评论管理</div>
       <div class="tab" data-tab="images">图片管理</div>
+      <div class="tab" data-tab="users">用户管理</div>
     </div>
 
     <div class="content">
@@ -182,12 +193,13 @@
           <div class="card-header">
             <h2>评论列表</h2>
             <div class="filters">
-              <select id="reviewStatusFilter" onchange="loadReviews()">
+              <select id="reviewStatusFilter">
                 <option value="">全部状态</option>
                 <option value="pending">待审核</option>
                 <option value="approved">已通过</option>
                 <option value="rejected">已拒绝</option>
               </select>
+              <button class="btn btn-sm btn-primary" id="refreshReviewsBtn">刷新</button>
             </div>
           </div>
           <div class="card-body">
@@ -220,103 +232,218 @@
             <h2>图片列表</h2>
             <div class="batch-actions">
               <span class="selected-count"><span id="selectedCount">0</span> 已选择</span>
-              <button class="btn btn-success btn-sm" onclick="batchApproveImages()">批量通过</button>
-              <button class="btn btn-danger btn-sm" onclick="batchDeleteImages()">批量删除</button>
+              <button class="btn btn-success btn-sm" id="batchApproveBtn">批量通过</button>
+              <button class="btn btn-danger btn-sm" id="batchDeleteBtn">批量删除</button>
             </div>
           </div>
           <div class="card-body">
             <div class="filters">
-              <select id="imageStatusFilter" onchange="loadImages()">
+              <select id="imageStatusFilter">
                 <option value="">全部状态</option>
                 <option value="pending">待审核</option>
                 <option value="approved">已通过</option>
                 <option value="rejected">已拒绝</option>
               </select>
-              <label><input type="checkbox" id="selectAllImages" onchange="toggleSelectAll()"> 全选</label>
+              <select id="imageProvinceFilter">
+                <option value="">全部省份/国家</option>
+              </select>
+              <label style="display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" id="selectAllImages"> 全选
+              </label>
+              <button class="btn btn-sm btn-primary" id="refreshImagesBtn">刷新</button>
             </div>
             <div class="image-grid" id="imagesGrid"></div>
             <div class="pagination" id="imagesPagination"></div>
           </div>
         </div>
       </div>
+
+      <!-- 用户管理 -->
+      <div class="tab-content" id="users">
+        <div class="card">
+          <div class="card-header">
+            <h2>用户列表</h2>
+            <button class="btn btn-sm btn-primary" id="refreshUsersBtn">刷新</button>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>邮箱</th>
+                    <th>角色</th>
+                    <th>城市数</th>
+                    <th>评论数</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTable"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="usersPagination"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- 确认删除模态框 -->
+  <!-- 确认模态框 -->
   <div class="modal" id="confirmModal">
     <div class="modal-content">
       <div class="modal-header">
         <h3 id="confirmTitle">确认操作</h3>
-        <span class="modal-close" onclick="closeModal('confirmModal')">&times;</span>
+        <button class="modal-close" id="confirmCloseBtn">&times;</button>
       </div>
       <div class="modal-body">
         <p id="confirmMessage">确定要执行此操作吗？</p>
       </div>
       <div class="modal-footer">
-        <button class="btn" onclick="closeModal('confirmModal')">取消</button>
-        <button class="btn btn-danger" id="confirmBtn">确定</button>
+        <button class="btn" id="confirmCancelBtn">取消</button>
+        <button class="btn btn-danger" id="confirmOkBtn">确定</button>
       </div>
     </div>
   </div>
 
+  <!-- 图片预览模态框 -->
+  <div class="modal preview-modal" id="previewModal">
+    <button class="modal-close" id="previewCloseBtn">&times;</button>
+    <div class="modal-content">
+      <img id="previewImage" src="" alt="预览">
+    </div>
+  </div>
+
   <script>
-    // 自动检测 BASE_PATH（支持 /yiju 等子路径部署）
+    // 自动检测 BASE_PATH
     const pathParts = window.location.pathname.split('/');
     const basePath = pathParts.length > 2 ? '/' + pathParts[1] : '';
     const API_BASE = basePath + '/api';
+
     let token = localStorage.getItem('adminToken');
     let currentUser = null;
     let selectedImages = new Set();
+    let confirmCallback = null;
 
-    // 页面加载
-    document.addEventListener('DOMContentLoaded', () => {
+    // ==================== 初始化 ====================
+    document.addEventListener('DOMContentLoaded', function() {
+      // 绑定事件
+      bindEvents();
+
+      // 检查登录状态
       if (token) {
         checkAuth();
       }
-
-      // 标签页切换
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          tab.classList.add('active');
-          document.getElementById(tab.dataset.tab).classList.add('active');
-
-          // 加载对应数据
-          if (tab.dataset.tab === 'reviews') loadReviews();
-          if (tab.dataset.tab === 'images') loadImages();
-          if (tab.dataset.tab === 'dashboard') loadStats();
-        });
-      });
-
-      // 登录表单
-      document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await login();
-      });
     });
 
-    // 登录
+    function bindEvents() {
+      // 登录表单
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        login();
+      });
+
+      // 退出登录
+      document.getElementById('logoutBtn').addEventListener('click', logout);
+
+      // 标签页切换
+      document.getElementById('tabsContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('tab')) {
+          switchTab(e.target.dataset.tab);
+        }
+      });
+
+      // 评论筛选
+      document.getElementById('reviewStatusFilter').addEventListener('change', function() {
+        loadReviews(1);
+      });
+      document.getElementById('refreshReviewsBtn').addEventListener('click', function() {
+        loadReviews(1);
+      });
+
+      // 图片筛选
+      document.getElementById('imageStatusFilter').addEventListener('change', function() {
+        loadImages(1);
+      });
+      document.getElementById('imageProvinceFilter').addEventListener('change', function() {
+        loadImages(1);
+      });
+      document.getElementById('refreshImagesBtn').addEventListener('click', function() {
+        loadImages(1);
+      });
+      document.getElementById('selectAllImages').addEventListener('change', toggleSelectAll);
+      document.getElementById('batchApproveBtn').addEventListener('click', batchApproveImages);
+      document.getElementById('batchDeleteBtn').addEventListener('click', batchDeleteImages);
+
+      // 用户刷新
+      document.getElementById('refreshUsersBtn').addEventListener('click', function() {
+        loadUsers(1);
+      });
+
+      // 确认模态框
+      document.getElementById('confirmCloseBtn').addEventListener('click', function() {
+        closeModal('confirmModal');
+      });
+      document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+        closeModal('confirmModal');
+      });
+      document.getElementById('confirmOkBtn').addEventListener('click', function() {
+        if (confirmCallback) {
+          confirmCallback();
+          confirmCallback = null;
+        }
+        closeModal('confirmModal');
+      });
+
+      // 图片预览模态框
+      document.getElementById('previewCloseBtn').addEventListener('click', function() {
+        closeModal('previewModal');
+      });
+      document.getElementById('previewModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal('previewModal');
+      });
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(function(t) {
+        t.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(function(c) {
+        c.classList.remove('active');
+      });
+      document.querySelector('.tab[data-tab="' + tabName + '"]').classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+
+      // 加载对应数据
+      if (tabName === 'dashboard') loadStats();
+      if (tabName === 'reviews') loadReviews(1);
+      if (tabName === 'images') { loadProvinces(); loadImages(1); }
+      if (tabName === 'users') loadUsers(1);
+    }
+
+    // ==================== 登录相关 ====================
     async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      const errorEl = document.getElementById('loginError');
 
       try {
-        const res = await fetch(`${API_BASE}/auth/login`, {
+        const res = await fetch(API_BASE + '/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ username: username, password: password })
         });
 
         const data = await res.json();
 
         if (!res.ok) {
-          document.getElementById('loginError').textContent = data.error || '登录失败';
+          errorEl.textContent = data.error || '登录失败';
           return;
         }
 
         if (data.user.role !== 'admin') {
-          document.getElementById('loginError').textContent = '需要管理员权限';
+          errorEl.textContent = '需要管理员权限';
           return;
         }
 
@@ -325,31 +452,30 @@
         localStorage.setItem('adminToken', token);
         showAdminPage();
       } catch (err) {
-        document.getElementById('loginError').textContent = '网络错误';
+        errorEl.textContent = '网络错误: ' + err.message;
       }
     }
 
-    // 检查认证
     async function checkAuth() {
       try {
-        const res = await fetch(`${API_BASE}/auth/me`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const res = await fetch(API_BASE + '/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
         });
 
         if (res.ok) {
           const data = await res.json();
-          if (data.user.role === 'admin') {
+          if (data.user && data.user.role === 'admin') {
             currentUser = data.user;
             showAdminPage();
             return;
           }
         }
-      } catch (err) {}
-
+      } catch (err) {
+        console.error('Auth check failed:', err);
+      }
       logout();
     }
 
-    // 显示管理页面
     function showAdminPage() {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('adminPage').style.display = 'block';
@@ -357,7 +483,6 @@
       loadStats();
     }
 
-    // 退出登录
     function logout() {
       token = null;
       currentUser = null;
@@ -366,16 +491,15 @@
       document.getElementById('adminPage').style.display = 'none';
     }
 
-    // API 请求封装
-    async function api(url, options = {}) {
-      const res = await fetch(`${API_BASE}${url}`, {
-        ...options,
-        headers: {
+    // ==================== API 请求 ====================
+    async function api(url, options) {
+      options = options || {};
+      const res = await fetch(API_BASE + url, Object.assign({}, options, {
+        headers: Object.assign({
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          ...options.headers
-        }
-      });
+          'Authorization': 'Bearer ' + token
+        }, options.headers || {})
+      }));
 
       if (res.status === 401) {
         logout();
@@ -385,166 +509,223 @@
       return res.json();
     }
 
-    // 加载统计数据
+    // ==================== 统计数据 ====================
     async function loadStats() {
       try {
         const stats = await api('/admin/stats');
 
-        document.getElementById('statCities').textContent = stats.cities?.total || 0;
-        document.getElementById('statCitiesPending').textContent = stats.cities?.pending || 0;
-        document.getElementById('statReviews').textContent = stats.reviews?.total || 0;
-        document.getElementById('statReviewsPending').textContent = stats.reviews?.pending || 0;
-        document.getElementById('statUsers').textContent = stats.users?.total || 0;
-        document.getElementById('statAdmins').textContent = stats.users?.admins || 0;
+        document.getElementById('statCities').textContent = stats.cities ? stats.cities.total : 0;
+        document.getElementById('statCitiesPending').textContent = stats.cities ? stats.cities.pending : 0;
+        document.getElementById('statReviews').textContent = stats.reviews ? stats.reviews.total : 0;
+        document.getElementById('statReviewsPending').textContent = stats.reviews ? stats.reviews.pending : 0;
+        document.getElementById('statUsers').textContent = stats.users ? stats.users.total : 0;
+        document.getElementById('statAdmins').textContent = stats.users ? stats.users.admins : 0;
 
-        // 加载图片统计
+        // 图片统计
         const imagesData = await api('/admin/images?limit=1');
-        document.getElementById('statImages').textContent = imagesData.pagination?.total || 0;
+        document.getElementById('statImages').textContent = imagesData.pagination ? imagesData.pagination.total : 0;
         const pendingImages = await api('/admin/images/pending?limit=1');
-        document.getElementById('statImagesPending').textContent = pendingImages.pagination?.total || 0;
+        document.getElementById('statImagesPending').textContent = pendingImages.pagination ? pendingImages.pagination.total : 0;
       } catch (err) {
         console.error('加载统计失败:', err);
       }
     }
 
-    // 加载评论
+    // ==================== 评论管理 ====================
     let reviewsPage = 1;
-    async function loadReviews(page = 1) {
-      reviewsPage = page;
+
+    async function loadReviews(page) {
+      reviewsPage = page || 1;
       const status = document.getElementById('reviewStatusFilter').value;
       const table = document.getElementById('reviewsTable');
 
       table.innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
 
       try {
-        let url = status === 'pending'
-          ? `/admin/reviews/pending?page=${page}&limit=20`
-          : `/admin/reviews/pending?page=${page}&limit=20`; // 暂时都用pending接口
-
+        // 获取所有评论（通过cities API获取）
+        let url = '/admin/reviews/pending?page=' + reviewsPage + '&limit=20';
         const data = await api(url);
 
         if (!data.reviews || data.reviews.length === 0) {
-          table.innerHTML = '<tr><td colspan="8" class="empty">暂无数据</td></tr>';
+          table.innerHTML = '<tr><td colspan="8" class="empty">暂无待审核评论</td></tr>';
+          document.getElementById('reviewsPagination').innerHTML = '';
           return;
         }
 
-        table.innerHTML = data.reviews.map(r => `
-          <tr>
-            <td>${r.id}</td>
-            <td>${r.city_name || '-'}</td>
-            <td>${r.username || '-'}</td>
-            <td>${r.rating}</td>
-            <td title="${r.comment || ''}">${(r.comment || '').substring(0, 50)}${(r.comment || '').length > 50 ? '...' : ''}</td>
-            <td><span class="status status-${r.status}">${statusText(r.status)}</span></td>
-            <td>${formatDate(r.created_at)}</td>
-            <td>
-              ${r.status === 'pending' ? `
-                <button class="btn btn-success btn-sm" onclick="approveReview(${r.id})">通过</button>
-                <button class="btn btn-sm" onclick="rejectReview(${r.id})">拒绝</button>
-              ` : ''}
-              <button class="btn btn-danger btn-sm" onclick="deleteReview(${r.id})">删除</button>
-            </td>
-          </tr>
-        `).join('');
+        let html = '';
+        data.reviews.forEach(function(r) {
+          html += '<tr>' +
+            '<td>' + r.id + '</td>' +
+            '<td>' + (r.city_name || '-') + '</td>' +
+            '<td>' + (r.username || '-') + '</td>' +
+            '<td>' + r.rating + '</td>' +
+            '<td title="' + (r.comment || '').replace(/"/g, '&quot;') + '">' +
+              ((r.comment || '').substring(0, 50) + ((r.comment || '').length > 50 ? '...' : '')) +
+            '</td>' +
+            '<td><span class="status status-' + r.status + '">' + statusText(r.status) + '</span></td>' +
+            '<td>' + formatDate(r.created_at) + '</td>' +
+            '<td class="actions-cell">' +
+              (r.status === 'pending' ?
+                '<button class="btn btn-success btn-sm" data-action="approve-review" data-id="' + r.id + '">通过</button>' +
+                '<button class="btn btn-warning btn-sm" data-action="reject-review" data-id="' + r.id + '">拒绝</button>' : '') +
+              '<button class="btn btn-danger btn-sm" data-action="delete-review" data-id="' + r.id + '">删除</button>' +
+            '</td>' +
+          '</tr>';
+        });
+        table.innerHTML = html;
+
+        // 绑定按钮事件
+        table.querySelectorAll('button[data-action]').forEach(function(btn) {
+          btn.addEventListener('click', handleReviewAction);
+        });
 
         renderPagination('reviewsPagination', data.pagination, loadReviews);
       } catch (err) {
-        table.innerHTML = '<tr><td colspan="8" class="error">加载失败</td></tr>';
+        table.innerHTML = '<tr><td colspan="8" class="error">加载失败: ' + err.message + '</td></tr>';
       }
     }
 
-    // 审核评论
+    function handleReviewAction(e) {
+      const action = e.target.dataset.action;
+      const id = e.target.dataset.id;
+
+      if (action === 'approve-review') approveReview(id);
+      else if (action === 'reject-review') rejectReview(id);
+      else if (action === 'delete-review') deleteReview(id);
+    }
+
     async function approveReview(id) {
       try {
-        await api(`/admin/reviews/${id}/review`, {
+        await api('/admin/reviews/' + id + '/review', {
           method: 'PUT',
           body: JSON.stringify({ status: 'approved' })
         });
         loadReviews(reviewsPage);
       } catch (err) {
-        alert('操作失败');
+        alert('操作失败: ' + err.message);
       }
     }
 
     async function rejectReview(id) {
       try {
-        await api(`/admin/reviews/${id}/review`, {
+        await api('/admin/reviews/' + id + '/review', {
           method: 'PUT',
           body: JSON.stringify({ status: 'rejected' })
         });
         loadReviews(reviewsPage);
       } catch (err) {
-        alert('操作失败');
+        alert('操作失败: ' + err.message);
       }
     }
 
-    // 删除评论
-    async function deleteReview(id) {
-      showConfirm('确认删除', '确定要删除这条评论吗？此操作不可恢复。', async () => {
+    function deleteReview(id) {
+      showConfirm('确认删除', '确定要删除这条评论吗？此操作不可恢复。', async function() {
         try {
-          await api(`/admin/reviews/${id}`, { method: 'DELETE' });
+          await api('/admin/reviews/' + id, { method: 'DELETE' });
           loadReviews(reviewsPage);
         } catch (err) {
-          alert('删除失败');
+          alert('删除失败: ' + err.message);
         }
       });
     }
 
-    // 加载图片
+    // ==================== 图片管理 ====================
     let imagesPage = 1;
-    async function loadImages(page = 1) {
-      imagesPage = page;
+
+    async function loadProvinces() {
+      try {
+        const data = await api('/cities/provinces');
+        const select = document.getElementById('imageProvinceFilter');
+        select.innerHTML = '<option value="">全部省份/国家</option>';
+        if (data.items) {
+          data.items.forEach(function(item) {
+            select.innerHTML += '<option value="' + item + '">' + item + '</option>';
+          });
+        }
+      } catch (err) {
+        console.error('加载省份失败:', err);
+      }
+    }
+
+    async function loadImages(page) {
+      imagesPage = page || 1;
       const status = document.getElementById('imageStatusFilter').value;
       const grid = document.getElementById('imagesGrid');
       selectedImages.clear();
       updateSelectedCount();
+      document.getElementById('selectAllImages').checked = false;
 
       grid.innerHTML = '<div class="loading">加载中...</div>';
 
       try {
-        let url = `/admin/images?page=${page}&limit=20`;
-        if (status) url += `&status=${status}`;
+        let url = '/admin/images?page=' + imagesPage + '&limit=20';
+        if (status) url += '&status=' + status;
 
         const data = await api(url);
 
         if (!data.images || data.images.length === 0) {
-          grid.innerHTML = '<div class="empty"><div class="empty-icon">📷</div><p>暂无图片</p></div>';
+          grid.innerHTML = '<div class="empty"><span class="empty-icon">📷</span><p>暂无图片</p></div>';
+          document.getElementById('imagesPagination').innerHTML = '';
           return;
         }
 
-        grid.innerHTML = data.images.map(img => `
-          <div class="image-card" data-id="${img.id}">
-            <label style="position:relative;display:block;">
-              <input type="checkbox" class="image-checkbox" value="${img.id}"
-                onchange="toggleImageSelect(${img.id})"
-                style="position:absolute;top:8px;left:8px;z-index:1;width:20px;height:20px;">
-              <img src="${img.thumbnail_url || img.image_url}" alt="${img.alt_text || ''}"
-                onclick="window.open('${img.image_url}', '_blank')">
-            </label>
-            <div class="image-info">
-              <div class="city-name">${img.city_name || '未知城市'}</div>
-              <div class="meta">
-                <span class="status status-${img.status}">${statusText(img.status)}</span>
-                ${img.uploader_name ? `· ${img.uploader_name}` : ''}
-              </div>
-            </div>
-            <div class="image-actions">
-              ${img.status === 'pending' ? `
-                <button class="btn btn-success btn-sm" onclick="approveImage(${img.id})">通过</button>
-                <button class="btn btn-sm" onclick="rejectImage(${img.id})">拒绝</button>
-              ` : ''}
-              <button class="btn btn-danger btn-sm" onclick="deleteImage(${img.id})">删除</button>
-            </div>
-          </div>
-        `).join('');
+        let html = '';
+        data.images.forEach(function(img) {
+          html += '<div class="image-card" data-id="' + img.id + '">' +
+            '<input type="checkbox" class="checkbox image-checkbox" value="' + img.id + '">' +
+            '<img src="' + (img.thumbnail_url || img.image_url) + '" alt="' + (img.alt_text || '') + '" data-full="' + img.image_url + '" data-action="preview">' +
+            '<div class="image-info">' +
+              '<div class="city-name">' + (img.city_name || '未知城市') + '</div>' +
+              '<div class="meta">' +
+                '<span class="status status-' + img.status + '">' + statusText(img.status) + '</span>' +
+                (img.uploader_name ? ' · ' + img.uploader_name : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="image-actions">' +
+              (img.status === 'pending' ?
+                '<button class="btn btn-success btn-sm" data-action="approve-image" data-id="' + img.id + '">通过</button>' +
+                '<button class="btn btn-warning btn-sm" data-action="reject-image" data-id="' + img.id + '">拒绝</button>' : '') +
+              '<button class="btn btn-danger btn-sm" data-action="delete-image" data-id="' + img.id + '">删除</button>' +
+            '</div>' +
+          '</div>';
+        });
+        grid.innerHTML = html;
+
+        // 绑定事件
+        grid.querySelectorAll('.image-checkbox').forEach(function(cb) {
+          cb.addEventListener('change', function() {
+            toggleImageSelect(parseInt(this.value));
+          });
+        });
+        grid.querySelectorAll('img[data-action="preview"]').forEach(function(img) {
+          img.addEventListener('click', function() {
+            previewImage(this.dataset.full);
+          });
+        });
+        grid.querySelectorAll('button[data-action]').forEach(function(btn) {
+          btn.addEventListener('click', handleImageAction);
+        });
 
         renderPagination('imagesPagination', data.pagination, loadImages);
       } catch (err) {
-        grid.innerHTML = '<div class="empty">加载失败</div>';
+        grid.innerHTML = '<div class="empty">加载失败: ' + err.message + '</div>';
       }
     }
 
-    // 图片选择
+    function handleImageAction(e) {
+      const action = e.target.dataset.action;
+      const id = e.target.dataset.id;
+
+      if (action === 'approve-image') approveImage(id);
+      else if (action === 'reject-image') rejectImage(id);
+      else if (action === 'delete-image') deleteImage(id);
+    }
+
+    function previewImage(url) {
+      document.getElementById('previewImage').src = url;
+      document.getElementById('previewModal').classList.add('show');
+    }
+
     function toggleImageSelect(id) {
       if (selectedImages.has(id)) {
         selectedImages.delete(id);
@@ -556,7 +737,7 @@
 
     function toggleSelectAll() {
       const checkAll = document.getElementById('selectAllImages').checked;
-      document.querySelectorAll('.image-checkbox').forEach(cb => {
+      document.querySelectorAll('.image-checkbox').forEach(function(cb) {
         cb.checked = checkAll;
         const id = parseInt(cb.value);
         if (checkAll) {
@@ -572,51 +753,48 @@
       document.getElementById('selectedCount').textContent = selectedImages.size;
     }
 
-    // 审核图片
     async function approveImage(id) {
       try {
-        await api(`/admin/images/${id}/review`, {
+        await api('/admin/images/' + id + '/review', {
           method: 'PUT',
           body: JSON.stringify({ status: 'approved' })
         });
         loadImages(imagesPage);
       } catch (err) {
-        alert('操作失败');
+        alert('操作失败: ' + err.message);
       }
     }
 
     async function rejectImage(id) {
       try {
-        await api(`/admin/images/${id}/review`, {
+        await api('/admin/images/' + id + '/review', {
           method: 'PUT',
           body: JSON.stringify({ status: 'rejected' })
         });
         loadImages(imagesPage);
       } catch (err) {
-        alert('操作失败');
+        alert('操作失败: ' + err.message);
       }
     }
 
-    // 删除图片
-    async function deleteImage(id) {
-      showConfirm('确认删除', '确定要删除这张图片吗？', async () => {
+    function deleteImage(id) {
+      showConfirm('确认删除', '确定要删除这张图片吗？', async function() {
         try {
-          await api(`/admin/images/${id}`, { method: 'DELETE' });
+          await api('/admin/images/' + id, { method: 'DELETE' });
           loadImages(imagesPage);
         } catch (err) {
-          alert('删除失败');
+          alert('删除失败: ' + err.message);
         }
       });
     }
 
-    // 批量操作
-    async function batchApproveImages() {
+    function batchApproveImages() {
       if (selectedImages.size === 0) {
         alert('请先选择图片');
         return;
       }
 
-      showConfirm('批量通过', `确定要通过这 ${selectedImages.size} 张图片吗？`, async () => {
+      showConfirm('批量通过', '确定要通过这 ' + selectedImages.size + ' 张图片吗？', async function() {
         try {
           await api('/admin/images/batch-review', {
             method: 'POST',
@@ -624,18 +802,18 @@
           });
           loadImages(imagesPage);
         } catch (err) {
-          alert('操作失败');
+          alert('操作失败: ' + err.message);
         }
       });
     }
 
-    async function batchDeleteImages() {
+    function batchDeleteImages() {
       if (selectedImages.size === 0) {
         alert('请先选择图片');
         return;
       }
 
-      showConfirm('批量删除', `确定要删除这 ${selectedImages.size} 张图片吗？此操作不可恢复。`, async () => {
+      showConfirm('批量删除', '确定要删除这 ' + selectedImages.size + ' 张图片吗？此操作不可恢复。', async function() {
         try {
           await api('/admin/images/batch-delete', {
             method: 'POST',
@@ -643,48 +821,123 @@
           });
           loadImages(imagesPage);
         } catch (err) {
-          alert('操作失败');
+          alert('操作失败: ' + err.message);
         }
       });
     }
 
-    // 工具函数
+    // ==================== 用户管理 ====================
+    let usersPage = 1;
+
+    async function loadUsers(page) {
+      usersPage = page || 1;
+      const table = document.getElementById('usersTable');
+
+      table.innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
+
+      try {
+        const data = await api('/admin/users?page=' + usersPage + '&limit=20');
+
+        if (!data.users || data.users.length === 0) {
+          table.innerHTML = '<tr><td colspan="8" class="empty">暂无用户</td></tr>';
+          document.getElementById('usersPagination').innerHTML = '';
+          return;
+        }
+
+        let html = '';
+        data.users.forEach(function(u) {
+          html += '<tr>' +
+            '<td>' + u.id + '</td>' +
+            '<td>' + u.username + '</td>' +
+            '<td>' + (u.email || '-') + '</td>' +
+            '<td><span class="status ' + (u.role === 'admin' ? 'status-approved' : 'status-pending') + '">' + u.role + '</span></td>' +
+            '<td>' + (u.cities_count || 0) + '</td>' +
+            '<td>' + (u.reviews_count || 0) + '</td>' +
+            '<td>' + formatDate(u.created_at) + '</td>' +
+            '<td class="actions-cell">' +
+              (u.role === 'admin' ?
+                '<button class="btn btn-warning btn-sm" data-action="set-user" data-id="' + u.id + '">设为用户</button>' :
+                '<button class="btn btn-success btn-sm" data-action="set-admin" data-id="' + u.id + '">设为管理员</button>') +
+            '</td>' +
+          '</tr>';
+        });
+        table.innerHTML = html;
+
+        // 绑定事件
+        table.querySelectorAll('button[data-action]').forEach(function(btn) {
+          btn.addEventListener('click', handleUserAction);
+        });
+
+        renderPagination('usersPagination', data.pagination, loadUsers);
+      } catch (err) {
+        table.innerHTML = '<tr><td colspan="8" class="error">加载失败: ' + err.message + '</td></tr>';
+      }
+    }
+
+    function handleUserAction(e) {
+      const action = e.target.dataset.action;
+      const id = e.target.dataset.id;
+
+      if (action === 'set-admin') setUserRole(id, 'admin');
+      else if (action === 'set-user') setUserRole(id, 'user');
+    }
+
+    async function setUserRole(id, role) {
+      showConfirm('确认操作', '确定要将此用户设为' + (role === 'admin' ? '管理员' : '普通用户') + '吗？', async function() {
+        try {
+          await api('/admin/users/' + id + '/role', {
+            method: 'PUT',
+            body: JSON.stringify({ role: role })
+          });
+          loadUsers(usersPage);
+        } catch (err) {
+          alert('操作失败: ' + err.message);
+        }
+      });
+    }
+
+    // ==================== 工具函数 ====================
     function statusText(status) {
-      const map = { pending: '待审核', approved: '已通过', rejected: '已拒绝' };
+      var map = { pending: '待审核', approved: '已通过', rejected: '已拒绝' };
       return map[status] || status;
     }
 
     function formatDate(dateStr) {
       if (!dateStr) return '-';
-      const d = new Date(dateStr);
-      return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+      var d = new Date(dateStr);
+      return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
     }
 
     function renderPagination(containerId, pagination, loadFn) {
-      const container = document.getElementById(containerId);
+      var container = document.getElementById(containerId);
       if (!pagination || pagination.pages <= 1) {
         container.innerHTML = '';
         return;
       }
 
-      let html = '';
-      html += `<button ${pagination.page <= 1 ? 'disabled' : ''} onclick="${loadFn.name}(${pagination.page - 1})">上一页</button>`;
+      var html = '';
+      html += '<button class="page-btn" data-page="' + (pagination.page - 1) + '"' + (pagination.page <= 1 ? ' disabled' : '') + '>上一页</button>';
 
-      for (let i = 1; i <= pagination.pages; i++) {
+      for (var i = 1; i <= pagination.pages; i++) {
         if (i === 1 || i === pagination.pages || Math.abs(i - pagination.page) <= 2) {
-          html += `<button class="${i === pagination.page ? 'active' : ''}" onclick="${loadFn.name}(${i})">${i}</button>`;
+          html += '<button class="page-btn' + (i === pagination.page ? ' active' : '') + '" data-page="' + i + '">' + i + '</button>';
         } else if (Math.abs(i - pagination.page) === 3) {
-          html += '<button disabled>...</button>';
+          html += '<button class="page-btn" disabled>...</button>';
         }
       }
 
-      html += `<button ${pagination.page >= pagination.pages ? 'disabled' : ''} onclick="${loadFn.name}(${pagination.page + 1})">下一页</button>`;
+      html += '<button class="page-btn" data-page="' + (pagination.page + 1) + '"' + (pagination.page >= pagination.pages ? ' disabled' : '') + '>下一页</button>';
 
       container.innerHTML = html;
+
+      // 绑定分页事件
+      container.querySelectorAll('.page-btn:not([disabled])').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          loadFn(parseInt(this.dataset.page));
+        });
+      });
     }
 
-    // 模态框
-    let confirmCallback = null;
     function showConfirm(title, message, callback) {
       document.getElementById('confirmTitle').textContent = title;
       document.getElementById('confirmMessage').textContent = message;
@@ -695,14 +948,6 @@
     function closeModal(id) {
       document.getElementById(id).classList.remove('show');
     }
-
-    document.getElementById('confirmBtn').addEventListener('click', async () => {
-      if (confirmCallback) {
-        await confirmCallback();
-        confirmCallback = null;
-      }
-      closeModal('confirmModal');
-    });
   </script>
 </body>
 </html>
