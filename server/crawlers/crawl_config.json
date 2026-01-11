@@ -1,0 +1,24 @@
+{
+  "engine": "Bing",
+  "max_number": 5,
+  "delay": 2,
+  "conda_env": "img",
+
+  "search_templates": [
+    "{city}地标建筑 著名景点",
+    "{city}街头小巷 市井生活",
+    "{city}自然风景 美景",
+    "{city}老街古巷 历史",
+    "{city}夜景 城市灯光",
+    "{city}早市菜市场 生活",
+    "{city}公园广场 休闲",
+    "{city}特色美食街"
+  ],
+
+  "注释": {
+    "engine": "搜索引擎: Bing/Google/Baidu",
+    "max_number": "每个城市爬取的图片数量",
+    "delay": "每个城市之间的延迟(秒)",
+    "search_templates": "搜索关键词模板，{city}会被替换为城市名，每个城市轮流使用不同模板"
+  }
+}

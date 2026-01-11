@@ -2,6 +2,8 @@
 """
 批量图片爬取脚本
 使用 image_downloader.py 批量爬取所有城市的图片
+
+配置文件: crawl_config.json
 """
 
 import json
@@ -12,30 +14,54 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 
-# 配置
+# 配置文件路径
 CITIES_FILE = Path(__file__).parent / 'cities.json'
 OUTPUT_DIR = Path(__file__).parent / 'raw_images'
 LOG_FILE = Path(__file__).parent / 'crawl_log.json'
+CONFIG_FILE = Path(__file__).parent / 'crawl_config.json'
 
-# 默认参数
-DEFAULT_ENGINE = 'Bing'  # Bing效果最好，Google国内不可用
+# 默认配置（如果配置文件不存在时使用）
+DEFAULT_CONFIG = {
+    'engine': 'Bing',
+    'max_number': 5,
+    'delay': 2,
+    'conda_env': 'img',
+    'search_templates': [
+        '{city}地标建筑 著名景点',
+        '{city}街头小巷 市井生活',
+        '{city}自然风景 美景',
+        '{city}老街古巷 历史',
+        '{city}夜景 城市灯光',
+        '{city}早市菜市场 生活',
+        '{city}公园广场 休闲',
+        '{city}特色美食街',
+    ]
+}
+
+def load_config():
+    """加载配置文件"""
+    if CONFIG_FILE.exists():
+        try:
+            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                # 移除注释字段
+                config.pop('注释', None)
+                # 合并默认配置
+                merged = {**DEFAULT_CONFIG, **config}
+                print(f"已加载配置文件: {CONFIG_FILE}", flush=True)
+                return merged
+        except Exception as e:
+            print(f"加载配置文件失败: {e}，使用默认配置", flush=True)
+    return DEFAULT_CONFIG
+
+# 加载配置
+CONFIG = load_config()
+DEFAULT_ENGINE = CONFIG['engine']
 DEFAULT_DRIVER = 'api'
-DEFAULT_MAX_NUMBER = 5   # 每个城市爬取的图片数量（5张足够）
-DEFAULT_DELAY = 2  # 每个城市之间的延迟（秒）
-DEFAULT_CONDA_ENV = 'img'  # conda环境名称
-
-# 搜索关键词模板（多样化）
-# 每个城市会轮流使用不同关键词，确保图片多样性
-SEARCH_TEMPLATES = [
-    '{city}地标建筑 著名景点',   # 标志性地标
-    '{city}街头小巷 市井生活',   # 人间烟火气
-    '{city}自然风景 美景',       # 自然景观
-    '{city}老街古巷 历史',       # 历史文化街区
-    '{city}夜景 城市灯光',       # 城市夜景
-    '{city}早市菜市场 生活',     # 烟火气息
-    '{city}公园广场 休闲',       # 市民生活
-    '{city}特色美食街',          # 美食文化
-]
+DEFAULT_MAX_NUMBER = CONFIG['max_number']
+DEFAULT_DELAY = CONFIG['delay']
+DEFAULT_CONDA_ENV = CONFIG['conda_env']
+SEARCH_TEMPLATES = CONFIG['search_templates']
 
 def load_cities():
     """加载城市列表"""
@@ -80,8 +106,12 @@ def crawl_city_images(city, args):
     # 创建输出目录
     city_output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 构建搜索关键词（轮流使用不同模板，确保多样性）
-    template_index = city_id % len(SEARCH_TEMPLATES)
+    # 构建搜索关键词
+    # 如果指定了模板索引，使用指定的模板；否则轮流使用不同模板
+    if hasattr(args, 'template_index') and args.template_index is not None:
+        template_index = args.template_index % len(SEARCH_TEMPLATES)
+    else:
+        template_index = city_id % len(SEARCH_TEMPLATES)
     keyword = SEARCH_TEMPLATES[template_index].format(city=city_name)
 
     print(f"\n[{city_id}] 正在爬取: {city_name}", flush=True)
@@ -126,11 +156,46 @@ python "{args.downloader}" "{keyword}" --engine {args.engine} --driver {args.dri
         print(f"    错误: {e}", flush=True)
         return False, 0
 
+def show_templates():
+    """显示所有关键词模板"""
+    print("\n当前关键词模板:", flush=True)
+    print("-" * 50, flush=True)
+    for i, template in enumerate(SEARCH_TEMPLATES):
+        print(f"  [{i}] {template}", flush=True)
+    print("-" * 50, flush=True)
+    print(f"共 {len(SEARCH_TEMPLATES)} 个模板", flush=True)
+    print(f"\n使用 --template-index N 可指定使用特定模板", flush=True)
+    print(f"配置文件: {CONFIG_FILE}", flush=True)
+
+def clear_crawl_log():
+    """清除爬取日志"""
+    if LOG_FILE.exists():
+        os.remove(LOG_FILE)
+        print(f"已清除爬取日志: {LOG_FILE}", flush=True)
+    else:
+        print("爬取日志不存在", flush=True)
+
 def batch_crawl(args):
     """批量爬取所有城市图片"""
+
+    # 显示模板
+    if args.show_templates:
+        show_templates()
+        return
+
+    # 清除日志
+    if args.clear_log:
+        clear_crawl_log()
+        return
+
     cities = load_cities()
     if not cities:
         return
+
+    # 强制模式：清除完成记录
+    if args.force:
+        print("强制模式：清除已完成记录，重新爬取所有城市", flush=True)
+        clear_crawl_log()
 
     log = load_crawl_log()
     completed_ids = set(log['completed'])
@@ -159,6 +224,10 @@ def batch_crawl(args):
     print(f"使用引擎: {args.engine}", flush=True)
     print(f"每城市图片数: {args.max_number}", flush=True)
     print(f"输出目录: {OUTPUT_DIR}", flush=True)
+    if args.template_index is not None:
+        print(f"使用模板: [{args.template_index}] {SEARCH_TEMPLATES[args.template_index % len(SEARCH_TEMPLATES)]}", flush=True)
+    else:
+        print(f"关键词模板: 轮流使用 {len(SEARCH_TEMPLATES)} 个模板", flush=True)
     print("-" * 50, flush=True)
 
     if args.dry_run:
@@ -253,6 +322,22 @@ def main():
     parser.add_argument('--conda-env',
                         default=DEFAULT_CONDA_ENV,
                         help=f'Conda环境名称 (默认: {DEFAULT_CONDA_ENV})')
+
+    parser.add_argument('--force', '-f',
+                        action='store_true',
+                        help='强制重新爬取所有城市（清除完成记录）')
+
+    parser.add_argument('--clear-log',
+                        action='store_true',
+                        help='仅清除爬取日志，不执行爬取')
+
+    parser.add_argument('--template-index', '-i',
+                        type=int,
+                        help='指定使用的关键词模板索引（0-N），用于针对性爬取')
+
+    parser.add_argument('--show-templates',
+                        action='store_true',
+                        help='显示所有关键词模板')
 
     args = parser.parse_args()
     batch_crawl(args)
