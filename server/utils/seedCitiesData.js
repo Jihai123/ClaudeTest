@@ -9,7 +9,7 @@ const citiesData = [
   // 一线城市
   {
     name: '北京',
-    province: '北京市',
+    province: '北京',
     population: 21893095,
     gdp: 41610.90,
     area: 16410.54,
@@ -24,7 +24,7 @@ const citiesData = [
   },
   {
     name: '上海',
-    province: '上海市',
+    province: '上海',
     population: 24870895,
     gdp: 43214.85,
     area: 6340.50,
@@ -39,7 +39,7 @@ const citiesData = [
   },
   {
     name: '广州',
-    province: '广东省',
+    province: '广东',
     population: 18676605,
     gdp: 28839.00,
     area: 7434.40,
@@ -54,7 +54,7 @@ const citiesData = [
   },
   {
     name: '深圳',
-    province: '广东省',
+    province: '广东',
     population: 17560061,
     gdp: 32387.68,
     area: 1997.47,
@@ -71,7 +71,7 @@ const citiesData = [
   // 新一线城市
   {
     name: '成都',
-    province: '四川省',
+    province: '四川',
     population: 21192000,
     gdp: 20817.50,
     area: 14335.00,
@@ -86,7 +86,7 @@ const citiesData = [
   },
   {
     name: '杭州',
-    province: '浙江省',
+    province: '浙江',
     population: 12204000,
     gdp: 18753.00,
     area: 16853.57,
@@ -101,7 +101,7 @@ const citiesData = [
   },
   {
     name: '重庆',
-    province: '重庆市',
+    province: '重庆',
     population: 32054000,
     gdp: 27894.02,
     area: 82402.00,
@@ -116,7 +116,7 @@ const citiesData = [
   },
   {
     name: '西安',
-    province: '陕西省',
+    province: '陕西',
     population: 13016000,
     gdp: 11486.51,
     area: 10752.00,
@@ -131,7 +131,7 @@ const citiesData = [
   },
   {
     name: '苏州',
-    province: '江苏省',
+    province: '江苏',
     population: 12748262,
     gdp: 23958.34,
     area: 8657.32,
@@ -146,7 +146,7 @@ const citiesData = [
   },
   {
     name: '武汉',
-    province: '湖北省',
+    province: '湖北',
     population: 13648000,
     gdp: 18866.43,
     area: 8569.15,
@@ -161,7 +161,7 @@ const citiesData = [
   },
   {
     name: '南京',
-    province: '江苏省',
+    province: '江苏',
     population: 9423400,
     gdp: 16907.85,
     area: 6587.02,
@@ -178,7 +178,7 @@ const citiesData = [
   // 二线城市
   {
     name: '天津',
-    province: '天津市',
+    province: '天津',
     population: 13866009,
     gdp: 15695.05,
     area: 11966.45,
@@ -193,7 +193,7 @@ const citiesData = [
   },
   {
     name: '郑州',
-    province: '河南省',
+    province: '河南',
     population: 12600574,
     gdp: 12691.02,
     area: 7446.00,
@@ -208,7 +208,7 @@ const citiesData = [
   },
   {
     name: '长沙',
-    province: '湖南省',
+    province: '湖南',
     population: 10240000,
     gdp: 13270.70,
     area: 11819.00,
@@ -223,7 +223,7 @@ const citiesData = [
   },
   {
     name: '沈阳',
-    province: '辽宁省',
+    province: '辽宁',
     population: 9070093,
     gdp: 7248.70,
     area: 12948.00,
@@ -238,7 +238,7 @@ const citiesData = [
   },
   {
     name: '青岛',
-    province: '山东省',
+    province: '山东',
     population: 10718000,
     gdp: 14920.75,
     area: 11293.00,
@@ -253,7 +253,7 @@ const citiesData = [
   },
   {
     name: '大连',
-    province: '辽宁省',
+    province: '辽宁',
     population: 7450785,
     gdp: 8476.10,
     area: 12573.85,
@@ -268,7 +268,7 @@ const citiesData = [
   },
   {
     name: '厦门',
-    province: '福建省',
+    province: '福建',
     population: 5280000,
     gdp: 7034.00,
     area: 1700.61,
@@ -283,7 +283,7 @@ const citiesData = [
   },
   {
     name: '宁波',
-    province: '浙江省',
+    province: '浙江',
     population: 9540000,
     gdp: 15704.28,
     area: 9816.00,
@@ -298,7 +298,7 @@ const citiesData = [
   },
   {
     name: '昆明',
-    province: '云南省',
+    province: '云南',
     population: 8500000,
     gdp: 7353.90,
     area: 21012.54,
@@ -313,7 +313,7 @@ const citiesData = [
   },
   {
     name: '福州',
-    province: '福建省',
+    province: '福建',
     population: 8291268,
     gdp: 11324.48,
     area: 11968.00,
@@ -330,7 +330,7 @@ const citiesData = [
   // 其他重要城市
   {
     name: '济南',
-    province: '山东省',
+    province: '山东',
     population: 9321600,
     gdp: 12027.50,
     area: 10244.45,
@@ -345,7 +345,7 @@ const citiesData = [
   },
   {
     name: '合肥',
-    province: '安徽省',
+    province: '安徽',
     population: 9369881,
     gdp: 11412.80,
     area: 11445.10,
@@ -360,7 +360,7 @@ const citiesData = [
   },
   {
     name: '南昌',
-    province: '江西省',
+    province: '江西',
     population: 6437000,
     gdp: 7203.50,
     area: 7402.36,
@@ -375,7 +375,7 @@ const citiesData = [
   },
   {
     name: '太原',
-    province: '山西省',
+    province: '山西',
     population: 5304000,
     gdp: 5571.18,
     area: 6988.00,
@@ -390,7 +390,7 @@ const citiesData = [
   },
   {
     name: '石家庄',
-    province: '河北省',
+    province: '河北',
     population: 11235086,
     gdp: 7100.60,
     area: 14464.00,
@@ -405,7 +405,7 @@ const citiesData = [
   },
   {
     name: '哈尔滨',
-    province: '黑龙江省',
+    province: '黑龙江',
     population: 10009854,
     gdp: 5351.70,
     area: 53100.00,
@@ -420,7 +420,7 @@ const citiesData = [
   },
   {
     name: '长春',
-    province: '吉林省',
+    province: '吉林',
     population: 9066906,
     gdp: 6744.00,
     area: 24592.00,
@@ -435,7 +435,7 @@ const citiesData = [
   },
   {
     name: '南宁',
-    province: '广西壮族自治区',
+    province: '广西',
     population: 8741584,
     gdp: 5120.94,
     area: 22112.00,
@@ -450,7 +450,7 @@ const citiesData = [
   },
   {
     name: '贵阳',
-    province: '贵州省',
+    province: '贵州',
     population: 5987018,
     gdp: 4711.04,
     area: 8034.00,
@@ -465,7 +465,7 @@ const citiesData = [
   },
   {
     name: '兰州',
-    province: '甘肃省',
+    province: '甘肃',
     population: 4359446,
     gdp: 3231.30,
     area: 13100.00,
@@ -480,7 +480,7 @@ const citiesData = [
   },
   {
     name: '乌鲁木齐',
-    province: '新疆维吾尔自治区',
+    province: '新疆',
     population: 4054369,
     gdp: 3690.00,
     area: 14216.30,
@@ -495,7 +495,7 @@ const citiesData = [
   },
   {
     name: '拉萨',
-    province: '西藏自治区',
+    province: '西藏',
     population: 867891,
     gdp: 678.10,
     area: 29538.90,
@@ -510,7 +510,7 @@ const citiesData = [
   },
   {
     name: '海口',
-    province: '海南省',
+    province: '海南',
     population: 2873358,
     gdp: 2009.70,
     area: 2290.00,
@@ -525,7 +525,7 @@ const citiesData = [
   },
   {
     name: '珠海',
-    province: '广东省',
+    province: '广东',
     population: 2439585,
     gdp: 4045.45,
     area: 1736.46,
@@ -540,7 +540,7 @@ const citiesData = [
   },
   {
     name: '三亚',
-    province: '海南省',
+    province: '海南',
     population: 1031396,
     gdp: 835.90,
     area: 1919.58,

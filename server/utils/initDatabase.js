@@ -6,7 +6,7 @@ const db = require('../models/database');
 const initialCities = [
   {
     name: '成都',
-    province: '四川省',
+    province: '四川',
     population: 21000000,
     gdp: 20817.5,
     area: 14335,
@@ -21,7 +21,7 @@ const initialCities = [
   },
   {
     name: '杭州',
-    province: '浙江省',
+    province: '浙江',
     population: 12200000,
     gdp: 18753,
     area: 16850,
@@ -36,7 +36,7 @@ const initialCities = [
   },
   {
     name: '青岛',
-    province: '山东省',
+    province: '山东',
     population: 10000000,
     gdp: 14920,
     area: 11282,
@@ -51,7 +51,7 @@ const initialCities = [
   },
   {
     name: '厦门',
-    province: '福建省',
+    province: '福建',
     population: 5280000,
     gdp: 7033,
     area: 1700,
@@ -66,7 +66,7 @@ const initialCities = [
   },
   {
     name: '大连',
-    province: '辽宁省',
+    province: '辽宁',
     population: 7450000,
     gdp: 8430,
     area: 12574,
@@ -81,7 +81,7 @@ const initialCities = [
   },
   {
     name: '昆明',
-    province: '云南省',
+    province: '云南',
     population: 8500000,
     gdp: 7222,
     area: 21012,
@@ -96,7 +96,7 @@ const initialCities = [
   },
   {
     name: '苏州',
-    province: '江苏省',
+    province: '江苏',
     population: 12900000,
     gdp: 23958,
     area: 8657,
@@ -111,7 +111,7 @@ const initialCities = [
   },
   {
     name: '珠海',
-    province: '广东省',
+    province: '广东',
     population: 2440000,
     gdp: 3881,
     area: 1736,
@@ -126,7 +126,7 @@ const initialCities = [
   },
   {
     name: '威海',
-    province: '山东省',
+    province: '山东',
     population: 2900000,
     gdp: 3463,
     area: 5797,
@@ -141,7 +141,7 @@ const initialCities = [
   },
   {
     name: '南京',
-    province: '江苏省',
+    province: '江苏',
     population: 9300000,
     gdp: 16907,
     area: 6587,
