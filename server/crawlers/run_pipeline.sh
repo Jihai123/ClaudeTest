@@ -11,6 +11,9 @@
 #   --limit N         限制爬取城市数量
 #   --engine ENGINE   搜索引擎 (Google/Baidu/Bing)
 #   --downloader PATH image_downloader.py 的路径
+#   --force           强制重新爬取（忽略已完成记录）
+#   --template N      使用指定的关键词模板
+#   --show-templates  显示所有关键词模板
 #   --help            显示帮助
 #
 
@@ -33,6 +36,9 @@ DRY_RUN=""
 LIMIT=""
 ENGINE="Bing"  # Bing效果最好，Google国内不可用
 MAX_NUMBER=5   # 每城市5张图片足够
+FORCE=""       # 强制重新爬取
+TEMPLATE_INDEX=""  # 指定关键词模板索引
+SHOW_TEMPLATES=""  # 显示模板
 
 # 颜色输出
 RED='\033[0;31m'
@@ -72,10 +78,13 @@ show_help() {
                         4 - 上传R2并导入数据库
   --dry-run           试运行模式，不实际执行
   --limit N           限制爬取城市数量
-  --engine ENGINE     搜索引擎 (Google/Baidu/Bing)，默认 Google
-  --max-number N      每城市爬取图片数，默认 10
+  --engine ENGINE     搜索引擎 (Google/Baidu/Bing)，默认 Bing
+  --max-number N      每城市爬取图片数，默认 5
   --downloader PATH   image_downloader.py 的路径
   --skip-upload       跳过R2上传，使用本地路径
+  --force             强制重新爬取所有城市（清除完成记录）
+  --template N        使用指定的关键词模板索引（0-N）
+  --show-templates    显示所有可用的关键词模板
   --help              显示此帮助
 
 示例:
@@ -87,6 +96,15 @@ show_help() {
 
   # 试运行，爬取前5个城市
   ./run_pipeline.sh --dry-run --limit 5
+
+  # 强制用新关键词重新爬取所有城市
+  ./run_pipeline.sh --force
+
+  # 用指定模板（如"地标建筑"）重新爬取
+  ./run_pipeline.sh --force --template 0
+
+  # 查看所有关键词模板
+  ./run_pipeline.sh --show-templates
 
   # 使用百度搜索引擎
   ./run_pipeline.sh --engine Baidu
@@ -100,6 +118,9 @@ show_help() {
   - boto3 (pip install boto3)
   - image_downloader.py 工具
   - R2环境变量配置 (或使用 --skip-upload)
+
+配置文件:
+  - crawl_config.json: 可自定义关键词模板和爬取参数
 
 EOF
 }
@@ -134,6 +155,18 @@ while [[ $# -gt 0 ]]; do
             ;;
         --skip-upload)
             SKIP_UPLOAD="--local-only"
+            shift
+            ;;
+        --force)
+            FORCE="--force"
+            shift
+            ;;
+        --template)
+            TEMPLATE_INDEX="--template-index $2"
+            shift 2
+            ;;
+        --show-templates)
+            SHOW_TEMPLATES="true"
             shift
             ;;
         --help)
@@ -185,7 +218,15 @@ step2_crawl_images() {
     CMD="$CMD --downloader $DOWNLOADER_PATH"
     CMD="$CMD --engine $ENGINE"
     CMD="$CMD --max-number $MAX_NUMBER"
-    CMD="$CMD --skip-completed"
+
+    # 如果不是强制模式，则跳过已完成的
+    if [[ -z "$FORCE" ]]; then
+        CMD="$CMD --skip-completed"
+    else
+        CMD="$CMD $FORCE"
+    fi
+
+    [[ -n "$TEMPLATE_INDEX" ]] && CMD="$CMD $TEMPLATE_INDEX"
     [[ -n "$LIMIT" ]] && CMD="$CMD $LIMIT"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD $DRY_RUN"
 
@@ -261,6 +302,14 @@ step4_import() {
     echo ""
 }
 
+# 显示关键词模板
+show_templates() {
+    log_info "显示关键词模板"
+    echo "----------------------------------------"
+    cd "$SCRIPT_DIR"
+    python3 -u batch_crawl.py --show-templates
+}
+
 # 主流程
 main() {
     echo ""
@@ -271,8 +320,19 @@ main() {
 
     check_python
 
+    # 如果只是显示模板
+    if [[ -n "$SHOW_TEMPLATES" ]]; then
+        show_templates
+        exit 0
+    fi
+
     if [[ -n "$DRY_RUN" ]]; then
         log_warn "试运行模式 - 不会实际执行操作"
+        echo ""
+    fi
+
+    if [[ -n "$FORCE" ]]; then
+        log_warn "强制模式 - 将重新爬取所有城市"
         echo ""
     fi
 
