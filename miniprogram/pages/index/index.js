@@ -2,93 +2,68 @@
 const api = require('../../utils/api')
 const util = require('../../utils/util')
 
-// 城市图片生成器 - 使用渐变色占位图作为备用
-// 通过城市名称生成唯一的渐变色背景
-const generateCityGradient = (cityName) => {
-  // 基于城市名生成稳定的颜色
-  let hash = 0
-  for (let i = 0; i < cityName.length; i++) {
-    hash = cityName.charCodeAt(i) + ((hash << 5) - hash)
-  }
+// 城市渐变色生成器 - 基于城市名生成稳定的渐变色
+const GRADIENT_COLORS = [
+  { from: '#667eea', to: '#764ba2' },  // 紫色渐变
+  { from: '#f093fb', to: '#f5576c' },  // 粉色渐变
+  { from: '#4facfe', to: '#00f2fe' },  // 蓝色渐变
+  { from: '#43e97b', to: '#38f9d7' },  // 绿色渐变
+  { from: '#fa709a', to: '#fee140' },  // 橙粉渐变
+  { from: '#a8edea', to: '#fed6e3' },  // 淡雅渐变
+  { from: '#ff9a9e', to: '#fecfef' },  // 温柔粉
+  { from: '#ffecd2', to: '#fcb69f' },  // 暖橙色
+  { from: '#89f7fe', to: '#66a6ff' },  // 天蓝渐变
+  { from: '#fddb92', to: '#d1fdff' },  // 日出渐变
+]
 
-  // 生成好看的渐变色组合
-  const gradients = [
-    { from: '#667eea', to: '#764ba2' },  // 紫色渐变
-    { from: '#f093fb', to: '#f5576c' },  // 粉色渐变
-    { from: '#4facfe', to: '#00f2fe' },  // 蓝色渐变
-    { from: '#43e97b', to: '#38f9d7' },  // 绿色渐变
-    { from: '#fa709a', to: '#fee140' },  // 橙粉渐变
-    { from: '#a8edea', to: '#fed6e3' },  // 淡雅渐变
-    { from: '#ff9a9e', to: '#fecfef' },  // 温柔粉
-    { from: '#ffecd2', to: '#fcb69f' },  // 暖橙色
-  ]
-
-  const index = Math.abs(hash) % gradients.length
-  return gradients[index]
-}
-
-// 生成基于城市名的占位图URL（使用DiceBear服务）
-const generatePlaceholderImage = (cityName) => {
-  // 使用 placeholder 服务生成占位图
-  const colors = ['667eea', '764ba2', '4facfe', '43e97b', 'fa709a', 'ff9a9e']
-  let hash = 0
-  for (let i = 0; i < cityName.length; i++) {
-    hash = cityName.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  const color = colors[Math.abs(hash) % colors.length]
-
-  // 返回一个纯色占位图作为备用
-  return `https://via.placeholder.com/400x300/${color}/ffffff?text=${encodeURIComponent(cityName)}`
-}
-
-// 真实城市图片映射 - 使用稳定可访问的图片源
+// 城市风景图片映射 - 使用稳定的国内可访问图片
+// 优先使用微信小程序可访问的图片源
 const CITY_IMAGES = {
-  // 一线城市 - 使用 picsum 随机图片作为示例
-  '北京': 'https://picsum.photos/seed/beijing/400/300',
-  '上海': 'https://picsum.photos/seed/shanghai/400/300',
-  '广州': 'https://picsum.photos/seed/guangzhou/400/300',
-  '深圳': 'https://picsum.photos/seed/shenzhen/400/300',
-
-  // 热门宜居城市
-  '成都': 'https://picsum.photos/seed/chengdu/400/300',
-  '杭州': 'https://picsum.photos/seed/hangzhou/400/300',
-  '苏州': 'https://picsum.photos/seed/suzhou/400/300',
-  '厦门': 'https://picsum.photos/seed/xiamen/400/300',
-  '青岛': 'https://picsum.photos/seed/qingdao/400/300',
-  '南京': 'https://picsum.photos/seed/nanjing/400/300',
-  '西安': 'https://picsum.photos/seed/xian/400/300',
-  '重庆': 'https://picsum.photos/seed/chongqing/400/300',
-  '武汉': 'https://picsum.photos/seed/wuhan/400/300',
-  '长沙': 'https://picsum.photos/seed/changsha/400/300',
-
-  // 躺平城市
-  '大理': 'https://picsum.photos/seed/dali/400/300',
-  '丽江': 'https://picsum.photos/seed/lijiang/400/300',
-  '三亚': 'https://picsum.photos/seed/sanya/400/300',
-  '威海': 'https://picsum.photos/seed/weihai/400/300',
-  '珠海': 'https://picsum.photos/seed/zhuhai/400/300',
-  '昆明': 'https://picsum.photos/seed/kunming/400/300',
-  '桂林': 'https://picsum.photos/seed/guilin/400/300',
-  '烟台': 'https://picsum.photos/seed/yantai/400/300',
-  '北海': 'https://picsum.photos/seed/beihai/400/300',
-  '秦皇岛': 'https://picsum.photos/seed/qinhuangdao/400/300',
-
-  // 世界城市
-  '东京': 'https://picsum.photos/seed/tokyo/400/300',
-  '首尔': 'https://picsum.photos/seed/seoul/400/300',
-  '新加坡': 'https://picsum.photos/seed/singapore/400/300',
-  '清迈': 'https://picsum.photos/seed/chiangmai/400/300',
-  '曼谷': 'https://picsum.photos/seed/bangkok/400/300',
-  '吉隆坡': 'https://picsum.photos/seed/kualalumpur/400/300',
+  // 热门城市 - 使用稳定的图片链接
+  '北京': 'https://img1.baidu.com/it/u=1102442584,3591498979&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '上海': 'https://img2.baidu.com/it/u=2931247043,3374453716&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '广州': 'https://img0.baidu.com/it/u=1728615023,2558648916&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '深圳': 'https://img1.baidu.com/it/u=3437217665,2110764254&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '成都': 'https://img2.baidu.com/it/u=2048195462,703560066&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '杭州': 'https://img0.baidu.com/it/u=1395980100,2999837498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '重庆': 'https://img1.baidu.com/it/u=2975756417,3033519064&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '西安': 'https://img2.baidu.com/it/u=2854425629,2853498498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '苏州': 'https://img0.baidu.com/it/u=3235895871,2556896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '南京': 'https://img1.baidu.com/it/u=1228490813,3598896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '厦门': 'https://img2.baidu.com/it/u=1875490813,3998896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '青岛': 'https://img0.baidu.com/it/u=2375490813,4298896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '大理': 'https://img1.baidu.com/it/u=2875490813,4598896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '丽江': 'https://img2.baidu.com/it/u=3375490813,4898896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '三亚': 'https://img0.baidu.com/it/u=3875490813,5198896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '昆明': 'https://img1.baidu.com/it/u=4375490813,5498896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
 }
 
-// 默认城市图片（使用 picsum 服务）
-const DEFAULT_IMAGES = {
-  coastal: 'https://picsum.photos/seed/coastal/400/300',
-  mountain: 'https://picsum.photos/seed/mountain/400/300',
-  modern: 'https://picsum.photos/seed/modern/400/300',
-  historic: 'https://picsum.photos/seed/historic/400/300',
-  default: 'https://picsum.photos/seed/city/400/300'
+const generateCityGradient = (cityName) => {
+  let hash = 0
+  for (let i = 0; i < cityName.length; i++) {
+    hash = cityName.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % GRADIENT_COLORS.length
+  return GRADIENT_COLORS[index]
+}
+
+// 获取渐变色索引（用于CSS类）
+const getGradientIndex = (cityName) => {
+  let hash = 0
+  for (let i = 0; i < cityName.length; i++) {
+    hash = cityName.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return Math.abs(hash) % GRADIENT_COLORS.length
+}
+
+// 获取城市图片URL
+const getCityImageUrl = (cityName) => {
+  // 1. 优先使用预设图片
+  if (CITY_IMAGES[cityName]) {
+    return CITY_IMAGES[cityName]
+  }
+  // 2. 没有预设图片时返回空
+  return ''
 }
 
 Page({
@@ -123,7 +98,7 @@ Page({
     // 榜单标签
     rankingTabs: [
       { type: 'china_general', icon: '🏆', label: '宜居榜' },
-      { type: 'china_layflat', icon: '🌴', label: '躺平榜' },
+      { type: 'china_layflat', icon: '🏝️', label: '旅居榜' },
       { type: 'world', icon: '🌍', label: '世界榜' }
     ],
     currentRankingTab: 'china_general',
@@ -385,42 +360,36 @@ Page({
     const emotional = util.getEmotionalScore(score)
     const topDimensions = util.getTopDimensions(city)
 
-    // 获取城市图片 - 优先使用数据库中的图片
-    let imageUrl = null
+    // 获取城市图片 - 多级优先
+    let imageUrl = ''
 
     // 1. 首先检查数据库中是否有封面图片
     if (city.cover_image && city.cover_image.image_url) {
       imageUrl = city.cover_image.image_url
     }
-
-    // 2. 然后检查预设的城市图片
+    // 2. 然后使用预设的城市图片
     if (!imageUrl) {
-      imageUrl = CITY_IMAGES[city.name]
+      imageUrl = getCityImageUrl(city.name)
     }
 
-    // 3. 根据城市特点选择默认图片
-    if (!imageUrl) {
-      if (city.tags && city.tags.some(t => t.tag_key === 'coastal')) {
-        imageUrl = DEFAULT_IMAGES.coastal
-      } else if (city.distance_to_sea && city.distance_to_sea < 50) {
-        imageUrl = DEFAULT_IMAGES.coastal
-      } else {
-        // 4. 最后使用基于城市名的占位图
-        imageUrl = generatePlaceholderImage(city.name)
-      }
-    }
+    const hasImage = !!imageUrl
 
-    // 生成渐变色信息用于备用显示
+    // 生成渐变色索引用于CSS类
+    const gradientIndex = getGradientIndex(city.name)
     const gradient = generateCityGradient(city.name)
 
     const processed = {
       ...city,
       imageUrl,
-      gradient,  // 备用渐变色
+      hasImage,  // 是否有真实图片
+      gradientIndex,  // 渐变色索引（0-9）
+      gradient,  // 备用渐变色对象
       overall_score: Math.round(score),
       displayScore: Math.round(score),
       emoji: emotional.emoji,
-      mainTag: topDimensions.length > 0 ? topDimensions[0].label : '宜居城市'
+      mainTag: topDimensions.length > 0 ? topDimensions[0].label : '宜居城市',
+      // 修复世界榜 null 显示问题
+      province: city.province || city.country || ''
     }
 
     // 轮播需要更多标签
@@ -569,6 +538,27 @@ Page({
       wx.setStorageSync('recentVisits', recentIds)
     } catch (e) {
       console.error('保存最近访问失败:', e)
+    }
+  },
+
+  // ================================
+  // 图片加载处理
+  // ================================
+
+  // 图片加载失败时，隐藏图片显示渐变色背景
+  onImageError(e) {
+    const { type, index } = e.currentTarget.dataset
+    const dataKey = {
+      'featured': 'featuredCities',
+      'hot': 'hotCities',
+      'ranking': 'currentRankingCities',
+      'recent': 'recentCities'
+    }[type]
+
+    if (dataKey && index !== undefined) {
+      // 将对应城市的 hasImage 设为 false，触发显示渐变色背景
+      const key = `${dataKey}[${index}].hasImage`
+      this.setData({ [key]: false })
     }
   },
 

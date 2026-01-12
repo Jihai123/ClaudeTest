@@ -63,12 +63,22 @@
       next-margin="20rpx"
     >
       <swiper-item wx:for="{{featuredCities}}" wx:key="id">
-        <view class="carousel-card" bindtap="onCityTap" data-id="{{item.id}}">
+        <view class="carousel-card gradient-bg-{{item.gradientIndex}}" bindtap="onCityTap" data-id="{{item.id}}">
+          <!-- 渐变色背景作为底层，图片覆盖在上面 -->
+          <!-- 城市名首字母始终显示在底层 -->
+          <view class="carousel-placeholder">
+            <text class="placeholder-text">{{item.name[0]}}</text>
+          </view>
+          <!-- 图片覆盖在渐变色上面 -->
           <image
+            wx:if="{{item.hasImage}}"
             class="carousel-image"
             src="{{item.imageUrl}}"
             mode="aspectFill"
             lazy-load="{{true}}"
+            binderror="onImageError"
+            data-type="featured"
+            data-index="{{index}}"
           />
           <view class="carousel-overlay"></view>
           <view class="carousel-info">
@@ -150,15 +160,23 @@
         <view class="ranking-medal {{index < 3 ? 'top-' + (index + 1) : ''}}">
           <text class="medal-text">{{index + 1}}</text>
         </view>
-        <image
-          class="ranking-avatar"
-          src="{{item.imageUrl}}"
-          mode="aspectFill"
-          lazy-load="{{true}}"
-        />
+        <!-- 渐变色头像 + 图片 -->
+        <view class="ranking-avatar gradient-bg-{{item.gradientIndex}}">
+          <text class="avatar-text">{{item.name[0]}}</text>
+          <image
+            wx:if="{{item.hasImage}}"
+            class="ranking-avatar-img"
+            src="{{item.imageUrl}}"
+            mode="aspectFill"
+            lazy-load="{{true}}"
+            binderror="onImageError"
+            data-type="ranking"
+            data-index="{{index}}"
+          />
+        </view>
         <view class="ranking-info">
           <text class="ranking-city">{{item.name}}</text>
-          <text class="ranking-province">{{item.province}} · {{item.mainTag}}</text>
+          <text class="ranking-province">{{item.province || item.country}} · {{item.mainTag}}</text>
         </view>
         <view class="ranking-score-wrap">
           <text class="ranking-score">{{item.displayScore}}</text>
@@ -187,15 +205,24 @@
       <view
         wx:for="{{hotCities}}"
         wx:key="id"
-        class="hot-card"
+        class="hot-card gradient-bg-{{item.gradientIndex}}"
         bindtap="onCityTap"
         data-id="{{item.id}}"
       >
+        <!-- 占位符始终显示在底层 -->
+        <view class="hot-placeholder">
+          <text class="placeholder-text">{{item.name[0]}}</text>
+        </view>
+        <!-- 图片覆盖在上面 -->
         <image
+          wx:if="{{item.hasImage}}"
           class="hot-image"
           src="{{item.imageUrl}}"
           mode="aspectFill"
           lazy-load="{{true}}"
+          binderror="onImageError"
+          data-type="hot"
+          data-index="{{index}}"
         />
         <view class="hot-overlay"></view>
         <view class="hot-info">
@@ -232,12 +259,19 @@
           bindtap="onCityTap"
           data-id="{{item.id}}"
         >
-          <image
-            class="recent-image"
-            src="{{item.imageUrl}}"
-            mode="aspectFill"
-            lazy-load="{{true}}"
-          />
+          <view class="recent-image gradient-bg-{{item.gradientIndex}}">
+            <text class="recent-placeholder-text">{{item.name[0]}}</text>
+            <image
+              wx:if="{{item.hasImage}}"
+              class="recent-image-inner"
+              src="{{item.imageUrl}}"
+              mode="aspectFill"
+              lazy-load="{{true}}"
+              binderror="onImageError"
+              data-type="recent"
+              data-index="{{index}}"
+            />
+          </view>
           <view class="recent-info">
             <text class="recent-city">{{item.name}}</text>
             <text class="recent-score">{{item.overall_score}}分</text>
