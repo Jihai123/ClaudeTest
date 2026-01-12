@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "宜居城市",
+  "navigationBarBackgroundColor": "#667eea",
+  "navigationBarTextStyle": "white",
   "enablePullDownRefresh": true,
-  "backgroundTextStyle": "dark"
+  "backgroundTextStyle": "dark",
+  "backgroundColor": "#F9FAFB"
 }
