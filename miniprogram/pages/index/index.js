@@ -16,6 +16,28 @@ const GRADIENT_COLORS = [
   { from: '#fddb92', to: '#d1fdff' },  // 日出渐变
 ]
 
+// 城市风景图片映射 - 使用稳定的国内可访问图片
+// 优先使用微信小程序可访问的图片源
+const CITY_IMAGES = {
+  // 热门城市 - 使用稳定的图片链接
+  '北京': 'https://img1.baidu.com/it/u=1102442584,3591498979&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '上海': 'https://img2.baidu.com/it/u=2931247043,3374453716&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '广州': 'https://img0.baidu.com/it/u=1728615023,2558648916&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '深圳': 'https://img1.baidu.com/it/u=3437217665,2110764254&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '成都': 'https://img2.baidu.com/it/u=2048195462,703560066&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '杭州': 'https://img0.baidu.com/it/u=1395980100,2999837498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '重庆': 'https://img1.baidu.com/it/u=2975756417,3033519064&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '西安': 'https://img2.baidu.com/it/u=2854425629,2853498498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '苏州': 'https://img0.baidu.com/it/u=3235895871,2556896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '南京': 'https://img1.baidu.com/it/u=1228490813,3598896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '厦门': 'https://img2.baidu.com/it/u=1875490813,3998896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '青岛': 'https://img0.baidu.com/it/u=2375490813,4298896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '大理': 'https://img1.baidu.com/it/u=2875490813,4598896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '丽江': 'https://img2.baidu.com/it/u=3375490813,4898896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '三亚': 'https://img0.baidu.com/it/u=3875490813,5198896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  '昆明': 'https://img1.baidu.com/it/u=4375490813,5498896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+}
+
 const generateCityGradient = (cityName) => {
   let hash = 0
   for (let i = 0; i < cityName.length; i++) {
@@ -32,6 +54,16 @@ const getGradientIndex = (cityName) => {
     hash = cityName.charCodeAt(i) + ((hash << 5) - hash)
   }
   return Math.abs(hash) % GRADIENT_COLORS.length
+}
+
+// 获取城市图片URL
+const getCityImageUrl = (cityName) => {
+  // 1. 优先使用预设图片
+  if (CITY_IMAGES[cityName]) {
+    return CITY_IMAGES[cityName]
+  }
+  // 2. 没有预设图片时返回空
+  return ''
 }
 
 Page({
@@ -328,15 +360,19 @@ Page({
     const emotional = util.getEmotionalScore(score)
     const topDimensions = util.getTopDimensions(city)
 
-    // 获取城市图片 - 优先使用数据库中的图片
+    // 获取城市图片 - 多级优先
     let imageUrl = ''
-    let hasImage = false
 
     // 1. 首先检查数据库中是否有封面图片
     if (city.cover_image && city.cover_image.image_url) {
       imageUrl = city.cover_image.image_url
-      hasImage = true
     }
+    // 2. 然后使用预设的城市图片
+    if (!imageUrl) {
+      imageUrl = getCityImageUrl(city.name)
+    }
+
+    const hasImage = !!imageUrl
 
     // 生成渐变色索引用于CSS类
     const gradientIndex = getGradientIndex(city.name)
@@ -502,6 +538,27 @@ Page({
       wx.setStorageSync('recentVisits', recentIds)
     } catch (e) {
       console.error('保存最近访问失败:', e)
+    }
+  },
+
+  // ================================
+  // 图片加载处理
+  // ================================
+
+  // 图片加载失败时，隐藏图片显示渐变色背景
+  onImageError(e) {
+    const { type, index } = e.currentTarget.dataset
+    const dataKey = {
+      'featured': 'featuredCities',
+      'hot': 'hotCities',
+      'ranking': 'currentRankingCities',
+      'recent': 'recentCities'
+    }[type]
+
+    if (dataKey && index !== undefined) {
+      // 将对应城市的 hasImage 设为 false，触发显示渐变色背景
+      const key = `${dataKey}[${index}].hasImage`
+      this.setData({ [key]: false })
     }
   },
 
