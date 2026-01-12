@@ -1,137 +1,258 @@
 <!--pages/index/index.wxml-->
-<view class="container">
-  <!-- 1. 搜索区 -->
-  <view class="search-section">
-    <!-- 搜索框 -->
-    <view class="search-box-main">
-      <icon class="search-icon-main" type="search" size="20" color="#87A878" />
-      <input
-        class="search-input-main"
-        placeholder="输入城市名 / 拼音 / 首字母"
-        value="{{searchQuery}}"
-        bindinput="onSearchInput"
-        confirm-type="search"
-        bindconfirm="onSearchConfirm"
-      />
-      <icon wx:if="{{searchQuery}}" class="clear-icon-main" type="clear" size="18" color="#999" bindtap="onClearSearch" />
-    </view>
-  </view>
+<view class="page-container">
 
-  <!-- 2. 快速入口区（条件找城） -->
-  <view class="quick-entry-section">
-    <view class="section-title">快速找城</view>
-    <view class="quick-entry-grid">
-      <view class="entry-item" bindtap="onQuickEntry" data-type="recommend">
-        <text class="entry-icon">🧭</text>
-        <text class="entry-label">我适合住哪</text>
-      </view>
-      <view class="entry-item" bindtap="onQuickEntry" data-type="lowCost">
-        <text class="entry-icon">💰</text>
-        <text class="entry-label">低生活成本</text>
-      </view>
-      <view class="entry-item" bindtap="onQuickEntry" data-type="elderly">
-        <text class="entry-icon">👵</text>
-        <text class="entry-label">适合养老</text>
-      </view>
-      <view class="entry-item" bindtap="onQuickEntry" data-type="employment">
-        <text class="entry-icon">💼</text>
-        <text class="entry-label">就业机会多</text>
-      </view>
-      <view class="entry-item" bindtap="onQuickEntry" data-type="airQuality">
-        <text class="entry-icon">🌿</text>
-        <text class="entry-label">空气好</text>
-      </view>
-      <view class="entry-item" bindtap="onQuickEntry" data-type="coastal">
-        <text class="entry-icon">🌊</text>
-        <text class="entry-label">沿海宜居</text>
-      </view>
-    </view>
-  </view>
+  <!-- 1. Hero区域 - 全屏视觉冲击 -->
+  <view class="hero-section">
+    <view class="hero-bg"></view>
+    <view class="hero-content">
+      <text class="hero-title">找到你的理想城市</text>
+      <text class="hero-subtitle">{{totalCities}}+ 城市数据 · 真实评分 · 智能推荐</text>
 
-  <!-- 3. 最近访问（如果有） -->
-  <view class="recent-section" wx:if="{{recentCities.length > 0}}">
-    <view class="section-title">最近访问</view>
-    <scroll-view scroll-x class="city-scroll">
-      <view class="city-cards">
-        <view
-          wx:for="{{recentCities}}"
-          wx:key="id"
-          class="city-card-mini"
-          bindtap="onCityTap"
-          data-id="{{item.id}}"
-        >
-          <text class="city-card-name">{{item.name}}</text>
-          <view class="city-card-score">
-            <text class="score-number">{{item.overall_score || 0}}</text>
-            <text class="score-unit">分</text>
-          </view>
-          <text class="city-card-tag">{{item.mainTag}}</text>
+      <!-- 搜索框 -->
+      <view class="search-container">
+        <view class="search-box">
+          <icon class="search-icon" type="search" size="18" color="#9CA3AF" />
+          <input
+            class="search-input"
+            placeholder="搜索城市 / 拼音 / 首字母"
+            value="{{searchQuery}}"
+            bindinput="onSearchInput"
+            confirm-type="search"
+            bindconfirm="onSearchConfirm"
+          />
+          <icon wx:if="{{searchQuery}}" class="clear-icon" type="clear" size="16" color="#9CA3AF" bindtap="onClearSearch" />
         </view>
       </view>
-    </scroll-view>
+
+      <!-- 快捷筛选标签 -->
+      <view class="quick-tags">
+        <view
+          wx:for="{{quickTags}}"
+          wx:key="type"
+          class="quick-tag {{item.active ? 'active' : ''}}"
+          bindtap="onQuickTagTap"
+          data-type="{{item.type}}"
+        >
+          <text class="tag-icon">{{item.icon}}</text>
+          <text class="tag-text">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
   </view>
 
-  <!-- 4. 热门城市 -->
-  <view class="hot-section">
+  <!-- 2. 推荐城市轮播 -->
+  <view class="carousel-section">
     <view class="section-header">
-      <text class="section-title">热门城市</text>
-      <text class="section-more" bindtap="onViewMore" data-type="hot">查看更多 →</text>
-    </view>
-    <scroll-view scroll-x class="city-scroll">
-      <view class="city-cards">
-        <view
-          wx:for="{{hotCities}}"
-          wx:key="id"
-          class="city-card-mini"
-          bindtap="onCityTap"
-          data-id="{{item.id}}"
-        >
-          <text class="city-card-name">{{item.name}}</text>
-          <view class="city-card-score">
-            <text class="score-number">{{item.overall_score || 0}}</text>
-            <text class="score-unit">分</text>
-          </view>
-          <text class="city-card-tag">{{item.mainTag}}</text>
-        </view>
+      <view class="section-title-wrap">
+        <text class="section-icon">⭐</text>
+        <text class="section-title">精选推荐</text>
       </view>
-    </scroll-view>
+      <text class="section-more" bindtap="onViewMore" data-type="featured">更多</text>
+    </view>
+
+    <swiper
+      class="city-carousel"
+      indicator-dots="{{true}}"
+      indicator-color="rgba(255,255,255,0.4)"
+      indicator-active-color="#ffffff"
+      autoplay="{{true}}"
+      interval="{{4000}}"
+      duration="{{500}}"
+      circular="{{true}}"
+      previous-margin="20rpx"
+      next-margin="20rpx"
+    >
+      <swiper-item wx:for="{{featuredCities}}" wx:key="id">
+        <view class="carousel-card" bindtap="onCityTap" data-id="{{item.id}}">
+          <image
+            class="carousel-image"
+            src="{{item.imageUrl}}"
+            mode="aspectFill"
+            lazy-load="{{true}}"
+          />
+          <view class="carousel-overlay"></view>
+          <view class="carousel-info">
+            <view class="carousel-header">
+              <text class="carousel-city">{{item.name}}</text>
+              <view class="carousel-score">
+                <text class="score-value">{{item.overall_score}}</text>
+                <text class="score-label">分</text>
+              </view>
+            </view>
+            <text class="carousel-province">{{item.province}}</text>
+            <view class="carousel-tags">
+              <text class="carousel-tag" wx:for="{{item.displayTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+            <text class="carousel-rent" wx:if="{{item.avg_rent}}">月租约 ¥{{item.avg_rent}}</text>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
   </view>
 
-  <!-- 5. 榜单与推荐区（克制展示） -->
+  <!-- 3. 按预算浏览 -->
+  <view class="budget-section">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <text class="section-icon">💰</text>
+        <text class="section-title">按预算找城市</text>
+      </view>
+    </view>
+
+    <view class="budget-grid">
+      <view
+        wx:for="{{budgetRanges}}"
+        wx:key="range"
+        class="budget-card budget-card-{{index}}"
+        bindtap="onBudgetTap"
+        data-range="{{item.range}}"
+      >
+        <text class="budget-label">{{item.label}}</text>
+        <text class="budget-desc">{{item.desc}}</text>
+        <text class="budget-count">{{item.count}}个城市</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 4. 城市榜单 - 3榜切换 -->
   <view class="ranking-section">
     <view class="section-header">
-      <text class="section-title">本月宜居榜单</text>
-      <text class="section-more" bindtap="onViewMore" data-type="ranking">查看完整榜单 →</text>
+      <view class="section-title-wrap">
+        <text class="section-icon">🏆</text>
+        <text class="section-title">城市榜单</text>
+      </view>
+      <text class="section-more" bindtap="onViewMore" data-type="ranking">完整榜单</text>
     </view>
+
+    <!-- 榜单切换标签 -->
+    <view class="ranking-tabs">
+      <view
+        wx:for="{{rankingTabs}}"
+        wx:key="type"
+        class="ranking-tab {{currentRankingTab === item.type ? 'active' : ''}}"
+        bindtap="onRankingTabChange"
+        data-type="{{item.type}}"
+      >
+        <text class="tab-icon">{{item.icon}}</text>
+        <text class="tab-text">{{item.label}}</text>
+      </view>
+    </view>
+
+    <!-- 榜单列表 -->
     <view class="ranking-list">
       <view
-        wx:for="{{rankingCities}}"
+        wx:for="{{currentRankingCities}}"
         wx:key="id"
         class="ranking-item"
         bindtap="onCityTap"
         data-id="{{item.id}}"
       >
-        <view class="ranking-number {{index < 3 ? 'top' : ''}}">{{index + 1}}</view>
+        <view class="ranking-medal {{index < 3 ? 'top-' + (index + 1) : ''}}">
+          <text class="medal-text">{{index + 1}}</text>
+        </view>
+        <image
+          class="ranking-avatar"
+          src="{{item.imageUrl}}"
+          mode="aspectFill"
+          lazy-load="{{true}}"
+        />
         <view class="ranking-info">
           <text class="ranking-city">{{item.name}}</text>
-          <text class="ranking-province">{{item.province}}</text>
+          <text class="ranking-province">{{item.province}} · {{item.mainTag}}</text>
         </view>
-        <view class="ranking-score">
-          <text class="ranking-score-value">{{item.overall_score || 0}}</text>
+        <view class="ranking-score-wrap">
+          <text class="ranking-score">{{item.displayScore}}</text>
           <text class="ranking-emoji">{{item.emoji}}</text>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view wx:if="{{currentRankingCities.length === 0 && !loading}}" class="ranking-empty">
+        <text class="empty-text">暂无数据</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 5. 热门城市网格 -->
+  <view class="hot-section">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <text class="section-icon">🔥</text>
+        <text class="section-title">热门城市</text>
+      </view>
+      <text class="section-more" bindtap="onViewMore" data-type="hot">更多</text>
+    </view>
+
+    <view class="hot-grid">
+      <view
+        wx:for="{{hotCities}}"
+        wx:key="id"
+        class="hot-card"
+        bindtap="onCityTap"
+        data-id="{{item.id}}"
+      >
+        <image
+          class="hot-image"
+          src="{{item.imageUrl}}"
+          mode="aspectFill"
+          lazy-load="{{true}}"
+        />
+        <view class="hot-overlay"></view>
+        <view class="hot-info">
+          <view class="hot-header">
+            <text class="hot-city">{{item.name}}</text>
+            <view class="hot-score">{{item.overall_score}}</view>
+          </view>
+          <text class="hot-province">{{item.province}}</text>
+          <view class="hot-tags">
+            <text class="hot-tag">{{item.mainTag}}</text>
+            <text class="hot-rent" wx:if="{{item.avg_rent}}">¥{{item.avg_rent}}/月</text>
+          </view>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 加载中 -->
-  <view wx:if="{{loading}}" class="loading-simple">
-    <text>加载中...</text>
+  <!-- 6. 最近访问（如果有） -->
+  <view class="recent-section" wx:if="{{recentCities.length > 0}}">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <text class="section-icon">🕐</text>
+        <text class="section-title">最近浏览</text>
+      </view>
+      <text class="section-more" bindtap="onClearRecent">清空</text>
+    </view>
+
+    <scroll-view scroll-x class="recent-scroll">
+      <view class="recent-cards">
+        <view
+          wx:for="{{recentCities}}"
+          wx:key="id"
+          class="recent-card"
+          bindtap="onCityTap"
+          data-id="{{item.id}}"
+        >
+          <image
+            class="recent-image"
+            src="{{item.imageUrl}}"
+            mode="aspectFill"
+            lazy-load="{{true}}"
+          />
+          <view class="recent-info">
+            <text class="recent-city">{{item.name}}</text>
+            <text class="recent-score">{{item.overall_score}}分</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 
-  <!-- 空状态 -->
-  <view wx:if="{{!loading && hotCities.length === 0}}" class="empty-simple">
-    <text class="empty-icon">🏙️</text>
-    <text class="empty-text">暂无城市数据</text>
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
   </view>
+
+  <!-- 底部安全区 -->
+  <view class="safe-bottom"></view>
 </view>

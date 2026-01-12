@@ -1,151 +1,189 @@
 /* ================================
-   首页样式 - 简洁高效版
-   核心目标：30秒内找到目标城市
+   首页样式 - 现代极简设计
+   风格：年轻化、现代感、视觉冲击
    ================================ */
 
-/* === 全局容器 === */
-.container {
-  background: #F7F8FA; /* 浅灰底色 */
+/* 基础变量（通过 CSS 选择器实现） */
+page {
+  --primary-color: #6366F1;
+  --primary-light: #818CF8;
+  --primary-dark: #4F46E5;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --bg-primary: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --border-color: #E5E7EB;
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16rpx 48rpx rgba(0, 0, 0, 0.12);
+  --radius-sm: 12rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 32rpx;
+}
+
+.page-container {
+  background: var(--bg-primary);
   min-height: 100vh;
-  padding-bottom: 40rpx;
 }
 
 /* ================================
-   1. 搜索 + 定位区（最高优先级）
+   1. Hero 区域 - 视觉冲击
    ================================ */
 
-.search-section {
-  background: #ffffff;
-  padding: 32rpx 32rpx 24rpx;
-  margin-bottom: 16rpx;
+.hero-section {
+  position: relative;
+  padding: 80rpx 32rpx 48rpx;
+  overflow: hidden;
 }
 
-/* 搜索框 - 整行宽度，最突出 */
-.search-box-main {
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  z-index: 0;
+}
+
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  display: block;
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 16rpx;
+  text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  margin-bottom: 40rpx;
+  letter-spacing: 1rpx;
+}
+
+/* 搜索框 */
+.search-container {
+  padding: 0 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.search-box {
   display: flex;
   align-items: center;
-  background: #F7F8FA;
-  border-radius: 16rpx;
-  padding: 24rpx 28rpx;
-  margin-bottom: 20rpx;
-  border: 2rpx solid #E5E7EB;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-xl);
+  padding: 24rpx 32rpx;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
 }
 
-.search-icon-main {
+.search-icon {
   margin-right: 16rpx;
   flex-shrink: 0;
 }
 
-.search-input-main {
+.search-input {
   flex: 1;
-  font-size: 30rpx;
-  color: #1F2937;
-}
-
-.search-input-main::placeholder {
-  color: #9CA3AF;
   font-size: 28rpx;
+  color: var(--text-primary);
 }
 
-.clear-icon-main {
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.clear-icon {
   margin-left: 16rpx;
   flex-shrink: 0;
 }
 
-/* 定位栏 */
-.location-bar {
+/* 快捷标签 */
+.quick-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 0 16rpx;
+}
+
+.quick-tag {
   display: flex;
   align-items: center;
-  padding: 20rpx 28rpx;
-  background: linear-gradient(135deg, #87A878 0%, #6B8E65 100%);
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 8rpx rgba(135, 168, 120, 0.2);
+  gap: 8rpx;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  padding: 14rpx 24rpx;
+  transition: all 0.3s ease;
 }
 
-.location-icon {
-  font-size: 28rpx;
-  margin-right: 12rpx;
+.quick-tag:active,
+.quick-tag.active {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(0.95);
 }
 
-.location-text {
-  flex: 1;
+.quick-tag.active .tag-text {
+  color: var(--primary-color);
+}
+
+.tag-icon {
   font-size: 28rpx;
+}
+
+.tag-text {
+  font-size: 24rpx;
   color: #ffffff;
   font-weight: 500;
 }
 
-.location-arrow {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.8);
+.quick-tag.active .tag-text,
+.quick-tag:active .tag-text {
+  color: var(--primary-color);
 }
 
 /* ================================
-   2. 快速入口区
+   2. 轮播区域
    ================================ */
 
-.quick-entry-section {
-  background: #ffffff;
-  padding: 32rpx;
-  margin-bottom: 16rpx;
-}
-
-.section-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1F2937;
-  margin-bottom: 24rpx;
-}
-
-.quick-entry-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20rpx;
-}
-
-.entry-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #F7F8FA;
-  border-radius: 16rpx;
-  padding: 32rpx 20rpx;
-  transition: all 0.3s;
-  border: 2rpx solid transparent;
-}
-
-.entry-item:active {
-  background: #E5E7EB;
-  border-color: #87A878;
-  transform: scale(0.95);
-}
-
-.entry-icon {
-  font-size: 48rpx;
-  margin-bottom: 12rpx;
-}
-
-.entry-label {
-  font-size: 24rpx;
-  color: #4B5563;
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* ================================
-   3. 最近访问 & 热门城市
-   ================================ */
-
-.recent-section,
-.hot-section {
-  background: #ffffff;
+.carousel-section {
   padding: 32rpx 0;
-  margin-bottom: 16rpx;
-}
-
-.recent-section .section-title,
-.hot-section .section-title {
-  padding: 0 32rpx;
+  background: var(--bg-card);
+  margin-top: -20rpx;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  position: relative;
+  z-index: 2;
 }
 
 .section-header {
@@ -155,178 +193,612 @@
   padding: 0 32rpx 24rpx;
 }
 
-.section-more {
-  font-size: 24rpx;
-  color: #87A878;
-}
-
-.city-scroll {
-  white-space: nowrap;
-  padding: 0 32rpx;
-}
-
-.city-cards {
-  display: inline-flex;
-}
-
-/* 城市卡片 - 小而清晰 */
-.city-card-mini {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 200rpx;
-  background: #F7F8FA;
-  border-radius: 16rpx;
-  padding: 28rpx 20rpx;
-  margin-right: 20rpx;
-  border: 2rpx solid #E5E7EB;
-  transition: all 0.3s;
-}
-
-.city-card-mini:active {
-  transform: translateY(-4rpx);
-  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.08);
-  border-color: #87A878;
-}
-
-.city-card-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #1F2937;
-  margin-bottom: 12rpx;
-}
-
-.city-card-score {
+.section-title-wrap {
   display: flex;
-  align-items: baseline;
-  margin-bottom: 12rpx;
+  align-items: center;
+  gap: 12rpx;
 }
 
-.score-number {
+.section-icon {
+  font-size: 36rpx;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-more {
+  font-size: 26rpx;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.city-carousel {
+  height: 420rpx;
+  padding: 0 12rpx;
+}
+
+.carousel-card {
+  position: relative;
+  height: 400rpx;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 0 8rpx;
+  box-shadow: var(--shadow-md);
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+}
+
+.carousel-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx;
+  color: #ffffff;
+}
+
+.carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.carousel-city {
   font-size: 40rpx;
   font-weight: 700;
-  color: #87A878;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
 }
 
-.score-unit {
-  font-size: 20rpx;
-  color: #6B7280;
+.carousel-score {
+  display: flex;
+  align-items: baseline;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-md);
+  padding: 8rpx 16rpx;
+}
+
+.score-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+.score-label {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.8);
   margin-left: 4rpx;
 }
 
-.city-card-tag {
-  font-size: 22rpx;
-  color: #87A878;
-  background: rgba(135, 168, 120, 0.1);
-  padding: 6rpx 16rpx;
+.carousel-province {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.carousel-tags {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  margin-bottom: 8rpx;
+}
+
+.carousel-tag {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
   border-radius: 20rpx;
+  padding: 6rpx 16rpx;
+  font-size: 22rpx;
+  color: #ffffff;
+}
+
+.carousel-rent {
+  font-size: 24rpx;
+  color: #10B981;
+  font-weight: 500;
 }
 
 /* ================================
-   4. 榜单区（克制展示）
+   3. 预算区域
+   ================================ */
+
+.budget-section {
+  padding: 32rpx 32rpx;
+  background: var(--bg-card);
+  margin-top: 16rpx;
+}
+
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.budget-card {
+  padding: 24rpx;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.budget-card:active {
+  transform: scale(0.98);
+}
+
+.budget-card-0 {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+}
+
+.budget-card-1 {
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+}
+
+.budget-card-2 {
+  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+}
+
+.budget-card-3 {
+  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+}
+
+.budget-label {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8rpx;
+}
+
+.budget-desc {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12rpx;
+}
+
+.budget-count {
+  display: block;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ================================
+   4. 榜单区域
    ================================ */
 
 .ranking-section {
-  background: #ffffff;
   padding: 32rpx;
-  margin-bottom: 16rpx;
+  background: var(--bg-card);
+  margin-top: 16rpx;
+}
+
+.ranking-tabs {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  padding: 8rpx;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+}
+
+.ranking-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx 16rpx;
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.ranking-tab.active {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-icon {
+  font-size: 28rpx;
+}
+
+.tab-text {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.ranking-tab.active .tab-text {
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 .ranking-list {
-  margin-top: 24rpx;
+  min-height: 200rpx;
 }
 
 .ranking-item {
   display: flex;
   align-items: center;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid #F3F4F6;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
+  transition: background 0.2s ease;
 }
 
 .ranking-item:last-child {
   border-bottom: none;
 }
 
-.ranking-number {
-  width: 56rpx;
-  height: 56rpx;
+.ranking-item:active {
+  background: var(--bg-primary);
+}
+
+.ranking-medal {
+  width: 52rpx;
+  height: 52rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #F3F4F6;
-  border-radius: 12rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #6B7280;
-  margin-right: 20rpx;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  margin-right: 16rpx;
   flex-shrink: 0;
 }
 
-.ranking-number.top {
+.ranking-medal.top-1 {
   background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  box-shadow: 0 4rpx 12rpx rgba(255, 215, 0, 0.4);
+}
+
+.ranking-medal.top-2 {
+  background: linear-gradient(135deg, #C0C0C0 0%, #E8E8E8 100%);
+  box-shadow: 0 4rpx 12rpx rgba(192, 192, 192, 0.4);
+}
+
+.ranking-medal.top-3 {
+  background: linear-gradient(135deg, #CD7F32 0%, #DDA15E 100%);
+  box-shadow: 0 4rpx 12rpx rgba(205, 127, 50, 0.4);
+}
+
+.medal-text {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.ranking-medal.top-1 .medal-text,
+.ranking-medal.top-2 .medal-text,
+.ranking-medal.top-3 .medal-text {
   color: #ffffff;
-  box-shadow: 0 4rpx 12rpx rgba(255, 215, 0, 0.3);
+}
+
+.ranking-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: var(--radius-md);
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  object-fit: cover;
 }
 
 .ranking-info {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  min-width: 0;
 }
 
 .ranking-city {
+  display: block;
   font-size: 30rpx;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   margin-bottom: 6rpx;
 }
 
 .ranking-province {
+  display: block;
   font-size: 24rpx;
-  color: #9CA3AF;
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.ranking-score {
+.ranking-score-wrap {
   display: flex;
   align-items: center;
+  gap: 8rpx;
   flex-shrink: 0;
 }
 
-.ranking-score-value {
+.ranking-score {
   font-size: 36rpx;
   font-weight: 700;
-  color: #87A878;
-  margin-right: 8rpx;
+  color: var(--primary-color);
 }
 
 .ranking-emoji {
-  font-size: 32rpx;
-}
-
-/* ================================
-   5. 加载与空状态（简化版）
-   ================================ */
-
-.loading-simple {
-  text-align: center;
-  padding: 80rpx 0;
-  color: #9CA3AF;
   font-size: 28rpx;
 }
 
-.empty-simple {
+.ranking-empty {
+  padding: 80rpx 0;
   text-align: center;
-  padding: 120rpx 0;
-}
-
-.empty-icon {
-  font-size: 100rpx;
-  margin-bottom: 24rpx;
-  display: block;
 }
 
 .empty-text {
   font-size: 28rpx;
-  color: #9CA3AF;
+  color: var(--text-tertiary);
+}
+
+/* ================================
+   5. 热门城市网格
+   ================================ */
+
+.hot-section {
+  padding: 32rpx;
+  background: var(--bg-card);
+  margin-top: 16rpx;
+}
+
+.hot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.hot-card {
+  position: relative;
+  height: 280rpx;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease;
+}
+
+.hot-card:active {
+  transform: scale(0.98);
+}
+
+.hot-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hot-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+}
+
+.hot-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx;
+  color: #ffffff;
+}
+
+.hot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+
+.hot-city {
+  font-size: 32rpx;
+  font-weight: 700;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+.hot-score {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border-radius: var(--radius-sm);
+  padding: 4rpx 12rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #FFD700;
+}
+
+.hot-province {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.hot-tags {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hot-tag {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border-radius: 16rpx;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  color: #ffffff;
+}
+
+.hot-rent {
+  font-size: 22rpx;
+  color: #10B981;
+  font-weight: 500;
+}
+
+/* ================================
+   6. 最近浏览
+   ================================ */
+
+.recent-section {
+  padding: 32rpx 0;
+  background: var(--bg-card);
+  margin-top: 16rpx;
+}
+
+.recent-section .section-header {
+  padding: 0 32rpx 24rpx;
+}
+
+.recent-scroll {
+  white-space: nowrap;
+  padding: 0 32rpx;
+}
+
+.recent-cards {
+  display: inline-flex;
+  gap: 16rpx;
+}
+
+.recent-card {
+  width: 160rpx;
+  display: inline-flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.recent-card:active {
+  transform: scale(0.95);
+}
+
+.recent-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  margin-bottom: 12rpx;
+}
+
+.recent-info {
+  text-align: center;
+}
+
+.recent-city {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4rpx;
+}
+
+.recent-score {
+  font-size: 22rpx;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* ================================
+   7. 加载状态
+   ================================ */
+
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 999;
+}
+
+.loading-spinner {
+  width: 64rpx;
+  height: 64rpx;
+  border: 4rpx solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16rpx;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+/* ================================
+   8. 底部安全区
+   ================================ */
+
+.safe-bottom {
+  height: 40rpx;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ================================
+   9. 动画效果
+   ================================ */
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.carousel-section,
+.budget-section,
+.ranking-section,
+.hot-section,
+.recent-section {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* 点击反馈 */
+.quick-tag:active,
+.budget-card:active,
+.ranking-item:active,
+.hot-card:active,
+.recent-card:active {
+  opacity: 0.85;
 }
