@@ -16,26 +16,37 @@ const GRADIENT_COLORS = [
   { from: '#fddb92', to: '#d1fdff' },  // 日出渐变
 ]
 
-// 城市风景图片映射 - 使用稳定的国内可访问图片
-// 优先使用微信小程序可访问的图片源
+// 城市风景图片映射 - 使用真实的城市图片 URL（来自 Unsplash）
+// 这些是固定的真实城市风景图片，作为数据库封面图的回退选项
 const CITY_IMAGES = {
-  // 热门城市 - 使用稳定的图片链接
-  '北京': 'https://img1.baidu.com/it/u=1102442584,3591498979&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '上海': 'https://img2.baidu.com/it/u=2931247043,3374453716&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '广州': 'https://img0.baidu.com/it/u=1728615023,2558648916&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '深圳': 'https://img1.baidu.com/it/u=3437217665,2110764254&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '成都': 'https://img2.baidu.com/it/u=2048195462,703560066&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '杭州': 'https://img0.baidu.com/it/u=1395980100,2999837498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '重庆': 'https://img1.baidu.com/it/u=2975756417,3033519064&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '西安': 'https://img2.baidu.com/it/u=2854425629,2853498498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '苏州': 'https://img0.baidu.com/it/u=3235895871,2556896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '南京': 'https://img1.baidu.com/it/u=1228490813,3598896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '厦门': 'https://img2.baidu.com/it/u=1875490813,3998896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '青岛': 'https://img0.baidu.com/it/u=2375490813,4298896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '大理': 'https://img1.baidu.com/it/u=2875490813,4598896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '丽江': 'https://img2.baidu.com/it/u=3375490813,4898896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '三亚': 'https://img0.baidu.com/it/u=3875490813,5198896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
-  '昆明': 'https://img1.baidu.com/it/u=4375490813,5498896498&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500',
+  // 一线城市
+  '北京': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&h=600&fit=crop',
+  '上海': 'https://images.unsplash.com/photo-1538428494232-9c0d8a3ab403?w=800&h=600&fit=crop',
+  '广州': 'https://images.unsplash.com/photo-1583001809873-a128495da465?w=800&h=600&fit=crop',
+  '深圳': 'https://images.unsplash.com/photo-1598711796884-f221383f7a7b?w=800&h=600&fit=crop',
+  // 热门旅居城市
+  '成都': 'https://images.unsplash.com/photo-1590650046871-92c887180603?w=800&h=600&fit=crop',
+  '杭州': 'https://images.unsplash.com/photo-1600054800747-be294a6a0d26?w=800&h=600&fit=crop',
+  '重庆': 'https://images.unsplash.com/photo-1607697210821-e1aff0769b09?w=800&h=600&fit=crop',
+  '西安': 'https://images.unsplash.com/photo-1624204621668-f7124c85c49a?w=800&h=600&fit=crop',
+  '苏州': 'https://images.unsplash.com/photo-1567706054965-4d25339ce9a5?w=800&h=600&fit=crop',
+  '南京': 'https://images.unsplash.com/photo-1599571234909-29ed5d1321d6?w=800&h=600&fit=crop',
+  // 沿海城市
+  '厦门': 'https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?w=800&h=600&fit=crop',
+  '青岛': 'https://images.unsplash.com/photo-1548991422-02ba3a9fe29a?w=800&h=600&fit=crop',
+  '三亚': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+  '珠海': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
+  '大连': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop',
+  '威海': 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&h=600&fit=crop',
+  // 云南城市
+  '大理': 'https://images.unsplash.com/photo-1537531383496-f4749c6e5d74?w=800&h=600&fit=crop',
+  '丽江': 'https://images.unsplash.com/photo-1591122947157-26bad3a117d2?w=800&h=600&fit=crop',
+  '昆明': 'https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?w=800&h=600&fit=crop',
+  // 其他热门城市
+  '武汉': 'https://images.unsplash.com/photo-1583001931096-959e9a1a6223?w=800&h=600&fit=crop',
+  '长沙': 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=800&h=600&fit=crop',
+  '天津': 'https://images.unsplash.com/photo-1580077812579-4e0b6db9e7da?w=800&h=600&fit=crop',
+  '桂林': 'https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&h=600&fit=crop',
 }
 
 const generateCityGradient = (cityName) => {
