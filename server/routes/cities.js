@@ -367,13 +367,22 @@ router.get('/', optionalAuth, async (req, res) => {
 
     const cities = await db.query(query, [...params, parseInt(limit), parseInt(offset)]);
 
-    // 获取城市标签
+    // 获取城市标签和封面图片
     for (let city of cities) {
       const tags = await db.query(
         'SELECT * FROM city_tags WHERE city_id = ? AND is_primary = 1',
         [city.id]
       );
       city.tags = tags;
+
+      // 获取城市封面图片
+      const coverImage = await db.get(
+        `SELECT id, image_url, thumbnail_url, alt_text FROM city_images
+         WHERE city_id = ? AND is_cover = 1 AND status = 'approved'
+         LIMIT 1`,
+        [city.id]
+      );
+      city.cover_image = coverImage || null;
     }
 
     const countQuery = `SELECT COUNT(*) as total FROM cities c LEFT JOIN city_dimensions cd ON c.id = cd.city_id ${whereClause}`;
