@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能推荐 - 宜居城市指南</title>
+    <meta name="description" content="通过几个简单问题，找到最适合你的宜居城市">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            --white: #ffffff;
+
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+
+            --transition: all 0.2s ease;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+                         'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--gray-900);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .question-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .option-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem 1rem;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option-item:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-300);
+        }
+
+        .option-item.selected {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .option-icon {
+            font-size: 2rem;
+        }
+
+        .option-text {
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            position: sticky;
+            bottom: 2rem;
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .recommend-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .recommend-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .recommend-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-hint {
+            text-align: center;
+            color: var(--success);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 0.75rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .page-title {
+                font-size: 1.875rem;
+            }
+
+            .question-card {
+                padding: 1.5rem;
+            }
+
+            .options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .option-item {
+                padding: 1rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <a href="index.html" class="back-link">← 返回首页</a>
+            <h1 class="page-title">找到适合你的城市</h1>
+            <p class="page-subtitle">回答几个简单问题，为你推荐最匹配的宜居城市</p>
+        </div>
+
+        <!-- Questionnaire -->
+        <div class="questionnaire" id="questionnaire">
+            <!-- Question 1: Budget -->
+            <div class="question-card">
+                <div class="question-title">
+                    <span class="question-number">1</span>
+                    <span class="question-text">你的生活成本预算是？</span>
+                </div>
+                <div class="options" data-question="budget">
+                    <div class="option-item" data-value="low">
+                        <span class="option-icon">💰</span>
+                        <span class="option-text">经济实惠</span>
+                    </div>
+                    <div class="option-item" data-value="medium">
+                        <span class="option-icon">💵</span>
+                        <span class="option-text">中等预算</span>
+                    </div>
+                    <div class="option-item" data-value="high">
+                        <span class="option-icon">💎</span>
+                        <span class="option-text">预算充足</span>
+                    </div>
+                    <div class="option-item" data-value="flexible">
+                        <span class="option-icon">🌟</span>
+                        <span class="option-text">预算灵活</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2: Purpose -->
+            <div class="question-card">
+                <div class="question-title">
+                    <span class="question-number">2</span>
+                    <span class="question-text">你去这个城市主要是为了？</span>
+                </div>
+                <div class="options" data-question="purpose">
+                    <div class="option-item" data-value="work">
+                        <span class="option-icon">💼</span>
+                        <span class="option-text">工作发展</span>
+                    </div>
+                    <div class="option-item" data-value="elderly">
+                        <span class="option-icon">👵</span>
+                        <span class="option-text">养老退休</span>
+                    </div>
+                    <div class="option-item" data-value="travel">
+                        <span class="option-icon">🎒</span>
+                        <span class="option-text">旅居体验</span>
+                    </div>
+                    <div class="option-item" data-value="settle">
+                        <span class="option-icon">🏡</span>
+                        <span class="option-text">长期定居</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3: Environment -->
+            <div class="question-card">
+                <div class="question-title">
+                    <span class="question-number">3</span>
+                    <span class="question-text">你更看重哪个环境因素？</span>
+                </div>
+                <div class="options" data-question="environment">
+                    <div class="option-item" data-value="air">
+                        <span class="option-icon">🌿</span>
+                        <span class="option-text">空气质量</span>
+                    </div>
+                    <div class="option-item" data-value="safety">
+                        <span class="option-icon">🛡️</span>
+                        <span class="option-text">治安安全</span>
+                    </div>
+                    <div class="option-item" data-value="climate">
+                        <span class="option-icon">☀️</span>
+                        <span class="option-text">气候舒适</span>
+                    </div>
+                    <div class="option-item" data-value="scenery">
+                        <span class="option-icon">🏞️</span>
+                        <span class="option-text">自然风光</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 4: Scale -->
+            <div class="question-card">
+                <div class="question-title">
+                    <span class="question-number">4</span>
+                    <span class="question-text">你喜欢什么规模的城市？</span>
+                </div>
+                <div class="options" data-question="scale">
+                    <div class="option-item" data-value="large">
+                        <span class="option-icon">🏙️</span>
+                        <span class="option-text">一线大城市</span>
+                    </div>
+                    <div class="option-item" data-value="medium">
+                        <span class="option-icon">🌆</span>
+                        <span class="option-text">二三线城市</span>
+                    </div>
+                    <div class="option-item" data-value="small">
+                        <span class="option-icon">🏘️</span>
+                        <span class="option-text">小城慢生活</span>
+                    </div>
+                    <div class="option-item" data-value="any">
+                        <span class="option-icon">🌍</span>
+                        <span class="option-text">都可以</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="recommend-btn" id="recommendBtn" disabled>请完成所有问题</button>
+            <div class="progress-hint" id="progressHint" style="display: none;">
+                <span>✓ 已完成 4/4</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        const answers = {
+            budget: '',
+            purpose: '',
+            environment: '',
+            scale: ''
+        };
+
+        // Get API base
+        const API_BASE = (() => {
+            const path = window.location.pathname;
+            if (path.includes('/yiju')) return window.location.origin + '/yiju';
+            if (path.includes('/livablecities')) return window.location.origin + '/livablecities';
+            return window.location.origin;
+        })();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initOptions();
+            updateProgress();
+        });
+
+        // Initialize option selection
+        function initOptions() {
+            const optionContainers = document.querySelectorAll('.options');
+
+            optionContainers.forEach(container => {
+                const question = container.dataset.question;
+                const options = container.querySelectorAll('.option-item');
+
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        // Remove selection from all options in this group
+                        options.forEach(opt => opt.classList.remove('selected'));
+
+                        // Select this option
+                        option.classList.add('selected');
+
+                        // Update answer
+                        answers[question] = option.dataset.value;
+
+                        // Update progress
+                        updateProgress();
+                    });
+                });
+            });
+
+            // Button click
+            document.getElementById('recommendBtn').addEventListener('click', generateRecommendation);
+        }
+
+        // Update progress
+        function updateProgress() {
+            const completed = Object.values(answers).filter(v => v !== '').length;
+            const canRecommend = completed === 4;
+
+            const btn = document.getElementById('recommendBtn');
+            const hint = document.getElementById('progressHint');
+
+            if (canRecommend) {
+                btn.disabled = false;
+                btn.textContent = '生成推荐';
+                hint.style.display = 'block';
+            } else {
+                btn.disabled = true;
+                btn.textContent = `请完成所有问题 (${completed}/4)`;
+                hint.style.display = 'none';
+            }
+        }
+
+        // Generate recommendation
+        function generateRecommendation() {
+            // Build filter parameters based on answers
+            const params = new URLSearchParams();
+
+            // 1. Budget
+            switch (answers.budget) {
+                case 'low':
+                    params.append('list_type', 'china_layflat');
+                    params.append('sort', 'avg_rent');
+                    params.append('order', 'ASC');
+                    break;
+                case 'medium':
+                    params.append('sort', 'living_cost');
+                    params.append('order', 'ASC');
+                    break;
+                case 'high':
+                case 'flexible':
+                    params.append('sort', 'overall_score');
+                    params.append('order', 'DESC');
+                    break;
+            }
+
+            // 2. Purpose
+            switch (answers.purpose) {
+                case 'work':
+                    params.append('sort', 'employment');
+                    params.append('order', 'DESC');
+                    break;
+                case 'elderly':
+                    params.append('sort', 'elderly_care');
+                    params.append('order', 'DESC');
+                    break;
+                case 'travel':
+                    params.append('sort', 'tourism_resources');
+                    params.append('order', 'DESC');
+                    break;
+                case 'settle':
+                    params.append('sort', 'overall_score');
+                    params.append('order', 'DESC');
+                    break;
+            }
+
+            // 3. Environment
+            switch (answers.environment) {
+                case 'air':
+                    params.append('min_air_quality', '7');
+                    break;
+                case 'safety':
+                    params.append('min_safety', '7');
+                    break;
+                case 'climate':
+                    params.append('min_climate_comfort', '7');
+                    break;
+                case 'scenery':
+                    params.append('min_tourism_resources', '7');
+                    break;
+            }
+
+            // 4. Scale
+            switch (answers.scale) {
+                case 'large':
+                    params.append('tier', '一线');
+                    break;
+                case 'medium':
+                    params.append('tier', '二线,三线');
+                    break;
+                case 'small':
+                    params.append('list_type', 'china_layflat');
+                    break;
+            }
+
+            // Redirect to index with filters
+            window.location.href = `index.html?${params.toString()}`;
+        }
+    </script>
+</body>
+</html>

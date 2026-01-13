@@ -475,7 +475,7 @@
 <body>
     <!-- 顶部导航 -->
     <div class="header">
-        <div class="logo" onclick="window.location.href='index.html'">🏖️ 宜居城市指南</div>
+        <div class="logo" id="logoLink">🏖️ 宜居城市指南</div>
         <div>
             <a href="index.html" class="btn btn-outline">← 返回首页</a>
         </div>
@@ -592,7 +592,15 @@
             initUploadArea();
             initForm();
             initCitySearch();
+            initLogoLink();
         });
+
+        // 初始化 logo 链接
+        function initLogoLink() {
+            document.getElementById('logoLink').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+        }
 
         // 加载城市列表
         async function loadCities() {
@@ -804,8 +812,15 @@
                         div.className = 'preview-item';
                         div.innerHTML = `
                             <img src="${e.target.result}" alt="预览">
-                            <button type="button" class="preview-remove" onclick="removeFile(${index})">×</button>
+                            <button type="button" class="preview-remove" data-index="${index}">×</button>
                         `;
+
+                        // 添加移除按钮事件监听器
+                        const removeBtn = div.querySelector('.preview-remove');
+                        removeBtn.addEventListener('click', function() {
+                            removeFile(parseInt(this.dataset.index));
+                        });
+
                         previewGrid.appendChild(div);
                     };
                     reader.readAsDataURL(file);

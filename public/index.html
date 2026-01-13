@@ -387,8 +387,11 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             z-index: 2;
+            background: inherit;
         }
 
         .featured-card:hover .featured-card-image img { transform: scale(1.05); }
@@ -625,8 +628,11 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             z-index: 2;
+            background: inherit;
         }
 
         .city-card:hover .city-card-image img { transform: scale(1.05); }
@@ -1058,6 +1064,95 @@
 
         .footer-link:hover { color: var(--white); }
 
+        /* ===== Compare Selection ===== */
+        .compare-checkbox {
+            position: absolute;
+            top: 0.625rem;
+            left: 0.625rem;
+            width: 24px;
+            height: 24px;
+            z-index: 10;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .city-card:hover .compare-checkbox,
+        .featured-card:hover .compare-checkbox {
+            opacity: 1;
+        }
+
+        .compare-checkbox-label {
+            position: absolute;
+            top: 0.625rem;
+            left: 0.625rem;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9;
+            transition: all 0.3s;
+            opacity: 0;
+        }
+
+        .city-card:hover .compare-checkbox-label,
+        .featured-card:hover .compare-checkbox-label {
+            opacity: 1;
+        }
+
+        .compare-checkbox:checked + .compare-checkbox-label {
+            background: var(--primary);
+            border-color: var(--primary);
+            opacity: 1;
+        }
+
+        .compare-checkbox:checked + .compare-checkbox-label::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Compare Float Button */
+        .compare-float-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-xl);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .compare-float-btn.show {
+            display: flex;
+        }
+
+        .compare-float-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.5);
+        }
+
+        .compare-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+        }
+
         /* ===== Responsive ===== */
         @media (max-width: 1024px) {
             .featured-card { flex: 0 0 calc(50% - 0.625rem); }
@@ -1320,6 +1415,13 @@
     <!-- Notification -->
     <div class="notification" id="notification"></div>
 
+    <!-- Compare Float Button -->
+    <div class="compare-float-btn" id="compareFloatBtn">
+        <span>⚖️</span>
+        <span>对比城市</span>
+        <span class="compare-count" id="compareCount">0</span>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
@@ -1362,7 +1464,8 @@
                 tier: null,
                 features: [],
                 quickFilter: null
-            }
+            },
+            compareList: [] // 对比城市列表
         };
 
         // ===== API Functions =====
@@ -1492,8 +1595,10 @@
                 return `
                     <div class="featured-card" data-city-id="${city.id}">
                         <div class="featured-card-image" style="background: ${gradient}">
+                            <input type="checkbox" class="compare-checkbox" data-city-id="${city.id}" data-city-name="${city.name}">
+                            <label class="compare-checkbox-label"></label>
                             <div class="featured-card-placeholder">${city.name[0]}</div>
-                            <img src="${imageUrl}" alt="${city.name}" onload="this.style.opacity=1" onerror="this.style.display='none'" style="opacity:0;transition:opacity 0.3s">
+                            <img src="${imageUrl}" alt="${city.name}" loading="eager" style="opacity:1">
                             <div class="featured-card-badge">#${index + 1}</div>
                             <div class="featured-card-score">⭐ ${score}</div>
                         </div>
@@ -1511,12 +1616,34 @@
                 `;
             }).join('');
 
-            // 绑定点击事件
+            // 绑定点击事件和图片错误处理
             track.querySelectorAll('.featured-card').forEach(card => {
-                card.addEventListener('click', () => {
+                card.addEventListener('click', (e) => {
+                    // 如果点击的是复选框或标签，不跳转
+                    if (e.target.classList.contains('compare-checkbox') ||
+                        e.target.classList.contains('compare-checkbox-label')) {
+                        return;
+                    }
                     const cityId = card.dataset.cityId;
                     if (cityId) goToCity(cityId);
                 });
+
+                // 处理图片加载失败
+                const img = card.querySelector('img');
+                if (img) {
+                    img.addEventListener('error', function() {
+                        this.style.display = 'none';
+                    });
+                    img.addEventListener('load', function() {
+                        this.style.opacity = '1';
+                    });
+                }
+
+                // 绑定复选框事件
+                const checkbox = card.querySelector('.compare-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('change', handleCompareCheckbox);
+                }
             });
         }
 
@@ -1563,8 +1690,10 @@
                 card.dataset.cityId = city.id;
                 card.innerHTML = `
                     <div class="city-card-image" style="background: ${gradient}">
+                        <input type="checkbox" class="compare-checkbox" data-city-id="${city.id}" data-city-name="${city.name}">
+                        <label class="compare-checkbox-label"></label>
                         <div class="city-card-placeholder">${city.name[0]}</div>
-                        <img src="${imageUrl}" alt="${city.name}" onload="this.style.opacity=1" onerror="this.style.display='none'" style="opacity:0;transition:opacity 0.3s">
+                        <img src="${imageUrl}" alt="${city.name}" loading="lazy" style="opacity:1">
                         <div class="city-card-rank ${rankClass}">${rank}</div>
                         <div class="city-card-score">⭐ ${score}</div>
                     </div>
@@ -1595,7 +1724,32 @@
                         </div>
                     </div>
                 `;
-                card.addEventListener('click', () => goToCity(city.id));
+                card.addEventListener('click', (e) => {
+                    // 如果点击的是复选框或标签，不跳转
+                    if (e.target.classList.contains('compare-checkbox') ||
+                        e.target.classList.contains('compare-checkbox-label')) {
+                        return;
+                    }
+                    goToCity(city.id);
+                });
+
+                // 处理图片加载失败
+                const img = card.querySelector('img');
+                if (img) {
+                    img.addEventListener('error', function() {
+                        this.style.display = 'none';
+                    });
+                    img.addEventListener('load', function() {
+                        this.style.opacity = '1';
+                    });
+                }
+
+                // 绑定复选框事件
+                const checkbox = card.querySelector('.compare-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('change', handleCompareCheckbox);
+                }
+
                 grid.appendChild(card);
             });
         }
@@ -1648,40 +1802,109 @@
             loadCities(true);
         }
 
+        // ===== Compare Functions =====
+        function handleCompareCheckbox(e) {
+            const checkbox = e.target;
+            const cityId = checkbox.dataset.cityId;
+            const cityName = checkbox.dataset.cityName;
+
+            if (checkbox.checked) {
+                // 添加到对比列表
+                if (state.compareList.length >= 5) {
+                    showNotification('最多只能对比5个城市', 'error');
+                    checkbox.checked = false;
+                    return;
+                }
+                state.compareList.push({ id: cityId, name: cityName });
+            } else {
+                // 从对比列表移除
+                state.compareList = state.compareList.filter(c => c.id !== cityId);
+            }
+
+            updateCompareButton();
+        }
+
+        function updateCompareButton() {
+            const btn = document.getElementById('compareFloatBtn');
+            const count = document.getElementById('compareCount');
+
+            if (state.compareList.length > 0) {
+                btn.classList.add('show');
+                count.textContent = state.compareList.length;
+            } else {
+                btn.classList.remove('show');
+            }
+        }
+
+        function goToCompare() {
+            if (state.compareList.length < 2) {
+                showNotification('请至少选择2个城市进行对比', 'error');
+                return;
+            }
+
+            const ids = state.compareList.map(c => c.id).join(',');
+            window.location.href = `city-compare.html?ids=${ids}`;
+        }
+
         // ===== Quick Filter Handler =====
         function handleQuickFilter(type) {
             // 根据快捷筛选类型跳转到对应页面或设置筛选
+            // 注意：这些筛选不受当前榜单限制，会搜索所有城市
             switch (type) {
                 case 'recommend':
                     // 跳转到推荐页面
                     window.location.href = 'recommend.html';
                     break;
                 case 'lowCost':
+                    // 切换到躺平榜并按租金筛选
+                    state.currentList = 'china_layflat';
                     state.filters.rent = '0-1000';
+                    updateActiveTab('china_layflat');
                     loadCities(true);
                     document.getElementById('ranking').scrollIntoView({ behavior: 'smooth' });
                     break;
                 case 'elderly':
+                    // 切换到综合宜居榜并筛选养老城市
+                    state.currentList = 'china_general';
                     state.filters.features = ['elderly_friendly'];
+                    updateActiveTab('china_general');
                     loadCities(true);
                     document.getElementById('ranking').scrollIntoView({ behavior: 'smooth' });
                     break;
                 case 'employment':
+                    // 切换到综合宜居榜并筛选就业城市
+                    state.currentList = 'china_general';
                     state.filters.features = ['employment'];
+                    updateActiveTab('china_general');
                     loadCities(true);
                     document.getElementById('ranking').scrollIntoView({ behavior: 'smooth' });
                     break;
                 case 'airQuality':
+                    // 不限制榜单，筛选空气好的城市
                     state.filters.features = ['air_quality'];
                     loadCities(true);
                     document.getElementById('ranking').scrollIntoView({ behavior: 'smooth' });
                     break;
                 case 'coastal':
+                    // 切换到综合宜居榜并筛选沿海城市
+                    state.currentList = 'china_general';
                     state.filters.features = ['coastal'];
+                    updateActiveTab('china_general');
                     loadCities(true);
                     document.getElementById('ranking').scrollIntoView({ behavior: 'smooth' });
                     break;
             }
+        }
+
+        // Update active tab style
+        function updateActiveTab(listType) {
+            document.querySelectorAll('.ranking-tab').forEach(tab => {
+                if (tab.dataset.list === listType) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
         }
 
         // ===== Event Listeners =====
@@ -1816,6 +2039,9 @@
             document.getElementById('viewAllRanking').addEventListener('click', () => {
                 window.location.href = 'city-ranking.html';
             });
+
+            // Compare Float Button
+            document.getElementById('compareFloatBtn').addEventListener('click', goToCompare);
         }
 
         // ===== Initialize =====
