@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../models/database');
 const { verifyToken, verifyAdmin } = require('../middleware/auth');
 const { validateId } = require('../middleware/validator');
+const { deleteFromR2, batchDeleteFromR2 } = require('../utils/r2Utils');
 
 // 所有管理员路由都需要管理员权限
 router.use(verifyToken, verifyAdmin);
@@ -464,6 +465,15 @@ router.delete('/images/:id', validateId, async (req, res) => {
       return res.status(404).json({ error: '图片不存在' });
     }
 
+    // 先删除 R2 存储中的文件（如果是 R2 图片）
+    if (image.image_url) {
+      await deleteFromR2(image.image_url);
+    }
+    if (image.thumbnail_url && image.thumbnail_url !== image.image_url) {
+      await deleteFromR2(image.thumbnail_url);
+    }
+
+    // 再删除数据库记录
     await db.run('DELETE FROM city_images WHERE id = ?', [req.params.id]);
 
     res.json({ message: '图片删除成功' });
@@ -482,7 +492,30 @@ router.post('/images/batch-delete', async (req, res) => {
       return res.status(400).json({ error: '请提供要删除的图片ID列表' });
     }
 
+    // 先获取所有要删除的图片信息
     const placeholders = ids.map(() => '?').join(',');
+    const images = await db.query(
+      `SELECT id, image_url, thumbnail_url FROM city_images WHERE id IN (${placeholders})`,
+      ids
+    );
+
+    // 收集所有需要删除的 R2 文件 URL
+    const urlsToDelete = [];
+    for (const img of images) {
+      if (img.image_url) {
+        urlsToDelete.push(img.image_url);
+      }
+      if (img.thumbnail_url && img.thumbnail_url !== img.image_url) {
+        urlsToDelete.push(img.thumbnail_url);
+      }
+    }
+
+    // 批量删除 R2 文件
+    if (urlsToDelete.length > 0) {
+      await batchDeleteFromR2(urlsToDelete);
+    }
+
+    // 删除数据库记录
     await db.run(
       `DELETE FROM city_images WHERE id IN (${placeholders})`,
       ids
@@ -523,6 +556,108 @@ router.post('/images/batch-review', async (req, res) => {
   } catch (error) {
     console.error('批量审核图片失败:', error);
     res.status(500).json({ error: '批量审核图片失败' });
+  }
+});
+
+// 检查并清理 404 图片
+router.post('/images/cleanup-404', async (req, res) => {
+  try {
+    const { dryRun = true } = req.body;
+
+    // 获取所有图片
+    const images = await db.query(`
+      SELECT id, city_id, image_url, alt_text
+      FROM city_images
+      ORDER BY id
+    `);
+
+    if (images.length === 0) {
+      return res.json({
+        message: '没有图片需要检查',
+        total: 0,
+        notFound: 0,
+        deleted: 0
+      });
+    }
+
+    // 检查每个图片 URL
+    const notFoundIds = [];
+    const BATCH_SIZE = 10;
+
+    for (let i = 0; i < images.length; i += BATCH_SIZE) {
+      const batch = images.slice(i, i + BATCH_SIZE);
+      const checks = await Promise.all(
+        batch.map(async (img) => {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+            const response = await fetch(img.image_url, {
+              method: 'HEAD',
+              signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (response.status === 404) {
+              return img.id;
+            }
+            return null;
+          } catch (error) {
+            // 超时或错误的图片也标记为需要删除
+            return img.id;
+          }
+        })
+      );
+
+      notFoundIds.push(...checks.filter(Boolean));
+    }
+
+    let deleted = 0;
+
+    // 如果不是 dry run，执行删除
+    if (!dryRun && notFoundIds.length > 0) {
+      // 先获取要删除的图片信息（用于删除 R2 文件）
+      const placeholders = notFoundIds.map(() => '?').join(',');
+      const imagesToDelete = await db.query(
+        `SELECT id, image_url, thumbnail_url FROM city_images WHERE id IN (${placeholders})`,
+        notFoundIds
+      );
+
+      // 收集 R2 URL
+      const urlsToDelete = [];
+      for (const img of imagesToDelete) {
+        if (img.image_url) urlsToDelete.push(img.image_url);
+        if (img.thumbnail_url && img.thumbnail_url !== img.image_url) {
+          urlsToDelete.push(img.thumbnail_url);
+        }
+      }
+
+      // 批量删除 R2 文件
+      if (urlsToDelete.length > 0) {
+        await batchDeleteFromR2(urlsToDelete);
+      }
+
+      // 删除数据库记录
+      await db.run(
+        `DELETE FROM city_images WHERE id IN (${placeholders})`,
+        notFoundIds
+      );
+
+      deleted = notFoundIds.length;
+    }
+
+    res.json({
+      message: dryRun ? '检查完成（未删除）' : '清理完成',
+      total: images.length,
+      notFound: notFoundIds.length,
+      deleted: deleted,
+      notFoundIds: dryRun ? notFoundIds : undefined
+    });
+
+  } catch (error) {
+    console.error('清理 404 图片失败:', error);
+    res.status(500).json({ error: '清理 404 图片失败' });
   }
 });
 

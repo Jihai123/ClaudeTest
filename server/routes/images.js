@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../models/database');
 const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateId } = require('../middleware/validator');
+const { deleteFromR2 } = require('../utils/r2Utils');
 
 // 获取城市图片列表
 router.get('/city/:cityId', async (req, res) => {
@@ -163,13 +164,24 @@ router.delete('/:id', verifyToken, validateId, async (req, res) => {
       return res.status(403).json({ error: '无权限删除此图片' });
     }
 
+    // 先删除 R2 存储中的文件（如果是 R2 图片）
+    if (image.image_url) {
+      await deleteFromR2(image.image_url);
+    }
+    if (image.thumbnail_url && image.thumbnail_url !== image.image_url) {
+      await deleteFromR2(image.thumbnail_url);
+    }
+
+    // 删除数据库记录
     await db.run('DELETE FROM city_images WHERE id = ?', [req.params.id]);
 
     // 更新用户上传计数
-    await db.run(
-      'UPDATE users SET images_count = images_count - 1 WHERE id = ?',
-      [image.uploader_id]
-    );
+    if (image.uploader_id) {
+      await db.run(
+        'UPDATE users SET images_count = images_count - 1 WHERE id = ?',
+        [image.uploader_id]
+      );
+    }
 
     res.json({ message: '图片已删除' });
   } catch (error) {
