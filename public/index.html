@@ -4,38 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>宜居城市指南 - 找到你的理想城市</title>
-    <meta name="description" content="极简卡片风格，智能搜索，快速找到最适合你的宜居城市">
-    <meta name="keywords" content="宜居城市,城市排行榜,低房租,生活成本,城市对比">
+    <meta name="description" content="探索中国宜居城市排行榜，发现最适合躺平、养老、旅居的理想城市">
+    <meta name="keywords" content="宜居城市,城市排行榜,躺平城市,养老城市,低房租城市">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>">
 
     <style>
-        /* ===== 全局重置和基础样式 ===== */
-        * {
+        /* ===== CSS Reset & Variables ===== */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         :root {
-            /* 极简配色 */
-            --color-primary: #2563eb;
-            --color-primary-hover: #1d4ed8;
-            --color-text: #111827;
-            --color-text-secondary: #6b7280;
-            --color-text-muted: #9ca3af;
-            --color-bg: #ffffff;
-            --color-bg-secondary: #f9fafb;
-            --color-bg-tertiary: #f3f4f6;
-            --color-border: #e5e7eb;
-            --color-border-light: #f3f4f6;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
 
-            /* 阴影 */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
 
-            /* 圆角 */
+            --white: #ffffff;
+            --black: #000000;
+
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
             --radius-sm: 0.375rem;
             --radius: 0.5rem;
             --radius-lg: 0.75rem;
@@ -43,422 +51,374 @@
             --radius-2xl: 1.5rem;
             --radius-full: 9999px;
 
-            /* 间距 */
-            --spacing-xs: 0.5rem;
-            --spacing-sm: 1rem;
-            --spacing-md: 1.5rem;
-            --spacing-lg: 2rem;
-            --spacing-xl: 3rem;
-            --spacing-2xl: 4rem;
-            --spacing-3xl: 6rem;
-
-            /* 动画 */
             --transition: all 0.2s ease;
+            --transition-slow: all 0.3s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background: var(--color-bg-secondary);
-            color: var(--color-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+                         'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
             line-height: 1.6;
-            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* ===== 导航栏 - 极简风格 ===== */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ===== Navigation ===== */
         .navbar {
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--color-border-light);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            box-shadow: var(--shadow-md);
         }
 
         .nav-container {
-            max-width: 1280px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 var(--spacing-lg);
-            height: 72px;
+            padding: 0 1.5rem;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--spacing-lg);
+            gap: 2rem;
         }
 
         .logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--color-text);
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .logo:hover {
-            opacity: 0.7;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            flex-shrink: 0;
         }
 
         .logo-icon {
             font-size: 1.5rem;
         }
 
-        /* 导航搜索框 */
         .nav-search {
             flex: 1;
-            max-width: 480px;
+            max-width: 400px;
             position: relative;
         }
 
         .nav-search-input {
             width: 100%;
-            padding: 0.625rem var(--spacing-sm) 0.625rem 2.75rem;
-            border: 1px solid var(--color-border);
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--gray-200);
             border-radius: var(--radius-full);
-            background: var(--color-bg);
-            font-size: 0.9375rem;
-            color: var(--color-text);
+            background: var(--gray-50);
+            font-size: 0.875rem;
             transition: var(--transition);
         }
 
         .nav-search-input:focus {
             outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .nav-search-input::placeholder {
-            color: var(--color-text-muted);
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
         .nav-search-icon {
             position: absolute;
-            left: 1rem;
+            left: 0.875rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--color-text-muted);
-            pointer-events: none;
+            color: var(--gray-400);
+            font-size: 0.875rem;
         }
 
-        /* 导航操作按钮 */
-        .nav-actions {
+        .nav-links {
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
         }
 
         .nav-link {
-            padding: 0.5rem var(--spacing-sm);
-            color: var(--color-text-secondary);
-            text-decoration: none;
-            font-size: 0.9375rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
             font-weight: 500;
+            color: var(--gray-600);
             border-radius: var(--radius);
             transition: var(--transition);
-            white-space: nowrap;
         }
 
         .nav-link:hover {
-            color: var(--color-text);
-            background: var(--color-bg-tertiary);
+            color: var(--gray-900);
+            background: var(--gray-100);
         }
 
-        .btn-login {
-            padding: 0.5rem var(--spacing-md);
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-full);
-            font-size: 0.9375rem;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
             font-weight: 600;
-            cursor: pointer;
+            border-radius: var(--radius-full);
+            border: none;
             transition: var(--transition);
-            white-space: nowrap;
         }
 
-        .btn-login:hover {
-            background: var(--color-primary-hover);
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
             transform: translateY(-1px);
         }
 
-        .filter-toggle-btn {
-            padding: 0.5rem;
-            background: var(--color-bg-tertiary);
-            border: none;
-            border-radius: var(--radius);
-            color: var(--color-text);
-            cursor: pointer;
-            transition: var(--transition);
-            display: none;
+        .btn-ghost {
+            background: transparent;
+            color: var(--gray-600);
         }
 
-        .filter-toggle-btn:hover {
-            background: var(--color-border);
+        .btn-ghost:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
         }
 
-        /* 移动端菜单按钮 */
         .mobile-menu-btn {
             display: none;
             padding: 0.5rem;
             background: none;
             border: none;
-            color: var(--color-text);
-            cursor: pointer;
+            font-size: 1.25rem;
         }
 
-        /* ===== Hero区域 - 全屏设计 ===== */
+        /* ===== Hero Section ===== */
         .hero {
-            min-height: calc(100vh - 72px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: var(--spacing-3xl) var(--spacing-lg);
-            background: linear-gradient(180deg, #ffffff 0%, var(--color-bg-secondary) 100%);
+            padding: 7rem 1.5rem 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             position: relative;
+            overflow: hidden;
         }
 
-        .hero-content {
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-container {
             max-width: 900px;
-            width: 100%;
+            margin: 0 auto;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-title {
-            font-size: 3.75rem;
+            font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: var(--spacing-md);
+            color: var(--white);
+            margin-bottom: 1rem;
             letter-spacing: -0.02em;
         }
 
         .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--color-text-secondary);
-            margin-bottom: var(--spacing-2xl);
+            font-size: 1.125rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
         }
 
-        /* 智能搜索框 */
-        .hero-search {
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .search-wrapper {
+        /* Search Box */
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 2rem;
             position: relative;
-            max-width: 700px;
-            margin: 0 auto var(--spacing-md);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .search-input {
             width: 100%;
-            padding: 1.25rem 11rem 1.25rem 3.5rem;
-            border: 2px solid var(--color-border);
+            padding: 1rem 1.5rem 1rem 3.5rem;
+            font-size: 1rem;
+            border: none;
             border-radius: var(--radius-2xl);
-            font-size: 1.125rem;
-            background: var(--color-bg);
+            background: var(--white);
             box-shadow: var(--shadow-xl);
             transition: var(--transition);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
         .search-input::placeholder {
-            color: var(--color-text-muted);
+            color: var(--gray-400);
         }
 
         .search-icon {
             position: absolute;
             left: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--color-text-muted);
-            font-size: 1.5rem;
+            color: var(--gray-400);
+            font-size: 1.25rem;
         }
 
         .search-btn {
             position: absolute;
-            right: 0.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 0.75rem 2rem;
-            background: var(--color-primary);
-            color: white;
+            right: 0.375rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--white);
             border: none;
             border-radius: var(--radius-xl);
-            font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
             transition: var(--transition);
         }
 
         .search-btn:hover {
-            background: var(--color-primary-hover);
+            background: var(--primary-dark);
         }
 
-        /* 搜索提示 */
-        .search-hints {
+        /* Quick Tags */
+        .quick-tags {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--spacing-sm);
-            font-size: 0.875rem;
-            color: var(--color-text-muted);
             flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
         }
 
-        .hint-tag {
-            padding: 0.25rem 0.75rem;
-            background: var(--color-bg-tertiary);
-            border: none;
+        .quick-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.625rem 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: var(--radius-full);
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
+            color: var(--white);
             font-size: 0.875rem;
-        }
-
-        .hint-tag:hover {
-            background: var(--color-border);
-            color: var(--color-text);
-        }
-
-        /* 快捷筛选标签 - 参考小程序 */
-        .quick-filters {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .filters-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--spacing-xs);
-            margin-bottom: var(--spacing-md);
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--color-text-secondary);
-        }
-
-        .filters-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing-sm);
-            justify-content: center;
-        }
-
-        .filter-tag {
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--color-bg);
-            border: 1.5px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            font-size: 0.9375rem;
             font-weight: 500;
-            color: var(--color-text);
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
         }
 
-        .filter-tag:hover {
-            border-color: var(--color-primary);
-            color: var(--color-primary);
+        .quick-tag:hover {
+            background: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
         }
 
-        .filter-tag.active {
-            background: var(--color-primary);
-            border-color: var(--color-primary);
-            color: white;
+        .quick-tag.active {
+            background: var(--white);
+            color: var(--primary);
         }
 
-        /* ===== 主内容容器 ===== */
+        /* ===== Main Content ===== */
         .main-content {
-            max-width: 1280px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: var(--spacing-3xl) var(--spacing-lg);
+            padding: 3rem 1.5rem;
         }
 
-        /* ===== 推荐城市轮播 - 3张大卡片 ===== */
-        .featured-section {
-            margin-bottom: var(--spacing-3xl);
-        }
-
+        /* Section Header */
         .section-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: var(--spacing-lg);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .section-title {
-            font-size: 1.875rem;
+            font-size: 1.5rem;
             font-weight: 700;
-        }
-
-        .carousel-controls {
-            display: flex;
-            gap: var(--spacing-sm);
-        }
-
-        .carousel-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--color-bg);
-            border: 1px solid var(--color-border);
-            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .section-more {
+            font-size: 0.875rem;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
             transition: var(--transition);
         }
 
-        .carousel-btn:hover {
-            background: var(--color-primary);
-            border-color: var(--color-primary);
-            color: white;
+        .section-more:hover {
+            color: var(--primary-dark);
         }
 
-        .carousel-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        /* ===== Featured Carousel ===== */
+        .featured-section {
+            margin-bottom: 4rem;
         }
 
-        .carousel-btn:disabled:hover {
-            background: var(--color-bg);
-            border-color: var(--color-border);
-            color: var(--color-text);
-        }
-
-        .carousel-wrapper {
+        .carousel-container {
             position: relative;
-            overflow: hidden;
         }
 
         .carousel-track {
             display: flex;
-            gap: var(--spacing-lg);
-            transition: transform 0.5s ease;
+            gap: 1.5rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 0.5rem 0;
+        }
+
+        .carousel-track::-webkit-scrollbar {
+            display: none;
         }
 
         .featured-card {
-            flex: 0 0 calc(33.333% - var(--spacing-lg) * 2 / 3);
-            background: var(--color-bg);
+            flex: 0 0 calc(33.333% - 1rem);
+            min-width: 300px;
+            scroll-snap-align: start;
+            background: var(--white);
             border-radius: var(--radius-xl);
             overflow: hidden;
             box-shadow: var(--shadow);
             cursor: pointer;
-            transition: var(--transition);
+            transition: var(--transition-slow);
         }
 
         .featured-card:hover {
@@ -467,137 +427,240 @@
         }
 
         .featured-card-image {
-            width: 100%;
-            height: 240px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
             position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .featured-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .featured-card:hover .featured-card-image img {
+            transform: scale(1.05);
+        }
+
+        .featured-card-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            opacity: 0.3;
+            color: var(--white);
         }
 
         .featured-card-badge {
             position: absolute;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
-            padding: 0.375rem var(--spacing-sm);
-            background: rgba(255, 255, 255, 0.95);
+            top: 1rem;
+            left: 1rem;
+            padding: 0.25rem 0.75rem;
+            background: var(--white);
             border-radius: var(--radius-full);
             font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .featured-card-score {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-full);
+            color: var(--white);
+            font-size: 0.875rem;
             font-weight: 600;
-            color: var(--color-primary);
         }
 
         .featured-card-content {
-            padding: var(--spacing-lg);
+            padding: 1.25rem;
         }
 
-        .featured-card-title {
-            font-size: 1.5rem;
+        .featured-card-name {
+            font-size: 1.25rem;
             font-weight: 700;
-            margin-bottom: var(--spacing-xs);
+            margin-bottom: 0.25rem;
         }
 
         .featured-card-location {
-            color: var(--color-text-secondary);
-            font-size: 0.9375rem;
-            margin-bottom: var(--spacing-md);
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 1rem;
+        }
+
+        .featured-card-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .featured-card-price {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 800;
-            color: var(--color-primary);
-            margin-bottom: var(--spacing-sm);
+            color: var(--primary);
         }
 
-        .featured-card-stats {
+        .featured-card-price span {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--gray-500);
+        }
+
+        .featured-card-tags {
             display: flex;
-            gap: var(--spacing-md);
-            padding-top: var(--spacing-md);
-            border-top: 1px solid var(--color-border-light);
+            gap: 0.375rem;
         }
 
-        .stat-item {
+        .card-tag {
+            padding: 0.25rem 0.5rem;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .carousel-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .carousel-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
-            font-size: 0.875rem;
-            color: var(--color-text-secondary);
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition);
         }
 
-        /* ===== 按预算浏览 ===== */
+        .carousel-btn:hover:not(:disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        .carousel-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== Budget Section ===== */
         .budget-section {
-            margin-bottom: var(--spacing-3xl);
+            margin-bottom: 4rem;
         }
 
         .budget-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: var(--spacing-md);
+            gap: 1rem;
         }
 
         .budget-card {
-            background: var(--color-bg);
-            border: 2px solid var(--color-border);
+            background: var(--white);
+            border: 2px solid var(--gray-200);
             border-radius: var(--radius-xl);
-            padding: var(--spacing-xl);
+            padding: 1.5rem;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
         }
 
         .budget-card:hover {
-            border-color: var(--color-primary);
+            border-color: var(--primary);
             transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
         }
 
         .budget-card.active {
-            background: var(--color-primary);
-            border-color: var(--color-primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-color: var(--primary);
+            color: var(--white);
         }
 
         .budget-icon {
-            font-size: 2.5rem;
-            margin-bottom: var(--spacing-sm);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
         }
 
         .budget-label {
             font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: var(--spacing-xs);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
         }
 
-        .budget-desc {
+        .budget-count {
             font-size: 0.875rem;
-            color: var(--color-text-muted);
+            color: var(--gray-500);
         }
 
-        .budget-card.active .budget-desc {
+        .budget-card.active .budget-count {
             color: rgba(255, 255, 255, 0.8);
         }
 
-        /* ===== 城市网格 - 瀑布流 ===== */
-        .cities-section {
-            margin-bottom: var(--spacing-3xl);
+        /* ===== Ranking Section ===== */
+        .ranking-section {
+            margin-bottom: 4rem;
         }
 
+        .ranking-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--gray-100);
+            padding: 0.375rem;
+            border-radius: var(--radius-xl);
+            width: fit-content;
+        }
+
+        .ranking-tab {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-lg);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .ranking-tab:hover {
+            color: var(--gray-900);
+        }
+
+        .ranking-tab.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        /* City Grid */
         .cities-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: var(--spacing-lg);
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
         }
 
         .city-card {
-            background: var(--color-bg);
+            background: var(--white);
             border-radius: var(--radius-xl);
             overflow: hidden;
             box-shadow: var(--shadow);
             cursor: pointer;
-            transition: var(--transition);
+            transition: var(--transition-slow);
         }
 
         .city-card:hover {
@@ -605,54 +668,124 @@
             box-shadow: var(--shadow-lg);
         }
 
-        .city-card-header {
-            padding: var(--spacing-lg);
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+        .city-card-image {
+            position: relative;
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
         }
 
-        .city-card-name {
-            font-size: 1.5rem;
+        .city-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .city-card:hover .city-card-image img {
+            transform: scale(1.05);
+        }
+
+        .city-card-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .city-card-rank {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            width: 32px;
+            height: 32px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
             font-weight: 700;
-            margin-bottom: var(--spacing-xs);
+            color: var(--gray-700);
         }
 
-        .city-card-location {
-            font-size: 0.9375rem;
-            color: var(--color-text-secondary);
+        .city-card-rank.top-1 {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: var(--white);
+        }
+
+        .city-card-rank.top-2 {
+            background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+            color: var(--white);
+        }
+
+        .city-card-rank.top-3 {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            color: var(--white);
+        }
+
+        .city-card-score {
+            position: absolute;
+            bottom: 0.75rem;
+            right: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-full);
+            color: var(--white);
+            font-size: 0.875rem;
+            font-weight: 600;
         }
 
         .city-card-body {
-            padding: var(--spacing-lg);
+            padding: 1.25rem;
+        }
+
+        .city-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .city-card-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .city-card-location {
+            font-size: 0.875rem;
+            color: var(--gray-500);
         }
 
         .city-card-price {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--color-primary);
-            margin-bottom: var(--spacing-md);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .city-card-price span {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--gray-500);
         }
 
         .city-card-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: var(--spacing-xs);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .city-tag {
-            padding: 0.25rem 0.625rem;
-            background: var(--color-bg-tertiary);
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            color: var(--color-text-secondary);
+            gap: 0.375rem;
+            margin-bottom: 1rem;
         }
 
         .city-card-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: var(--spacing-sm);
-            padding-top: var(--spacing-md);
-            border-top: 1px solid var(--color-border-light);
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-100);
         }
 
         .city-stat {
@@ -660,18 +793,79 @@
         }
 
         .city-stat-value {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 700;
-            color: var(--color-text);
+            color: var(--gray-900);
         }
 
         .city-stat-label {
             font-size: 0.75rem;
-            color: var(--color-text-muted);
+            color: var(--gray-500);
         }
 
-        /* ===== 侧边筛选抽屉 ===== */
-        .filter-drawer-overlay {
+        /* ===== Loading & Empty States ===== */
+        .loading {
+            text-align: center;
+            padding: 4rem;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-desc {
+            color: var(--gray-500);
+        }
+
+        /* Load More Button */
+        .load-more {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .load-more-btn {
+            padding: 0.75rem 2rem;
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            color: var(--gray-700);
+            transition: var(--transition);
+        }
+
+        .load-more-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ===== Filter Drawer ===== */
+        .filter-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -684,7 +878,7 @@
             transition: var(--transition);
         }
 
-        .filter-drawer-overlay.active {
+        .filter-overlay.active {
             opacity: 1;
             visibility: visible;
         }
@@ -692,182 +886,288 @@
         .filter-drawer {
             position: fixed;
             top: 0;
-            right: -400px;
-            width: 400px;
-            max-width: 90vw;
+            right: -420px;
+            width: 420px;
+            max-width: 100%;
             height: 100vh;
-            background: var(--color-bg);
-            box-shadow: var(--shadow-xl);
+            background: var(--white);
             z-index: 2000;
             transition: right 0.3s ease;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .filter-drawer.active {
             right: 0;
         }
 
-        .filter-drawer-header {
-            padding: var(--spacing-lg);
-            border-bottom: 1px solid var(--color-border-light);
+        .filter-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            background: var(--color-bg);
-            z-index: 10;
         }
 
-        .filter-drawer-title {
-            font-size: 1.25rem;
+        .filter-title {
+            font-size: 1.125rem;
             font-weight: 700;
         }
 
-        .filter-drawer-close {
+        .filter-close {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: var(--color-bg-tertiary);
+            background: var(--gray-100);
             border: none;
-            cursor: pointer;
+            font-size: 1.25rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
         }
 
-        .filter-drawer-close:hover {
-            background: var(--color-border);
+        .filter-close:hover {
+            background: var(--gray-200);
         }
 
-        .filter-drawer-body {
-            padding: var(--spacing-lg);
+        .filter-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
         }
 
         .filter-group {
-            margin-bottom: var(--spacing-xl);
+            margin-bottom: 2rem;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
         }
 
         .filter-group-title {
-            font-size: 1rem;
+            font-size: 0.875rem;
             font-weight: 600;
-            margin-bottom: var(--spacing-md);
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
-            gap: var(--spacing-xs);
+            gap: 0.5rem;
         }
 
         .filter-options {
             display: flex;
             flex-wrap: wrap;
-            gap: var(--spacing-sm);
+            gap: 0.5rem;
         }
 
         .filter-option {
-            padding: 0.5rem var(--spacing-sm);
-            background: var(--color-bg-tertiary);
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
             border: 1px solid transparent;
-            border-radius: var(--radius);
+            border-radius: var(--radius-full);
             font-size: 0.875rem;
-            cursor: pointer;
+            color: var(--gray-700);
             transition: var(--transition);
         }
 
         .filter-option:hover {
-            background: var(--color-border);
+            background: var(--gray-200);
         }
 
         .filter-option.active {
-            background: var(--color-primary);
-            border-color: var(--color-primary);
-            color: white;
+            background: var(--primary);
+            color: var(--white);
         }
 
-        .filter-drawer-footer {
-            padding: var(--spacing-lg);
-            border-top: 1px solid var(--color-border-light);
-            position: sticky;
-            bottom: 0;
-            background: var(--color-bg);
+        .filter-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--gray-100);
             display: flex;
-            gap: var(--spacing-sm);
+            gap: 0.75rem;
         }
 
-        .btn {
+        .filter-footer .btn {
             flex: 1;
             padding: 0.75rem;
+        }
+
+        .btn-outline {
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-50);
+        }
+
+        /* ===== Modal ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gray-100);
             border: none;
-            border-radius: var(--radius);
-            font-size: 0.9375rem;
-            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: var(--transition);
         }
 
-        .btn-secondary {
-            background: var(--color-bg-tertiary);
-            color: var(--color-text);
+        .modal-close:hover {
+            background: var(--gray-200);
         }
 
-        .btn-secondary:hover {
-            background: var(--color-border);
-        }
-
-        .btn-primary {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--color-primary-hover);
-        }
-
-        /* ===== 加载和空状态 ===== */
-        .loading {
-            text-align: center;
-            padding: var(--spacing-3xl);
-            color: var(--color-text-muted);
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--color-border);
-            border-top-color: var(--color-primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto var(--spacing-md);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: var(--spacing-3xl);
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .empty-title {
+        .modal-title {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: var(--spacing-xs);
+            margin-bottom: 1.5rem;
         }
 
-        .empty-desc {
-            color: var(--color-text-secondary);
+        .form-group {
+            margin-bottom: 1rem;
         }
 
-        /* ===== 响应式设计 ===== */
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* ===== Notification ===== */
+        .notification {
+            position: fixed;
+            top: 5rem;
+            right: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            border-left: 4px solid var(--primary);
+            z-index: 4000;
+            transform: translateX(calc(100% + 2rem));
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left-color: var(--success);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            background: var(--gray-900);
+            color: var(--gray-400);
+            padding: 3rem 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-link {
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        /* ===== Responsive ===== */
         @media (max-width: 1024px) {
             .featured-card {
-                flex: 0 0 calc(50% - var(--spacing-lg) / 2);
+                flex: 0 0 calc(50% - 0.75rem);
             }
 
             .budget-grid {
@@ -880,421 +1180,271 @@
                 display: none;
             }
 
-            .nav-link {
+            .nav-links .nav-link {
                 display: none;
             }
 
-            .filter-toggle-btn,
             .mobile-menu-btn {
                 display: block;
             }
 
             .hero {
-                min-height: auto;
-                padding: var(--spacing-2xl) var(--spacing-md);
+                padding: 6rem 1rem 2rem;
             }
 
             .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1rem;
-            }
-
-            .search-input {
-                padding: 1rem 7rem 1rem 3rem;
-                font-size: 1rem;
+                font-size: 2rem;
             }
 
             .search-btn {
-                padding: 0.625rem 1.25rem;
+                padding: 0.625rem 1rem;
                 font-size: 0.875rem;
             }
 
+            .quick-tags {
+                gap: 0.5rem;
+            }
+
+            .quick-tag {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8125rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+
             .featured-card {
-                flex: 0 0 100%;
+                flex: 0 0 280px;
             }
 
             .budget-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .ranking-tabs {
+                width: 100%;
+                overflow-x: auto;
             }
 
             .cities-grid {
                 grid-template-columns: 1fr;
             }
 
-            .main-content {
-                padding: var(--spacing-lg) var(--spacing-md);
+            .footer-container {
+                flex-direction: column;
+                text-align: center;
             }
-        }
-
-        /* ===== 模态框 ===== */
-        .modal {
-            position: fixed;
-            z-index: 3000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--color-bg);
-            padding: var(--spacing-xl);
-            border-radius: var(--radius-xl);
-            width: 90%;
-            max-width: 450px;
-            box-shadow: var(--shadow-xl);
-            position: relative;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-close {
-            position: absolute;
-            right: var(--spacing-md);
-            top: var(--spacing-md);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--color-bg-tertiary);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: var(--color-text-secondary);
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            background: var(--color-border);
-            color: var(--color-text);
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .form-group {
-            margin-bottom: var(--spacing-md);
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: var(--spacing-xs);
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--color-text-secondary);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.625rem var(--spacing-sm);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius);
-            font-size: 0.9375rem;
-            transition: var(--transition);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* ===== 通知 ===== */
-        .notification {
-            position: fixed;
-            top: 5rem;
-            right: 2rem;
-            background: var(--color-bg);
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            z-index: 4000;
-            transform: translateX(500px);
-            transition: transform 0.3s ease;
-            border-left: 4px solid var(--color-primary);
-            max-width: 350px;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.error {
-            border-left-color: #ef4444;
-        }
-
-        .notification.success {
-            border-left-color: #10b981;
         }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar">
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <div class="logo">
+            <a href="/" class="logo">
                 <span class="logo-icon">🏙️</span>
-                <span>城市排行榜</span>
-            </div>
+                <span>宜居城市</span>
+            </a>
 
-            <!-- 导航搜索 -->
             <div class="nav-search">
                 <span class="nav-search-icon">🔍</span>
-                <input
-                    type="text"
-                    class="nav-search-input"
-                    placeholder="搜索城市或省份..."
-                    id="navSearchInput"
-                >
+                <input type="text" class="nav-search-input" placeholder="搜索城市..." id="navSearchInput">
             </div>
 
-            <div class="nav-actions">
-                <a href="#cities" class="nav-link">榜单</a>
+            <div class="nav-links">
+                <a href="#ranking" class="nav-link">榜单</a>
                 <a href="city-compare.html" class="nav-link">对比</a>
-                <button class="filter-toggle-btn" id="filterToggleBtn">
-                    <span>🎯</span>
-                </button>
-                <button class="btn-login" id="loginBtn">登录</button>
-                <button class="mobile-menu-btn">☰</button>
+                <button class="btn btn-ghost" id="filterBtn">🎯 筛选</button>
+                <button class="btn btn-primary" id="loginBtn">登录</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero区域 - 全屏 -->
+    <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-content">
+        <div class="hero-container">
             <h1 class="hero-title">找到你的理想城市</h1>
-            <p class="hero-subtitle">
-                探索全国宜居城市，发现最适合你的生活方式
-            </p>
+            <p class="hero-subtitle">探索 300+ 城市数据 · 真实评分 · 智能推荐</p>
 
-            <!-- 智能搜索框 -->
-            <div class="hero-search">
-                <div class="search-wrapper">
+            <div class="search-box">
+                <div class="search-input-wrapper">
                     <span class="search-icon">🔍</span>
-                    <input
-                        type="text"
-                        class="search-input"
-                        placeholder="输入城市名、省份或拼音..."
-                        id="heroSearchInput"
-                    >
+                    <input type="text" class="search-input" placeholder="输入城市名、省份..." id="heroSearchInput">
                     <button class="search-btn" id="heroSearchBtn">搜索</button>
-                </div>
-
-                <!-- 搜索提示 -->
-                <div class="search-hints">
-                    <span>试试：</span>
-                    <button class="hint-tag" data-hint="成都">成都</button>
-                    <button class="hint-tag" data-hint="浙江">浙江</button>
-                    <button class="hint-tag" data-hint="海边">海边</button>
                 </div>
             </div>
 
-            <!-- 快捷筛选标签 - 参考小程序 -->
-            <div class="quick-filters">
-                <div class="filters-label">
-                    <span>⚡</span>
-                    <span>快速筛选</span>
-                </div>
-                <div class="filters-grid">
-                    <button class="filter-tag" data-filter="low-cost">
-                        <span>💰</span>
-                        <span>低生活成本</span>
-                    </button>
-                    <button class="filter-tag" data-filter="elderly">
-                        <span>👵</span>
-                        <span>适合养老</span>
-                    </button>
-                    <button class="filter-tag" data-filter="employment">
-                        <span>💼</span>
-                        <span>就业机会多</span>
-                    </button>
-                    <button class="filter-tag" data-filter="air">
-                        <span>🌿</span>
-                        <span>空气好</span>
-                    </button>
-                    <button class="filter-tag" data-filter="coastal">
-                        <span>🌊</span>
-                        <span>沿海宜居</span>
-                    </button>
-                    <button class="filter-tag" data-filter="safety">
-                        <span>🛡️</span>
-                        <span>安全</span>
-                    </button>
-                </div>
+            <div class="quick-tags" id="quickTags">
+                <button class="quick-tag" data-filter="low_rent">💰 低房租</button>
+                <button class="quick-tag" data-filter="spring_climate">🌡️ 四季如春</button>
+                <button class="quick-tag" data-filter="coastal">🌊 沿海城市</button>
+                <button class="quick-tag" data-filter="quiet">🤫 安静宜居</button>
+                <button class="quick-tag" data-filter="elderly_friendly">👴 适合养老</button>
+                <button class="quick-tag" data-filter="digital_nomad">💻 数字游民</button>
             </div>
         </div>
     </section>
 
-    <!-- 主内容 -->
-    <main class="main-content" id="cities">
-        <!-- 推荐城市轮播 - 3张大卡片 -->
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Featured Carousel -->
         <section class="featured-section">
             <div class="section-header">
-                <h2 class="section-title">⭐ 推荐城市</h2>
-                <div class="carousel-controls">
+                <h2 class="section-title">⭐ 精选推荐</h2>
+                <div class="carousel-nav">
                     <button class="carousel-btn" id="carouselPrev">←</button>
                     <button class="carousel-btn" id="carouselNext">→</button>
                 </div>
             </div>
 
-            <div class="carousel-wrapper">
+            <div class="carousel-container">
                 <div class="carousel-track" id="carouselTrack">
-                    <!-- 将通过JavaScript动态加载 -->
+                    <!-- Dynamic content -->
                 </div>
             </div>
         </section>
 
-        <!-- 按预算浏览 -->
+        <!-- Budget Section -->
         <section class="budget-section">
             <div class="section-header">
-                <h2 class="section-title">💰 按预算浏览</h2>
+                <h2 class="section-title">💰 按预算找城市</h2>
             </div>
 
-            <div class="budget-grid">
+            <div class="budget-grid" id="budgetGrid">
                 <div class="budget-card" data-budget="0-500">
                     <div class="budget-icon">💸</div>
                     <div class="budget-label">¥500以下</div>
-                    <div class="budget-desc">超低成本</div>
+                    <div class="budget-count">超低成本</div>
                 </div>
-                <div class="budget-card" data-budget="500-800">
+                <div class="budget-card" data-budget="500-1000">
                     <div class="budget-icon">💵</div>
-                    <div class="budget-label">¥500-800</div>
-                    <div class="budget-desc">经济实惠</div>
+                    <div class="budget-label">¥500-1000</div>
+                    <div class="budget-count">经济实惠</div>
                 </div>
-                <div class="budget-card" data-budget="800-1200">
+                <div class="budget-card" data-budget="1000-2000">
                     <div class="budget-icon">💴</div>
-                    <div class="budget-label">¥800-1200</div>
-                    <div class="budget-desc">性价比高</div>
+                    <div class="budget-label">¥1000-2000</div>
+                    <div class="budget-count">性价比高</div>
                 </div>
-                <div class="budget-card" data-budget="1200-9999">
+                <div class="budget-card" data-budget="2000+">
                     <div class="budget-icon">💰</div>
-                    <div class="budget-label">¥1200+</div>
-                    <div class="budget-desc">品质生活</div>
+                    <div class="budget-label">¥2000+</div>
+                    <div class="budget-count">品质生活</div>
                 </div>
             </div>
         </section>
 
-        <!-- 城市网格 - 瀑布流 -->
-        <section class="cities-section">
+        <!-- Ranking Section -->
+        <section class="ranking-section" id="ranking">
             <div class="section-header">
-                <h2 class="section-title">🏙️ 城市探索</h2>
+                <h2 class="section-title">🏆 城市榜单</h2>
+                <span class="section-more" id="viewAllRanking">查看完整榜单 →</span>
             </div>
 
-            <!-- 加载状态 -->
+            <!-- Ranking Tabs -->
+            <div class="ranking-tabs" id="rankingTabs">
+                <button class="ranking-tab active" data-list="china_layflat">
+                    <span>🏖️</span> 躺平小城
+                </button>
+                <button class="ranking-tab" data-list="china_general">
+                    <span>🏙️</span> 综合宜居
+                </button>
+                <button class="ranking-tab" data-list="world">
+                    <span>🌍</span> 世界城市
+                </button>
+            </div>
+
+            <!-- Loading State -->
             <div class="loading" id="loading">
                 <div class="spinner"></div>
                 <p>加载中...</p>
             </div>
 
-            <!-- 城市网格 -->
-            <div class="cities-grid" id="citiesGrid">
-                <!-- 将通过JavaScript动态加载 -->
-            </div>
+            <!-- Cities Grid -->
+            <div class="cities-grid" id="citiesGrid"></div>
 
-            <!-- 空状态 -->
+            <!-- Empty State -->
             <div class="empty-state" id="emptyState" style="display: none;">
                 <div class="empty-icon">🏙️</div>
                 <h3 class="empty-title">没有找到符合条件的城市</h3>
                 <p class="empty-desc">试试调整筛选条件吧</p>
             </div>
+
+            <!-- Load More -->
+            <div class="load-more" id="loadMore" style="display: none;">
+                <button class="load-more-btn" id="loadMoreBtn">加载更多</button>
+            </div>
         </section>
     </main>
 
-    <!-- 侧边筛选抽屉 -->
-    <div class="filter-drawer-overlay" id="filterOverlay"></div>
+    <!-- Filter Drawer -->
+    <div class="filter-overlay" id="filterOverlay"></div>
     <aside class="filter-drawer" id="filterDrawer">
-        <div class="filter-drawer-header">
-            <h3 class="filter-drawer-title">筛选条件</h3>
-            <button class="filter-drawer-close" id="filterDrawerClose">×</button>
+        <div class="filter-header">
+            <h3 class="filter-title">筛选条件</h3>
+            <button class="filter-close" id="filterClose">×</button>
         </div>
 
-        <div class="filter-drawer-body">
-            <!-- 租金区间 -->
+        <div class="filter-body">
             <div class="filter-group">
                 <div class="filter-group-title">💰 租金区间</div>
-                <div class="filter-options">
-                    <button class="filter-option" data-filter-type="rent" data-value="0-500">¥500以下</button>
-                    <button class="filter-option" data-filter-type="rent" data-value="500-1000">¥500-1000</button>
-                    <button class="filter-option" data-filter-type="rent" data-value="1000-2000">¥1000-2000</button>
-                    <button class="filter-option" data-filter-type="rent" data-value="2000-5000">¥2000-5000</button>
-                    <button class="filter-option" data-filter-type="rent" data-value="5000+">¥5000+</button>
+                <div class="filter-options" data-filter-type="rent">
+                    <button class="filter-option" data-value="0-500">¥500以下</button>
+                    <button class="filter-option" data-value="500-1000">¥500-1000</button>
+                    <button class="filter-option" data-value="1000-2000">¥1000-2000</button>
+                    <button class="filter-option" data-value="2000-5000">¥2000-5000</button>
+                    <button class="filter-option" data-value="5000+">¥5000+</button>
                 </div>
             </div>
 
-            <!-- 地区 -->
             <div class="filter-group">
                 <div class="filter-group-title">📍 地区</div>
-                <div class="filter-options">
-                    <button class="filter-option" data-filter-type="region" data-value="华东">华东</button>
-                    <button class="filter-option" data-filter-type="region" data-value="华南">华南</button>
-                    <button class="filter-option" data-filter-type="region" data-value="华北">华北</button>
-                    <button class="filter-option" data-filter-type="region" data-value="西南">西南</button>
-                    <button class="filter-option" data-filter-type="region" data-value="西北">西北</button>
-                    <button class="filter-option" data-filter-type="region" data-value="东北">东北</button>
-                    <button class="filter-option" data-filter-type="region" data-value="华中">华中</button>
+                <div class="filter-options" data-filter-type="region">
+                    <button class="filter-option" data-value="华东">华东</button>
+                    <button class="filter-option" data-value="华南">华南</button>
+                    <button class="filter-option" data-value="华北">华北</button>
+                    <button class="filter-option" data-value="西南">西南</button>
+                    <button class="filter-option" data-value="西北">西北</button>
+                    <button class="filter-option" data-value="东北">东北</button>
+                    <button class="filter-option" data-value="华中">华中</button>
                 </div>
             </div>
 
-            <!-- 城市等级 -->
             <div class="filter-group">
                 <div class="filter-group-title">🏙️ 城市等级</div>
-                <div class="filter-options">
-                    <button class="filter-option" data-filter-type="tier" data-value="一线">一线城市</button>
-                    <button class="filter-option" data-filter-type="tier" data-value="新一线">新一线</button>
-                    <button class="filter-option" data-filter-type="tier" data-value="二线">二线城市</button>
-                    <button class="filter-option" data-filter-type="tier" data-value="三线">三线及以下</button>
+                <div class="filter-options" data-filter-type="tier">
+                    <button class="filter-option" data-value="一线">一线城市</button>
+                    <button class="filter-option" data-value="新一线">新一线</button>
+                    <button class="filter-option" data-value="二线">二线城市</button>
+                    <button class="filter-option" data-value="三线">三线及以下</button>
                 </div>
             </div>
 
-            <!-- 特色标签 -->
             <div class="filter-group">
-                <div class="filter-group-title">✨ 特色</div>
-                <div class="filter-options">
-                    <button class="filter-option" data-filter-type="feature" data-value="seaside">🏖️ 看海</button>
-                    <button class="filter-option" data-filter-type="feature" data-value="spring_climate">🌡️ 四季如春</button>
-                    <button class="filter-option" data-filter-type="feature" data-value="quiet">🤫 安静</button>
-                    <button class="filter-option" data-filter-type="feature" data-value="medical">🏥 医疗好</button>
-                    <button class="filter-option" data-filter-type="feature" data-value="digital_nomad">💻 数字游民</button>
+                <div class="filter-group-title">✨ 特色标签</div>
+                <div class="filter-options" data-filter-type="features">
+                    <button class="filter-option" data-value="coastal">🏖️ 沿海</button>
+                    <button class="filter-option" data-value="spring_climate">🌡️ 四季如春</button>
+                    <button class="filter-option" data-value="quiet">🤫 安静</button>
+                    <button class="filter-option" data-value="medical">🏥 医疗好</button>
+                    <button class="filter-option" data-value="digital_nomad">💻 数字游民</button>
+                    <button class="filter-option" data-value="elderly_friendly">👴 适合养老</button>
+                    <button class="filter-option" data-value="lake">🏞️ 有湖</button>
+                    <button class="filter-option" data-value="mountain">⛰️ 有山</button>
                 </div>
             </div>
         </div>
 
-        <div class="filter-drawer-footer">
-            <button class="btn btn-secondary" id="resetFiltersBtn">重置</button>
-            <button class="btn btn-primary" id="applyFiltersBtn">应用</button>
+        <div class="filter-footer">
+            <button class="btn btn-outline" id="resetFilters">重置</button>
+            <button class="btn btn-primary" id="applyFilters">应用筛选</button>
         </div>
     </aside>
 
-    <!-- 登录模态框 -->
-    <div id="loginModal" class="modal">
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
         <div class="modal-content">
             <button class="modal-close" id="closeLoginModal">×</button>
             <h2 class="modal-title">登录</h2>
@@ -1307,555 +1457,538 @@
                     <label class="form-label">密码</label>
                     <input type="password" class="form-input" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">登录</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">登录</button>
             </form>
         </div>
     </div>
 
-    <!-- 注册模态框 -->
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeRegisterModal">×</button>
-            <h2 class="modal-title">注册</h2>
-            <form id="registerForm">
-                <div class="form-group">
-                    <label class="form-label">用户名</label>
-                    <input type="text" class="form-input" id="registerUsername" required minlength="3">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">邮箱</label>
-                    <input type="email" class="form-input" id="registerEmail" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">密码</label>
-                    <input type="password" class="form-input" id="registerPassword" required minlength="6">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">确认密码</label>
-                    <input type="password" class="form-input" id="registerPasswordConfirm" required minlength="6">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">注册</button>
-            </form>
-        </div>
-    </div>
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
 
-    <!-- 通知 -->
-    <div id="notification" class="notification"></div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <span>🏙️</span>
+                <span>宜居城市指南</span>
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">关于我们</a>
+                <a href="#" class="footer-link">数据来源</a>
+                <a href="#" class="footer-link">隐私政策</a>
+                <a href="#" class="footer-link">联系我们</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // API配置
-        const API_CONFIG = {
-            baseURL: window.API_BASE_URL || (() => {
-                const pathname = window.location.pathname;
-                const href = window.location.href;
-                if (pathname.includes('/yiju') || href.includes('/yiju')) {
-                    return window.location.origin + '/yiju';
-                }
-                if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
-                    return window.location.origin + '/livablecities';
-                }
-                return window.location.origin;
-            })(),
-            isDev: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        // ===== Configuration =====
+        const API_BASE = (() => {
+            const path = window.location.pathname;
+            if (path.includes('/yiju')) return window.location.origin + '/yiju';
+            if (path.includes('/livablecities')) return window.location.origin + '/livablecities';
+            return window.location.origin;
+        })();
+
+        // R2 图片基础 URL
+        const R2_IMAGE_BASE = 'https://cityimg.zhibeimao.com/city_images';
+
+        // ===== State =====
+        const state = {
+            currentList: 'china_layflat',
+            cities: [],
+            featuredCities: [],
+            page: 1,
+            limit: 12,
+            loading: false,
+            hasMore: true,
+            filters: {
+                search: '',
+                rent: null,
+                region: null,
+                tier: null,
+                features: [],
+                budget: null
+            }
         };
 
-        console.log('🚀 API配置:', API_CONFIG);
-
-        // 全局状态
-        let allCities = [];
-        let filteredCities = [];
-        let activeFilters = {
-            search: '',
-            quickFilter: null,
-            budget: null,
-            rent: null,
-            region: null,
-            tier: null,
-            feature: null
-        };
-        let carouselIndex = 0;
-        const carouselItemsPerPage = 3;
-
-        // API请求辅助函数
-        async function apiRequest(endpoint, options = {}) {
-            const url = `${API_CONFIG.baseURL}${endpoint}`;
+        // ===== API Functions =====
+        async function fetchAPI(endpoint, options = {}) {
+            const url = `${API_BASE}${endpoint}`;
             console.log('API Request:', url);
 
-            try {
-                const response = await fetch(url, {
-                    ...options,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...options.headers
-                    }
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
                 }
-
-                return data;
-            } catch (error) {
-                console.error('API Error:', error);
-                throw error;
-            }
-        }
-
-        // 通知函数
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type} show`;
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // 初始化
-        async function init() {
-            console.log('初始化应用...');
-
-            // 加载推荐城市
-            await loadFeaturedCities();
-
-            // 加载所有城市
-            await loadAllCities();
-
-            // 初始化事件监听
-            initEventListeners();
-        }
-
-        // 加载推荐城市（用于轮播）
-        async function loadFeaturedCities() {
-            try {
-                const data = await apiRequest('/api/cities/hot?type=featured&limit=9');
-
-                if (data.cities && data.cities.length > 0) {
-                    renderFeaturedCities(data.cities);
-                }
-            } catch (error) {
-                console.error('加载推荐城市失败:', error);
-            }
-        }
-
-        // 渲染推荐城市轮播
-        function renderFeaturedCities(cities) {
-            const track = document.getElementById('carouselTrack');
-            track.innerHTML = '';
-
-            cities.forEach((city, index) => {
-                const card = createFeaturedCard(city, index + 1);
-                track.appendChild(card);
             });
 
-            updateCarousel();
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            return response.json();
         }
 
-        // 创建推荐城市卡片
-        function createFeaturedCard(city, rank) {
-            const card = document.createElement('div');
-            card.className = 'featured-card';
+        // ===== City Image Helper =====
+        function getCityImageUrl(city) {
+            // 优先使用数据库中的封面图片
+            if (city.cover_image && city.cover_image.image_url) {
+                return city.cover_image.image_url;
+            }
+            // 回退到 R2 默认路径
+            return `${R2_IMAGE_BASE}/${city.id}/${city.id}_1.jpeg`;
+        }
 
-            const score = (city.layflat_score || city.overall_score || 0).toFixed(1);
-            const rent = city.avg_rent || '暂无';
-
-            // 随机渐变色
+        // 生成渐变色背景（作为图片加载失败的回退）
+        function getGradientStyle(index) {
             const gradients = [
                 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
                 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
+                'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)'
             ];
-            const gradient = gradients[rank % gradients.length];
-
-            card.innerHTML = `
-                <div class="featured-card-image" style="background: ${gradient}">
-                    <div class="featured-card-badge">#${rank}</div>
-                    <span style="font-size: 4rem;">🏙️</span>
-                </div>
-                <div class="featured-card-content">
-                    <h3 class="featured-card-title">${city.name}</h3>
-                    <p class="featured-card-location">${city.province || ''}</p>
-                    <div class="featured-card-price">¥${rent}/月</div>
-                    <div class="featured-card-stats">
-                        <div class="stat-item">
-                            <span>⭐</span>
-                            <span>${score}分</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>👁️</span>
-                            <span>${city.views_count || 0}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            card.onclick = () => {
-                window.location.href = `city-detail.html?id=${city.id}`;
-            };
-
-            return card;
+            return gradients[index % gradients.length];
         }
 
-        // 更新轮播位置
-        function updateCarousel() {
-            const track = document.getElementById('carouselTrack');
-            const cards = track.querySelectorAll('.featured-card');
-            const totalPages = Math.ceil(cards.length / carouselItemsPerPage);
-
-            // 计算偏移量
-            const cardWidth = cards[0]?.offsetWidth || 0;
-            const gap = 24; // var(--spacing-lg) = 24px
-            const offset = -(carouselIndex * (cardWidth + gap) * carouselItemsPerPage);
-
-            track.style.transform = `translateX(${offset}px)`;
-
-            // 更新按钮状态
-            document.getElementById('carouselPrev').disabled = carouselIndex === 0;
-            document.getElementById('carouselNext').disabled = carouselIndex >= totalPages - 1;
+        // ===== Load Data =====
+        async function loadFeaturedCities() {
+            try {
+                const data = await fetchAPI('/api/cities/hot?type=featured&limit=9');
+                if (data.cities) {
+                    state.featuredCities = data.cities;
+                    renderFeaturedCities();
+                }
+            } catch (error) {
+                console.error('加载推荐城市失败:', error);
+            }
         }
 
-        // 加载所有城市
-        async function loadAllCities() {
+        async function loadCities(reset = false) {
+            if (state.loading) return;
+
             const loading = document.getElementById('loading');
             const citiesGrid = document.getElementById('citiesGrid');
             const emptyState = document.getElementById('emptyState');
+            const loadMore = document.getElementById('loadMore');
 
-            loading.style.display = 'block';
-            citiesGrid.innerHTML = '';
+            if (reset) {
+                state.page = 1;
+                state.hasMore = true;
+                citiesGrid.innerHTML = '';
+            }
+
+            state.loading = true;
+            loading.style.display = reset ? 'block' : 'none';
             emptyState.style.display = 'none';
 
             try {
-                const data = await apiRequest('/api/cities?limit=100&list_type=china_layflat');
+                // 构建查询参数
+                const params = new URLSearchParams({
+                    page: state.page,
+                    limit: state.limit,
+                    list_type: state.currentList
+                });
+
+                // 添加筛选参数
+                if (state.filters.search) {
+                    params.append('search', state.filters.search);
+                }
+
+                // 构建 filters JSON
+                const filters = {};
+                if (state.filters.rent) {
+                    filters.rent = state.filters.rent;
+                }
+                if (state.filters.region) {
+                    filters.region = state.filters.region;
+                }
+                if (state.filters.tier) {
+                    filters.tier = state.filters.tier;
+                }
+                if (state.filters.features.length > 0) {
+                    filters.features = state.filters.features;
+                }
+
+                if (Object.keys(filters).length > 0) {
+                    params.append('filters', JSON.stringify(filters));
+                }
+
+                const data = await fetchAPI(`/api/cities?${params}`);
 
                 if (data.cities && data.cities.length > 0) {
-                    allCities = data.cities;
-                    filteredCities = [...allCities];
-                    renderCities(filteredCities);
+                    state.cities = reset ? data.cities : [...state.cities, ...data.cities];
+                    state.hasMore = data.cities.length >= state.limit;
+                    renderCities(data.cities, reset);
+                    loadMore.style.display = state.hasMore ? 'block' : 'none';
                 } else {
-                    emptyState.style.display = 'block';
+                    if (reset) {
+                        emptyState.style.display = 'block';
+                    }
+                    state.hasMore = false;
+                    loadMore.style.display = 'none';
                 }
             } catch (error) {
                 console.error('加载城市失败:', error);
                 showNotification('加载失败，请稍后再试', 'error');
-                emptyState.style.display = 'block';
+                if (reset) {
+                    emptyState.style.display = 'block';
+                }
             } finally {
+                state.loading = false;
                 loading.style.display = 'none';
             }
         }
 
-        // 渲染城市网格
-        function renderCities(cities) {
-            const citiesGrid = document.getElementById('citiesGrid');
-            const emptyState = document.getElementById('emptyState');
+        // ===== Render Functions =====
+        function renderFeaturedCities() {
+            const track = document.getElementById('carouselTrack');
+            track.innerHTML = state.featuredCities.map((city, index) => {
+                const score = (city.layflat_score || city.overall_score || 0).toFixed(1);
+                const rent = city.avg_rent ? `¥${city.avg_rent}` : '暂无';
+                const imageUrl = getCityImageUrl(city);
+                const gradient = getGradientStyle(index);
 
-            citiesGrid.innerHTML = '';
+                // 获取城市标签
+                const tags = [];
+                if (city.tags && city.tags.length > 0) {
+                    city.tags.slice(0, 2).forEach(t => tags.push(t.tag_name));
+                } else {
+                    if (city.avg_rent && city.avg_rent < 1000) tags.push('低成本');
+                    if (city.air_quality >= 7) tags.push('空气好');
+                }
 
-            if (cities.length === 0) {
-                emptyState.style.display = 'block';
-                return;
+                return `
+                    <div class="featured-card" onclick="goToCity(${city.id})">
+                        <div class="featured-card-image" style="background: ${gradient}">
+                            <img src="${imageUrl}" alt="${city.name}"
+                                 onerror="this.style.display='none'">
+                            <div class="featured-card-placeholder">${city.name[0]}</div>
+                            <div class="featured-card-badge">#${index + 1}</div>
+                            <div class="featured-card-score">⭐ ${score}</div>
+                        </div>
+                        <div class="featured-card-content">
+                            <div class="featured-card-name">${city.name}</div>
+                            <div class="featured-card-location">${city.province || ''}</div>
+                            <div class="featured-card-info">
+                                <div class="featured-card-price">${rent}<span>/月</span></div>
+                                <div class="featured-card-tags">
+                                    ${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCities(cities, reset = false) {
+            const grid = document.getElementById('citiesGrid');
+
+            if (reset) {
+                grid.innerHTML = '';
             }
 
-            emptyState.style.display = 'none';
+            const startIndex = reset ? 0 : state.cities.length - cities.length;
 
-            cities.forEach(city => {
-                const card = createCityCard(city);
-                citiesGrid.appendChild(card);
+            cities.forEach((city, i) => {
+                const index = startIndex + i;
+                const rank = index + 1;
+
+                // 根据榜单类型选择评分
+                let score;
+                if (state.currentList === 'china_layflat') {
+                    score = city.layflat_score || city.overall_score || 0;
+                } else if (state.currentList === 'world') {
+                    score = city.world_score || city.overall_score || 0;
+                } else {
+                    score = city.overall_score || 0;
+                }
+                score = score.toFixed(1);
+
+                const rent = city.avg_rent ? `¥${city.avg_rent}` : '暂无';
+                const imageUrl = getCityImageUrl(city);
+                const gradient = getGradientStyle(index);
+
+                // 生成标签
+                const tags = [];
+                if (city.tags && city.tags.length > 0) {
+                    city.tags.slice(0, 3).forEach(t => tags.push(t.tag_name));
+                } else {
+                    if (city.avg_rent && city.avg_rent < 1000) tags.push('低成本');
+                    if (city.air_quality >= 7) tags.push('空气好');
+                    if (city.elderly_care >= 7) tags.push('适合养老');
+                }
+
+                // 维度数据
+                const air = (city.air_quality || 0).toFixed(1);
+                const medical = (city.medical_facilities || 0).toFixed(1);
+                const living = (city.living_cost || 0).toFixed(1);
+
+                const rankClass = rank <= 3 ? `top-${rank}` : '';
+
+                const card = document.createElement('div');
+                card.className = 'city-card';
+                card.onclick = () => goToCity(city.id);
+                card.innerHTML = `
+                    <div class="city-card-image" style="background: ${gradient}">
+                        <img src="${imageUrl}" alt="${city.name}"
+                             onerror="this.style.display='none'">
+                        <div class="city-card-placeholder">${city.name[0]}</div>
+                        <div class="city-card-rank ${rankClass}">${rank}</div>
+                        <div class="city-card-score">⭐ ${score}</div>
+                    </div>
+                    <div class="city-card-body">
+                        <div class="city-card-header">
+                            <div>
+                                <div class="city-card-name">${city.name}</div>
+                                <div class="city-card-location">${city.province || city.country || ''}</div>
+                            </div>
+                            <div class="city-card-price">${rent}<span>/月</span></div>
+                        </div>
+                        <div class="city-card-tags">
+                            ${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+                        </div>
+                        <div class="city-card-stats">
+                            <div class="city-stat">
+                                <div class="city-stat-value">${air}</div>
+                                <div class="city-stat-label">空气</div>
+                            </div>
+                            <div class="city-stat">
+                                <div class="city-stat-value">${medical}</div>
+                                <div class="city-stat-label">医疗</div>
+                            </div>
+                            <div class="city-stat">
+                                <div class="city-stat-value">${living}</div>
+                                <div class="city-stat-label">生活</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
         }
 
-        // 创建城市卡片
-        function createCityCard(city) {
-            const card = document.createElement('div');
-            card.className = 'city-card';
+        // ===== Navigation & Actions =====
+        function goToCity(id) {
+            window.location.href = `city-detail.html?id=${id}`;
+        }
 
-            const score = (city.layflat_score || city.overall_score || 0).toFixed(1);
-            const rent = city.avg_rent || '暂无';
-            const air = (city.air_quality || 0).toFixed(1);
-            const medical = (city.medical_facilities || 0).toFixed(1);
-            const employment = (city.employment || 0).toFixed(1);
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
 
-            // 生成标签
-            const tags = [];
-            if (city.avg_rent && city.avg_rent < 1000) tags.push('低成本');
-            if (city.air_quality >= 7) tags.push('空气好');
-            if (city.elderly_care >= 7) tags.push('适合养老');
-            if (city.employment >= 7) tags.push('就业好');
+        // ===== Filter Functions =====
+        function openFilterDrawer() {
+            document.getElementById('filterOverlay').classList.add('active');
+            document.getElementById('filterDrawer').classList.add('active');
+        }
 
-            card.innerHTML = `
-                <div class="city-card-header">
-                    <h3 class="city-card-name">${city.name}</h3>
-                    <p class="city-card-location">${city.province || ''}</p>
-                </div>
-                <div class="city-card-body">
-                    <div class="city-card-price">¥${rent}/月</div>
-                    <div class="city-card-tags">
-                        ${tags.map(tag => `<span class="city-tag">${tag}</span>`).join('')}
-                    </div>
-                    <div class="city-card-stats">
-                        <div class="city-stat">
-                            <div class="city-stat-value">${score}</div>
-                            <div class="city-stat-label">综合评分</div>
-                        </div>
-                        <div class="city-stat">
-                            <div class="city-stat-value">${air}</div>
-                            <div class="city-stat-label">空气质量</div>
-                        </div>
-                        <div class="city-stat">
-                            <div class="city-stat-value">${medical}</div>
-                            <div class="city-stat-label">医疗</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        function closeFilterDrawer() {
+            document.getElementById('filterOverlay').classList.remove('active');
+            document.getElementById('filterDrawer').classList.remove('active');
+        }
 
-            card.onclick = () => {
-                window.location.href = `city-detail.html?id=${city.id}`;
+        function applyFilters() {
+            // 收集筛选条件
+            document.querySelectorAll('.filter-options').forEach(group => {
+                const type = group.dataset.filterType;
+                const activeOptions = group.querySelectorAll('.filter-option.active');
+
+                if (type === 'features') {
+                    state.filters.features = Array.from(activeOptions).map(o => o.dataset.value);
+                } else if (activeOptions.length > 0) {
+                    state.filters[type] = activeOptions[0].dataset.value;
+                } else {
+                    state.filters[type] = null;
+                }
+            });
+
+            closeFilterDrawer();
+            loadCities(true);
+        }
+
+        function resetFilters() {
+            state.filters = {
+                search: '',
+                rent: null,
+                region: null,
+                tier: null,
+                features: [],
+                budget: null
             };
 
-            return card;
+            document.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+            document.querySelectorAll('.quick-tag').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.budget-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('heroSearchInput').value = '';
+            document.getElementById('navSearchInput').value = '';
+
+            closeFilterDrawer();
+            loadCities(true);
         }
 
-        // 应用筛选
-        function applyFilters() {
-            filteredCities = allCities.filter(city => {
-                // 搜索过滤
-                if (activeFilters.search) {
-                    const search = activeFilters.search.toLowerCase();
-                    const matchName = city.name.toLowerCase().includes(search);
-                    const matchProvince = city.province && city.province.toLowerCase().includes(search);
-                    if (!matchName && !matchProvince) return false;
-                }
-
-                // 预算过滤
-                if (activeFilters.budget) {
-                    const [min, max] = activeFilters.budget.split('-').map(Number);
-                    const rent = city.avg_rent || 0;
-                    if (max === 9999) {
-                        if (rent < min) return false;
-                    } else {
-                        if (rent < min || rent > max) return false;
-                    }
-                }
-
-                // 快速筛选
-                if (activeFilters.quickFilter) {
-                    const filter = activeFilters.quickFilter;
-                    if (filter === 'low-cost' && city.avg_rent > 1500) return false;
-                    if (filter === 'elderly' && city.elderly_care < 5) return false;
-                    if (filter === 'employment' && city.employment < 5) return false;
-                    if (filter === 'air' && city.air_quality < 7) return false;
-                    if (filter === 'safety' && city.safety < 7) return false;
-                    // coastal 需要标签支持
-                }
-
-                return true;
+        // ===== Event Listeners =====
+        function initEventListeners() {
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
+                const navbar = document.getElementById('navbar');
+                navbar.classList.toggle('scrolled', window.scrollY > 10);
             });
 
-            renderCities(filteredCities);
-        }
-
-        // 初始化事件监听
-        function initEventListeners() {
-            // 搜索功能
+            // Search
             const heroSearchInput = document.getElementById('heroSearchInput');
             const heroSearchBtn = document.getElementById('heroSearchBtn');
             const navSearchInput = document.getElementById('navSearchInput');
 
             heroSearchBtn.addEventListener('click', () => {
-                activeFilters.search = heroSearchInput.value.trim();
-                applyFilters();
-                document.getElementById('cities').scrollIntoView({ behavior: 'smooth' });
+                state.filters.search = heroSearchInput.value.trim();
+                loadCities(true);
+                document.getElementById('ranking').scrollIntoView({ behavior: 'smooth' });
             });
 
             heroSearchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    heroSearchBtn.click();
-                }
+                if (e.key === 'Enter') heroSearchBtn.click();
             });
 
             navSearchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    activeFilters.search = navSearchInput.value.trim();
-                    applyFilters();
+                    state.filters.search = navSearchInput.value.trim();
+                    loadCities(true);
                 }
             });
 
-            // 搜索提示
-            document.querySelectorAll('.hint-tag').forEach(tag => {
-                tag.addEventListener('click', () => {
-                    const hint = tag.dataset.hint;
-                    heroSearchInput.value = hint;
-                    activeFilters.search = hint;
-                    applyFilters();
-                    document.getElementById('cities').scrollIntoView({ behavior: 'smooth' });
-                });
-            });
-
-            // 快捷筛选
-            document.querySelectorAll('.quick-filters .filter-tag').forEach(tag => {
+            // Quick Tags
+            document.querySelectorAll('.quick-tag').forEach(tag => {
                 tag.addEventListener('click', () => {
                     const filter = tag.dataset.filter;
+                    const isActive = tag.classList.contains('active');
 
-                    // 切换激活状态
-                    document.querySelectorAll('.quick-filters .filter-tag').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.quick-tag').forEach(t => t.classList.remove('active'));
 
-                    if (activeFilters.quickFilter === filter) {
-                        activeFilters.quickFilter = null;
-                    } else {
+                    if (!isActive) {
                         tag.classList.add('active');
-                        activeFilters.quickFilter = filter;
+                        state.filters.features = [filter];
+                    } else {
+                        state.filters.features = [];
                     }
 
-                    applyFilters();
-                    document.getElementById('cities').scrollIntoView({ behavior: 'smooth' });
+                    loadCities(true);
+                    document.getElementById('ranking').scrollIntoView({ behavior: 'smooth' });
                 });
             });
 
-            // 轮播控制
-            document.getElementById('carouselPrev').addEventListener('click', () => {
-                if (carouselIndex > 0) {
-                    carouselIndex--;
-                    updateCarousel();
-                }
-            });
-
-            document.getElementById('carouselNext').addEventListener('click', () => {
-                const track = document.getElementById('carouselTrack');
-                const cards = track.querySelectorAll('.featured-card');
-                const totalPages = Math.ceil(cards.length / carouselItemsPerPage);
-
-                if (carouselIndex < totalPages - 1) {
-                    carouselIndex++;
-                    updateCarousel();
-                }
-            });
-
-            // 预算筛选
+            // Budget Cards
             document.querySelectorAll('.budget-card').forEach(card => {
                 card.addEventListener('click', () => {
                     const budget = card.dataset.budget;
+                    const isActive = card.classList.contains('active');
 
-                    // 切换激活状态
                     document.querySelectorAll('.budget-card').forEach(c => c.classList.remove('active'));
 
-                    if (activeFilters.budget === budget) {
-                        activeFilters.budget = null;
-                    } else {
+                    if (!isActive) {
                         card.classList.add('active');
-                        activeFilters.budget = budget;
+                        state.filters.rent = budget;
+                    } else {
+                        state.filters.rent = null;
                     }
 
-                    applyFilters();
+                    loadCities(true);
                 });
             });
 
-            // 筛选抽屉
-            const filterOverlay = document.getElementById('filterOverlay');
-            const filterDrawer = document.getElementById('filterDrawer');
-            const filterToggleBtn = document.getElementById('filterToggleBtn');
-            const filterDrawerClose = document.getElementById('filterDrawerClose');
-            const applyFiltersBtn = document.getElementById('applyFiltersBtn');
-            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
-
-            function openFilterDrawer() {
-                filterOverlay.classList.add('active');
-                filterDrawer.classList.add('active');
-            }
-
-            function closeFilterDrawer() {
-                filterOverlay.classList.remove('active');
-                filterDrawer.classList.remove('active');
-            }
-
-            filterToggleBtn.addEventListener('click', openFilterDrawer);
-            filterDrawerClose.addEventListener('click', closeFilterDrawer);
-            filterOverlay.addEventListener('click', closeFilterDrawer);
-
-            applyFiltersBtn.addEventListener('click', () => {
-                applyFilters();
-                closeFilterDrawer();
+            // Ranking Tabs
+            document.querySelectorAll('.ranking-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.ranking-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    state.currentList = tab.dataset.list;
+                    loadCities(true);
+                });
             });
 
-            resetFiltersBtn.addEventListener('click', () => {
-                // 清除所有筛选选项
-                document.querySelectorAll('.filter-option').forEach(opt => opt.classList.remove('active'));
-                activeFilters = {
-                    search: '',
-                    quickFilter: null,
-                    budget: null,
-                    rent: null,
-                    region: null,
-                    tier: null,
-                    feature: null
-                };
-                applyFilters();
-                closeFilterDrawer();
+            // Carousel Navigation
+            const carouselTrack = document.getElementById('carouselTrack');
+            document.getElementById('carouselPrev').addEventListener('click', () => {
+                carouselTrack.scrollBy({ left: -320, behavior: 'smooth' });
+            });
+            document.getElementById('carouselNext').addEventListener('click', () => {
+                carouselTrack.scrollBy({ left: 320, behavior: 'smooth' });
             });
 
-            // 筛选选项
+            // Filter Drawer
+            document.getElementById('filterBtn').addEventListener('click', openFilterDrawer);
+            document.getElementById('filterOverlay').addEventListener('click', closeFilterDrawer);
+            document.getElementById('filterClose').addEventListener('click', closeFilterDrawer);
+            document.getElementById('applyFilters').addEventListener('click', applyFilters);
+            document.getElementById('resetFilters').addEventListener('click', resetFilters);
+
+            // Filter Options (toggle)
             document.querySelectorAll('.filter-option').forEach(option => {
                 option.addEventListener('click', () => {
-                    const filterType = option.dataset.filterType;
-                    const value = option.dataset.value;
+                    const parent = option.closest('.filter-options');
+                    const type = parent.dataset.filterType;
 
-                    // 同类型互斥
-                    document.querySelectorAll(`[data-filter-type="${filterType}"]`).forEach(opt => {
-                        opt.classList.remove('active');
-                    });
-
-                    if (activeFilters[filterType] === value) {
-                        activeFilters[filterType] = null;
+                    if (type === 'features') {
+                        // 多选
+                        option.classList.toggle('active');
                     } else {
-                        option.classList.add('active');
-                        activeFilters[filterType] = value;
+                        // 单选
+                        parent.querySelectorAll('.filter-option').forEach(o => {
+                            if (o !== option) o.classList.remove('active');
+                        });
+                        option.classList.toggle('active');
                     }
                 });
             });
 
-            // 登录/注册模态框
-            const loginBtn = document.getElementById('loginBtn');
-            const loginModal = document.getElementById('loginModal');
-            const closeLoginModal = document.getElementById('closeLoginModal');
-            const registerModal = document.getElementById('registerModal');
-            const closeRegisterModal = document.getElementById('closeRegisterModal');
-
-            loginBtn.addEventListener('click', () => {
-                loginModal.classList.add('show');
+            // Load More
+            document.getElementById('loadMoreBtn').addEventListener('click', () => {
+                state.page++;
+                loadCities(false);
             });
 
-            closeLoginModal.addEventListener('click', () => {
-                loginModal.classList.remove('show');
+            // Login Modal
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                document.getElementById('loginModal').classList.add('show');
             });
-
-            closeRegisterModal.addEventListener('click', () => {
-                registerModal.classList.remove('show');
+            document.getElementById('closeLoginModal').addEventListener('click', () => {
+                document.getElementById('loginModal').classList.remove('show');
             });
-
-            // 点击模态框外部关闭
-            loginModal.addEventListener('click', (e) => {
-                if (e.target === loginModal) {
-                    loginModal.classList.remove('show');
+            document.getElementById('loginModal').addEventListener('click', (e) => {
+                if (e.target.id === 'loginModal') {
+                    document.getElementById('loginModal').classList.remove('show');
                 }
             });
 
-            registerModal.addEventListener('click', (e) => {
-                if (e.target === registerModal) {
-                    registerModal.classList.remove('show');
-                }
-            });
-
-            // 窗口大小改变时更新轮播
-            window.addEventListener('resize', () => {
-                updateCarousel();
+            // View All Ranking
+            document.getElementById('viewAllRanking').addEventListener('click', () => {
+                window.location.href = 'city-ranking.html';
             });
         }
 
-        // 页面加载完成后初始化
+        // ===== Initialize =====
+        async function init() {
+            console.log('🚀 初始化应用...');
+            console.log('API Base:', API_BASE);
+
+            initEventListeners();
+
+            await Promise.all([
+                loadFeaturedCities(),
+                loadCities(true)
+            ]);
+        }
+
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
