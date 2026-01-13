@@ -30,18 +30,28 @@ async function checkUrl(url) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
+    // 使用 GET 请求（Range header 只获取第一个字节，减少流量）
     const response = await fetch(url, {
-      method: 'HEAD',
+      method: 'GET',
+      headers: {
+        'Range': 'bytes=0-0'
+      },
       signal: controller.signal
     });
 
     clearTimeout(timeoutId);
+
+    // 206 Partial Content 或 200 OK 都表示文件存在
+    if (response.status === 206 || response.status === 200 || response.status === 304) {
+      return 200;
+    }
     return response.status;
   } catch (error) {
     if (error.name === 'AbortError') {
       return 'TIMEOUT';
     }
-    return 'ERROR';
+    // 返回更详细的错误信息
+    return `ERROR:${error.code || error.message?.substring(0, 30) || 'unknown'}`;
   }
 }
 

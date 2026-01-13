@@ -562,26 +562,35 @@ router.post('/images/batch-review', async (req, res) => {
 // 检查并清理 404 图片
 router.post('/images/cleanup-404', async (req, res) => {
   try {
-    const { dryRun = true } = req.body;
+    const { dryRun = true, limit = 0 } = req.body;
 
     // 获取所有图片
-    const images = await db.query(`
+    let query = `
       SELECT id, city_id, image_url, alt_text
       FROM city_images
       ORDER BY id
-    `);
+    `;
+    if (limit > 0) {
+      query += ` LIMIT ${parseInt(limit)}`;
+    }
+
+    const images = await db.query(query);
 
     if (images.length === 0) {
       return res.json({
         message: '没有图片需要检查',
         total: 0,
+        valid: 0,
         notFound: 0,
+        errors: 0,
         deleted: 0
       });
     }
 
     // 检查每个图片 URL
     const notFoundIds = [];
+    const errorImages = [];
+    let validCount = 0;
     const BATCH_SIZE = 10;
 
     for (let i = 0; i < images.length; i += BATCH_SIZE) {
@@ -592,39 +601,54 @@ router.post('/images/cleanup-404', async (req, res) => {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
 
+            // 使用 GET + Range 请求
             const response = await fetch(img.image_url, {
-              method: 'HEAD',
+              method: 'GET',
+              headers: { 'Range': 'bytes=0-0' },
               signal: controller.signal
             });
 
             clearTimeout(timeoutId);
 
             if (response.status === 404) {
-              return img.id;
+              return { id: img.id, status: 404 };
             }
-            return null;
+            if (response.status === 200 || response.status === 206 || response.status === 304) {
+              return { id: img.id, status: 'valid' };
+            }
+            return { id: img.id, status: response.status, url: img.image_url };
           } catch (error) {
-            // 超时或错误的图片也标记为需要删除
-            return img.id;
+            return {
+              id: img.id,
+              status: 'ERROR',
+              error: error.code || error.message?.substring(0, 50),
+              url: img.image_url
+            };
           }
         })
       );
 
-      notFoundIds.push(...checks.filter(Boolean));
+      for (const result of checks) {
+        if (result.status === 404) {
+          notFoundIds.push(result.id);
+        } else if (result.status === 'valid') {
+          validCount++;
+        } else {
+          errorImages.push(result);
+        }
+      }
     }
 
     let deleted = 0;
 
-    // 如果不是 dry run，执行删除
+    // 如果不是 dry run，执行删除 404 图片
     if (!dryRun && notFoundIds.length > 0) {
-      // 先获取要删除的图片信息（用于删除 R2 文件）
       const placeholders = notFoundIds.map(() => '?').join(',');
       const imagesToDelete = await db.query(
         `SELECT id, image_url, thumbnail_url FROM city_images WHERE id IN (${placeholders})`,
         notFoundIds
       );
 
-      // 收集 R2 URL
       const urlsToDelete = [];
       for (const img of imagesToDelete) {
         if (img.image_url) urlsToDelete.push(img.image_url);
@@ -633,12 +657,10 @@ router.post('/images/cleanup-404', async (req, res) => {
         }
       }
 
-      // 批量删除 R2 文件
       if (urlsToDelete.length > 0) {
         await batchDeleteFromR2(urlsToDelete);
       }
 
-      // 删除数据库记录
       await db.run(
         `DELETE FROM city_images WHERE id IN (${placeholders})`,
         notFoundIds
@@ -650,9 +672,12 @@ router.post('/images/cleanup-404', async (req, res) => {
     res.json({
       message: dryRun ? '检查完成（未删除）' : '清理完成',
       total: images.length,
+      valid: validCount,
       notFound: notFoundIds.length,
+      errors: errorImages.length,
       deleted: deleted,
-      notFoundIds: dryRun ? notFoundIds : undefined
+      notFoundIds: dryRun ? notFoundIds.slice(0, 100) : undefined,
+      errorSamples: errorImages.slice(0, 10)
     });
 
   } catch (error) {
