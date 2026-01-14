@@ -201,7 +201,11 @@ def batch_crawl(args):
     completed_ids = set(log['completed'])
 
     # 筛选需要爬取的城市
-    if args.only_missing:
+    if args.no_images:
+        # 只爬取完全没有图片的城市
+        cities = [c for c in cities if c['image_count'] == 0]
+        print(f"筛选出 {len(cities)} 个没有图片的城市", flush=True)
+    elif args.only_missing:
         # 只爬取图片不足的城市
         cities = [c for c in cities if c['image_count'] < 3]
         print(f"筛选出 {len(cities)} 个图片不足的城市", flush=True)
@@ -310,6 +314,10 @@ def main():
     parser.add_argument('--only-missing', '-m',
                         action='store_true',
                         help='只爬取图片不足的城市(图片<3张)')
+
+    parser.add_argument('--no-images',
+                        action='store_true',
+                        help='只爬取完全没有图片的城市(图片=0张)')
 
     parser.add_argument('--skip-completed', '-s',
                         action='store_true',

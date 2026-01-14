@@ -43,6 +43,8 @@ LIST_TYPE=""
 CITY_ID=""
 SKIP_CONFIRM=""
 BACKUP_ENABLED="true"
+ONLY_MISSING=""
+NO_IMAGES=""
 
 # 颜色输出
 RED='\033[0;31m'
@@ -94,6 +96,8 @@ ${YELLOW}选项:${NC}
   --template N        使用指定的关键词模板索引
   --list-type TYPE    只刷新指定榜单 (china_general/china_layflat/world)
   --city-id ID        只刷新指定城市ID
+  --only-missing      只刷新图片不足的城市（图片<3张）
+  --no-images         只刷新完全没有图片的城市（图片=0张）
   --limit N           限制刷新的城市数量
   --engine ENGINE     搜索引擎 (Google/Baidu/Bing)
   --max-number N      每城市爬取图片数
@@ -190,6 +194,14 @@ while [[ $# -gt 0 ]]; do
             BACKUP_ENABLED=""
             shift
             ;;
+        --only-missing)
+            ONLY_MISSING="true"
+            shift
+            ;;
+        --no-images)
+            NO_IMAGES="true"
+            shift
+            ;;
         --downloader)
             DOWNLOADER_PATH="$2"
             shift 2
@@ -275,6 +287,8 @@ show_warning() {
     [[ -n "$TEMPLATE_INDEX" ]] && log_info "指定模板索引: $TEMPLATE_INDEX"
     [[ -n "$LIST_TYPE" ]] && log_info "指定榜单类型: $LIST_TYPE"
     [[ -n "$CITY_ID" ]] && log_info "指定城市ID: $CITY_ID"
+    [[ -n "$NO_IMAGES" ]] && log_info "只刷新没有图片的城市（=0张）"
+    [[ -n "$ONLY_MISSING" ]] && log_info "只刷新图片不足的城市（<3张）"
     [[ -n "$LIMIT" ]] && log_info "限制城市数量: $LIMIT"
     echo ""
 }
@@ -400,6 +414,8 @@ step2_crawl_with_new_keywords() {
     [[ -n "$TEMPLATE_INDEX" ]] && CMD="$CMD --template-index $TEMPLATE_INDEX"
     [[ -n "$LIST_TYPE" ]] && CMD="$CMD --list-type $LIST_TYPE"
     [[ -n "$CITY_ID" ]] && CMD="$CMD --city-id $CITY_ID"
+    [[ -n "$NO_IMAGES" ]] && CMD="$CMD --no-images"
+    [[ -n "$ONLY_MISSING" ]] && CMD="$CMD --only-missing"
     [[ -n "$LIMIT" ]] && CMD="$CMD --limit $LIMIT"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD --dry-run"
 
