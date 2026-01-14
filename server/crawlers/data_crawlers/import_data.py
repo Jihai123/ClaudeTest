@@ -124,12 +124,16 @@ class DatabaseImporter:
                 if crawl_field in data and data[crawl_field] is not None:
                     value = data[crawl_field]
 
-                    # 检查是否需要更新（force模式或字段为空）
+                    # 检查是否需要更新（仅force模式覆盖，或字段为空）
                     cursor.execute(f'SELECT {db_field} FROM cities WHERE id = ?', (city_id,))
                     row = cursor.fetchone()
                     current_value = row[0] if row else None
 
-                    if self.force or current_value is None or current_value == '' or current_value == 0:
+                    # 默认只填充空值，不覆盖任何已有数据
+                    # 注意：0 可能是有意义的值，不应被覆盖
+                    is_empty = current_value is None or current_value == ''
+
+                    if self.force or is_empty:
                         updates.append(f'{db_field} = ?')
                         values.append(value)
 

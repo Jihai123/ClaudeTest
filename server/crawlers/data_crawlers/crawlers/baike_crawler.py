@@ -228,9 +228,10 @@ class BaikeCrawler(BaseCrawler):
         value = value.strip()
 
         patterns = [
-            (r'([\d.]+)\s*万?\s*(?:平方公里|km²|㎢)', lambda m: float(m.group(1))),
-            (r'([\d.]+)\s*万\s*(?:平方公里|km²|㎢)', lambda m: float(m.group(1)) * 10000),
-            (r'([\d,]+)\s*(?:平方千米|平方公里)', lambda m: float(m.group(1).replace(',', ''))),
+            # 先匹配"万平方公里"（优先级高）
+            (r'([\d.]+)\s*万\s*(?:平方公里|平方千米|km²|㎢)', lambda m: float(m.group(1)) * 10000),
+            # 再匹配普通的"平方公里"
+            (r'([\d,.]+)\s*(?:平方公里|平方千米|km²|㎢)', lambda m: float(m.group(1).replace(',', ''))),
         ]
 
         for pattern, converter in patterns:

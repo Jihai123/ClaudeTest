@@ -4,11 +4,12 @@
 整合所有数据源，支持分类爬取
 
 用法:
-    python crawl_all.py --type all          # 爬取全部数据
+    python crawl_all.py --type all          # 爬取全部数据（不含评论）
     python crawl_all.py --type basic        # 只爬取基础数据（百度百科）
     python crawl_all.py --type housing      # 只爬取房价租金
     python crawl_all.py --type weather      # 只爬取气候数据
     python crawl_all.py --type quality      # 只爬取生活质量数据
+    python crawl_all.py --type reviews      # 只爬取用户评论（抖音/小红书/知乎）
     python crawl_all.py --city-id 1         # 只处理指定城市
     python crawl_all.py --limit 10          # 限制城市数量
     python crawl_all.py --dry-run           # 试运行
@@ -28,7 +29,7 @@ SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent.parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from crawlers import BaikeCrawler, WeatherCrawler, HousingCrawler, QualityCrawler
+from crawlers import BaikeCrawler, WeatherCrawler, HousingCrawler, QualityCrawler, ReviewCrawler
 
 # 加载.env文件
 def load_env():
@@ -191,6 +192,28 @@ def crawl_quality_data(cities: List[Dict], skip_completed: bool = False,
     return results
 
 
+def crawl_review_data(cities: List[Dict], skip_completed: bool = False,
+                      completed_ids: set = None) -> List[Dict]:
+    """爬取用户评论数据（抖音/小红书/知乎/贴吧）"""
+    logger.info("=" * 50)
+    logger.info("开始爬取用户评论数据")
+    logger.info("=" * 50)
+    logger.info("注意：社交平台反爬严格，部分数据可能获取失败")
+
+    crawler = ReviewCrawler(delay=5.0)  # 较长延迟避免封IP
+    results = crawler.crawl_cities(
+        cities,
+        skip_completed=skip_completed,
+        completed_ids=completed_ids
+    )
+
+    # 保存原始数据
+    output_file = RAW_DATA_DIR / 'review_data.json'
+    crawler.save_results(results, output_file)
+
+    return results
+
+
 def merge_all_data(cities: List[Dict]) -> List[Dict]:
     """合并所有爬取的数据"""
     logger.info("=" * 50)
@@ -203,6 +226,7 @@ def merge_all_data(cities: List[Dict]) -> List[Dict]:
         'weather': RAW_DATA_DIR / 'weather_data.json',
         'housing': RAW_DATA_DIR / 'housing_data.json',
         'quality': RAW_DATA_DIR / 'quality_data.json',
+        'reviews': RAW_DATA_DIR / 'review_data.json',
     }
 
     all_data = {}
@@ -242,8 +266,8 @@ def merge_all_data(cities: List[Dict]) -> List[Dict]:
 def main():
     parser = argparse.ArgumentParser(description='城市数据批量爬取')
     parser.add_argument('--type', '-t', default='all',
-                        choices=['all', 'basic', 'weather', 'housing', 'quality', 'merge'],
-                        help='爬取类型')
+                        choices=['all', 'basic', 'weather', 'housing', 'quality', 'reviews', 'merge'],
+                        help='爬取类型（reviews需要更长时间）')
     parser.add_argument('--city-id', type=int, help='只处理指定城市ID')
     parser.add_argument('--limit', '-l', type=int, help='限制城市数量')
     parser.add_argument('--skip-completed', '-s', action='store_true',
@@ -340,6 +364,12 @@ def main():
         results = crawl_quality_data(cities, args.skip_completed, completed)
         completed.update(r['city_id'] for r in results if 'error' not in r)
         save_log('quality', results, completed)
+
+    elif crawl_type == 'reviews':
+        completed = load_completed_ids('reviews') if args.skip_completed else set()
+        results = crawl_review_data(cities, args.skip_completed, completed)
+        completed.update(r['city_id'] for r in results if 'error' not in r)
+        save_log('reviews', results, completed)
 
     elif crawl_type == 'merge':
         merge_all_data(cities)
