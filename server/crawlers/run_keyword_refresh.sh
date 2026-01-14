@@ -373,11 +373,8 @@ step1_export_cities() {
 
     cd "$SCRIPT_DIR"
 
-    if [[ -n "$DRY_RUN" ]]; then
-        log_warn "[DRY-RUN] 将执行: python3 -u export_cities.py"
-    else
-        python3 -u export_cities.py
-    fi
+    # 无论是否dry-run，都需要导出城市列表（用于后续查询）
+    python3 -u export_cities.py
 
     log_success "城市列表导出完成"
     echo ""
@@ -421,18 +418,15 @@ step2_crawl_with_new_keywords() {
 
     log_info "执行命令: $CMD"
 
-    if [[ -n "$DRY_RUN" ]]; then
-        log_warn "[DRY-RUN] 将执行上述命令"
-    else
-        # 激活conda环境
-        if command -v conda &> /dev/null && conda env list | grep -q "^$CONDA_ENV "; then
-            log_info "激活 conda 环境: $CONDA_ENV"
-            eval "$(conda shell.bash hook)"
-            conda activate $CONDA_ENV
-        fi
-
-        eval $CMD
+    # 激活conda环境
+    if command -v conda &> /dev/null && conda env list | grep -q "^$CONDA_ENV "; then
+        log_info "激活 conda 环境: $CONDA_ENV"
+        eval "$(conda shell.bash hook)"
+        conda activate $CONDA_ENV
     fi
+
+    # 无论是否dry-run，都执行命令（batch_crawl.py的--dry-run会显示城市列表但不实际爬取）
+    eval $CMD
 
     # 恢复原配置文件
     if [[ -n "$use_temp_config" ]] && [[ -f "$DEFAULT_CONFIG_FILE.bak" ]]; then
