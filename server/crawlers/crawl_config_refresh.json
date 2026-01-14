@@ -1,0 +1,27 @@
+{
+  "engine": "Bing",
+  "max_number": 5,
+  "delay": 2,
+  "conda_env": "img",
+
+  "search_templates": [
+    "{city}城市风光 高清",
+    "{city}著名地标 建筑",
+    "{city}旅游景点 风景",
+    "{city}城市夜景 灯光",
+    "{city}当地特色 文化"
+  ],
+
+  "注释": {
+    "说明": "这是关键词刷新专用的配置文件",
+    "用法": "./run_keyword_refresh.sh 会自动使用此文件",
+    "修改": "请根据需要修改 search_templates 中的关键词模板",
+    "格式": "{city} 会被替换为城市名称",
+    "示例": [
+      "{city}城市天际线",
+      "{city}历史古迹",
+      "{city}自然公园",
+      "{city}美食街道"
+    ]
+  }
+}
