@@ -188,6 +188,10 @@ while [[ $# -gt 0 ]]; do
             BACKUP_ENABLED=""
             shift
             ;;
+        --downloader)
+            DOWNLOADER_PATH="$2"
+            shift 2
+            ;;
         --skip-upload)
             SKIP_UPLOAD="--local-only"
             shift
@@ -378,6 +382,7 @@ step2_crawl_with_new_keywords() {
 
     [[ -n "$TEMPLATE_INDEX" ]] && CMD="$CMD --template-index $TEMPLATE_INDEX"
     [[ -n "$LIST_TYPE" ]] && CMD="$CMD --list-type $LIST_TYPE"
+    [[ -n "$CITY_ID" ]] && CMD="$CMD --city-id $CITY_ID"
     [[ -n "$LIMIT" ]] && CMD="$CMD --limit $LIMIT"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD --dry-run"
 
