@@ -9,7 +9,9 @@ import json
 import shutil
 import hashlib
 import argparse
+import uuid
 from pathlib import Path
+from datetime import datetime
 from PIL import Image
 from collections import defaultdict
 
@@ -145,6 +147,17 @@ class ImageFilter:
             'failed_images': failed
         }
 
+    def generate_unique_filename(self, city_id, ext):
+        """
+        生成唯一文件名，避免覆盖已有文件
+
+        格式: {city_id}_{timestamp}_{random}.{ext}
+        例如: 1211_20240114120000_a1b2c3d4.jpg
+        """
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        random_str = uuid.uuid4().hex[:8]
+        return f'{city_id}_{timestamp}_{random_str}{ext}'
+
     def copy_filtered_images(self, city_result):
         """复制筛选后的图片到目标目录"""
         city_id = city_result['city_id']
@@ -156,9 +169,19 @@ class ImageFilter:
             for i, img_info in enumerate(city_result['selected_images'], 1):
                 src_path = img_info['path']
                 ext = src_path.suffix
-                dst_path = output_dir / f'{city_id}_{i}{ext}'
+
+                # 根据参数决定使用唯一文件名还是固定文件名
+                if self.args.unique_names:
+                    # 使用唯一文件名，避免覆盖已有图片
+                    filename = self.generate_unique_filename(city_id, ext)
+                else:
+                    # 使用固定文件名（原有逻辑）
+                    filename = f'{city_id}_{i}{ext}'
+
+                dst_path = output_dir / filename
                 shutil.copy2(src_path, dst_path)
                 img_info['filtered_path'] = str(dst_path)
+                img_info['filtered_filename'] = filename
 
     def copy_rejected_images(self, city_result):
         """复制被拒绝的图片到拒绝目录（用于审核）"""
@@ -200,6 +223,10 @@ class ImageFilter:
         print(f"  - 文件大小: {MIN_FILE_SIZE/1024}KB - {MAX_FILE_SIZE/1024/1024}MB")
         print(f"  - 宽高比: {PREFERRED_RATIO_MIN} - {PREFERRED_RATIO_MAX}")
         print(f"  - 每城市最多: {MAX_IMAGES_PER_CITY} 张")
+        if self.args.unique_names:
+            print(f"  - 文件命名: 唯一文件名 (city_timestamp_random.ext)")
+        else:
+            print(f"  - 文件命名: 固定文件名 (city_1.ext)")
         print("-" * 50)
 
         results = []
@@ -259,6 +286,10 @@ def main():
                         type=int,
                         default=MAX_IMAGES_PER_CITY,
                         help=f'每城市最多图片数 (默认: {MAX_IMAGES_PER_CITY})')
+
+    parser.add_argument('--unique-names',
+                        action='store_true',
+                        help='使用唯一文件名（时间戳+随机字符串），避免覆盖已有图片')
 
     args = parser.parse_args()
 

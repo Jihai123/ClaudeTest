@@ -30,6 +30,7 @@ load_env()
 try:
     import boto3
     from botocore.config import Config
+    from botocore.exceptions import ClientError
 except ImportError:
     print("请安装 boto3: pip install boto3")
     exit(1)
@@ -72,16 +73,35 @@ class R2Uploader:
         )
         self.bucket = R2_BUCKET_NAME
 
-    def upload_file(self, file_path, key=None):
+    def check_exists(self, key):
+        """
+        检查R2中是否已存在指定key的文件
+
+        Args:
+            key: R2对象键名
+
+        Returns:
+            bool: 文件是否存在
+        """
+        try:
+            self.s3.head_object(Bucket=self.bucket, Key=key)
+            return True
+        except ClientError as e:
+            if e.response['Error']['Code'] == '404':
+                return False
+            raise
+
+    def upload_file(self, file_path, key=None, no_overwrite=False):
         """
         上传文件到R2
 
         Args:
             file_path: 本地文件路径
             key: R2对象键名（默认使用唯一文件名）
+            no_overwrite: 如果为True，当文件已存在时返回None而不是覆盖
 
         Returns:
-            str: 公开访问URL
+            str: 公开访问URL，如果no_overwrite=True且文件已存在则返回None
         """
         path = Path(file_path)
 
@@ -91,6 +111,17 @@ class R2Uploader:
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             random_str = uuid.uuid4().hex[:8]
             key = f"city_images/{timestamp}_{random_str}{ext}"
+
+        # 如果启用了不覆盖模式，先检查文件是否存在
+        if no_overwrite:
+            try:
+                if self.check_exists(key):
+                    print(f"    [安全] R2文件已存在，跳过: {key}")
+                    return None
+            except Exception as e:
+                print(f"    [警告] 无法检查R2文件是否存在: {e}")
+                # 出错时为安全起见，不上传
+                return None
 
         # 获取MIME类型
         content_type = mimetypes.guess_type(str(path))[0] or 'image/jpeg'
@@ -203,12 +234,18 @@ def import_images(args):
 
     db = DatabaseImporter(DB_PATH)
 
+    # 显示安全模式状态
+    no_overwrite = getattr(args, 'no_overwrite', False)
+    if no_overwrite:
+        print("[安全模式] 启用不覆盖模式，R2已存在的文件将被跳过")
+
     # 统计
     stats = {
         'cities_processed': 0,
         'images_uploaded': 0,
         'images_imported': 0,
         'images_skipped': 0,
+        'images_skipped_r2': 0,  # R2文件已存在而跳过的
         'errors': []
     }
 
@@ -232,7 +269,8 @@ def import_images(args):
             'total': len(images),
             'uploaded': 0,
             'imported': 0,
-            'skipped': 0
+            'skipped': 0,
+            'skipped_r2': 0
         }
 
         for img_path in images:
@@ -245,7 +283,14 @@ def import_images(args):
                 # 上传到R2
                 if uploader and not args.local_only:
                     key = f"city_images/{city_id}/{img_path.name}"
-                    image_url = uploader.upload_file(img_path, key)
+                    image_url = uploader.upload_file(img_path, key, no_overwrite=no_overwrite)
+
+                    # 如果启用了不覆盖模式且R2文件已存在，跳过
+                    if image_url is None:
+                        city_result['skipped_r2'] += 1
+                        stats['images_skipped_r2'] += 1
+                        continue
+
                     print(f"    上传: {img_path.name} -> {image_url}")
                 else:
                     # 本地模式，使用本地路径
@@ -298,7 +343,9 @@ def import_images(args):
     print(f"处理城市数: {stats['cities_processed']}")
     print(f"上传图片数: {stats['images_uploaded']}")
     print(f"导入数据库: {stats['images_imported']}")
-    print(f"跳过(已存在): {stats['images_skipped']}")
+    print(f"跳过(数据库已存在): {stats['images_skipped']}")
+    if stats['images_skipped_r2'] > 0:
+        print(f"跳过(R2已存在): {stats['images_skipped_r2']}")
     print(f"错误数: {len(stats['errors'])}")
     print(f"日志文件: {IMPORT_LOG}")
 
@@ -321,6 +368,10 @@ def main():
     parser.add_argument('--city-id',
                         type=str,
                         help='只处理指定城市ID')
+
+    parser.add_argument('--no-overwrite',
+                        action='store_true',
+                        help='安全模式：如果R2文件已存在则跳过，不覆盖')
 
     args = parser.parse_args()
     import_images(args)
