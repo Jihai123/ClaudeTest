@@ -3,3 +3,5 @@ node_modules/
 database.sqlite
 *.log
 .DS_Store
+__pycache__/
+*.pyc
