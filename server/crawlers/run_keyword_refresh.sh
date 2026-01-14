@@ -90,6 +90,7 @@ ${YELLOW}用法:${NC}
 
 ${YELLOW}选项:${NC}
   --config FILE       使用指定的关键词配置文件（默认: crawl_config_refresh.json）
+  --downloader PATH   image_downloader.py 的路径（必需）
   --template N        使用指定的关键词模板索引
   --list-type TYPE    只刷新指定榜单 (china_general/china_layflat/world)
   --city-id ID        只刷新指定城市ID
@@ -99,6 +100,7 @@ ${YELLOW}选项:${NC}
   --dry-run           试运行，不实际执行
   --skip-confirm      跳过确认提示
   --no-backup         不备份本地缓存
+  --skip-upload       跳过R2上传，使用本地模式
   --show-templates    显示关键词模板
   --help              显示此帮助
 
@@ -110,20 +112,20 @@ ${YELLOW}工作流程:${NC}
   5. 上传到R2并导入数据库
 
 ${YELLOW}示例:${NC}
-  # 使用新关键词配置刷新所有城市
-  ./run_keyword_refresh.sh
+  # 刷新指定城市（推荐先测试单个城市）
+  ./run_keyword_refresh.sh --city-id 1002 --downloader /www/imgDownloader/image_downloader.py
 
   # 只刷新躺平榜前10个城市
-  ./run_keyword_refresh.sh --list-type china_layflat --limit 10
+  ./run_keyword_refresh.sh --list-type china_layflat --limit 10 --downloader /path/to/image_downloader.py
 
   # 使用指定模板刷新
-  ./run_keyword_refresh.sh --template 0
+  ./run_keyword_refresh.sh --template 0 --downloader /path/to/image_downloader.py
 
-  # 只刷新指定城市
-  ./run_keyword_refresh.sh --city-id 1211
+  # 试运行查看会执行什么（不需要downloader）
+  ./run_keyword_refresh.sh --city-id 1002 --dry-run
 
-  # 试运行查看会执行什么
-  ./run_keyword_refresh.sh --dry-run
+  # 使用nohup后台执行
+  nohup ./run_keyword_refresh.sh --city-id 1002 --downloader /www/imgDownloader/image_downloader.py --skip-confirm > refresh.log 2>&1 &
 
 ${YELLOW}配置文件:${NC}
   默认使用 crawl_config_refresh.json，可以设置新的关键词模板：
@@ -188,6 +190,10 @@ while [[ $# -gt 0 ]]; do
             BACKUP_ENABLED=""
             shift
             ;;
+        --downloader)
+            DOWNLOADER_PATH="$2"
+            shift 2
+            ;;
         --skip-upload)
             SKIP_UPLOAD="--local-only"
             shift
@@ -219,6 +225,21 @@ done
 check_python() {
     if ! command -v python3 &> /dev/null; then
         log_error "未找到 python3"
+        exit 1
+    fi
+}
+
+# 检查downloader路径
+check_downloader() {
+    if [[ "$DOWNLOADER_PATH" == "image_downloader.py" ]] && [[ ! -f "$DOWNLOADER_PATH" ]]; then
+        log_error "未指定 image_downloader.py 路径"
+        log_info "请使用 --downloader 参数指定路径，例如:"
+        echo "  ./run_keyword_refresh.sh --downloader /www/imgDownloader/image_downloader.py"
+        exit 1
+    fi
+
+    if [[ ! -f "$DOWNLOADER_PATH" ]]; then
+        log_error "image_downloader.py 不存在: $DOWNLOADER_PATH"
         exit 1
     fi
 }
@@ -378,6 +399,7 @@ step2_crawl_with_new_keywords() {
 
     [[ -n "$TEMPLATE_INDEX" ]] && CMD="$CMD --template-index $TEMPLATE_INDEX"
     [[ -n "$LIST_TYPE" ]] && CMD="$CMD --list-type $LIST_TYPE"
+    [[ -n "$CITY_ID" ]] && CMD="$CMD --city-id $CITY_ID"
     [[ -n "$LIMIT" ]] && CMD="$CMD --limit $LIMIT"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD --dry-run"
 
@@ -447,6 +469,7 @@ step4_safe_upload() {
     # 使用 --no-overwrite 选项确保不覆盖
     CMD="python3 -u import_to_db.py --no-overwrite"
     [[ -n "$SKIP_UPLOAD" ]] && CMD="$CMD $SKIP_UPLOAD"
+    [[ -n "$CITY_ID" ]] && CMD="$CMD --city-id $CITY_ID"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD --dry-run"
 
     log_info "执行命令: $CMD"
@@ -470,6 +493,11 @@ main() {
     echo ""
 
     check_python
+
+    # 非试运行模式下检查downloader路径
+    if [[ -z "$DRY_RUN" ]]; then
+        check_downloader
+    fi
 
     # 显示警告
     show_warning

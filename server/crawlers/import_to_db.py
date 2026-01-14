@@ -212,6 +212,14 @@ def import_images(args):
     # 获取所有城市目录
     city_dirs = [d for d in FILTERED_DIR.iterdir() if d.is_dir()]
 
+    # 如果指定了城市ID，只处理该城市
+    if args.city_id:
+        city_dirs = [d for d in city_dirs if d.name == args.city_id]
+        if not city_dirs:
+            print(f"错误: 未找到城市ID {args.city_id} 的筛选图片目录")
+            return
+        print(f"只处理城市ID: {args.city_id}")
+
     if not city_dirs:
         print("没有找到筛选后的图片目录")
         return

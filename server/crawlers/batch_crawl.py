@@ -216,6 +216,14 @@ def batch_crawl(args):
         cities = [c for c in cities if c['list_type'] == args.list_type]
         print(f"筛选 {args.list_type} 榜单，共 {len(cities)} 个城市", flush=True)
 
+    if args.city_id:
+        # 只爬取指定城市ID
+        cities = [c for c in cities if c['id'] == args.city_id]
+        if not cities:
+            print(f"错误: 未找到城市ID {args.city_id}", flush=True)
+            return
+        print(f"只爬取城市ID: {args.city_id} ({cities[0]['name']})", flush=True)
+
     if args.limit:
         cities = cities[:args.limit]
         print(f"限制为前 {args.limit} 个城市", flush=True)
@@ -338,6 +346,10 @@ def main():
     parser.add_argument('--show-templates',
                         action='store_true',
                         help='显示所有关键词模板')
+
+    parser.add_argument('--city-id',
+                        type=int,
+                        help='只爬取指定城市ID')
 
     args = parser.parse_args()
     batch_crawl(args)
