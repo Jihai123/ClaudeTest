@@ -1,0 +1,11 @@
+[
+  {
+    "avg_temp": 16.5,
+    "rainfall": 900,
+    "climate_type": "亚热带季风气候",
+    "data_source": "reference",
+    "best_months": "3-5月, 9-11月",
+    "city_id": 1,
+    "city_name": "成都"
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-01-14T14:51:45.382239",
+  "stats": {
+    "original_count": 1,
+    "filtered_count": 1,
+    "pass_rate": "100.0%"
+  },
+  "field_coverage": {
+    "population": "0/1",
+    "gdp": "0/1",
+    "area": "0/1",
+    "avg_price": "1/1",
+    "avg_rent": "1/1",
+    "avg_temp": "1/1",
+    "rainfall": "1/1",
+    "aqi": "1/1",
+    "hospital_count": "1/1",
+    "university_count": "1/1",
+    "description": "0/1",
+    "climate_type": "1/1"
+  },
+  "completeness": {
+    "excellent": 0,
+    "good": 1,
+    "partial": 0,
+    "poor": 0
+  },
+  "warnings_count": 0,
+  "errors_count": 0,
+  "sample_warnings": [],
+  "sample_errors": []
+}

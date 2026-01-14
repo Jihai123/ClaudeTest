@@ -1,0 +1,101 @@
+{
+  "total": 10,
+  "stats": {
+    "china_general": 10,
+    "china_layflat": 0,
+    "world": 0,
+    "need_images": 10
+  },
+  "cities": [
+    {
+      "id": 1,
+      "name": "成都",
+      "name_en": null,
+      "province": "四川",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 2,
+      "name": "杭州",
+      "name_en": null,
+      "province": "浙江",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 3,
+      "name": "青岛",
+      "name_en": null,
+      "province": "山东",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 4,
+      "name": "厦门",
+      "name_en": null,
+      "province": "福建",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 5,
+      "name": "大连",
+      "name_en": null,
+      "province": "辽宁",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 6,
+      "name": "昆明",
+      "name_en": null,
+      "province": "云南",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 7,
+      "name": "苏州",
+      "name_en": null,
+      "province": "江苏",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 8,
+      "name": "珠海",
+      "name_en": null,
+      "province": "广东",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 9,
+      "name": "威海",
+      "name_en": null,
+      "province": "山东",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    },
+    {
+      "id": 10,
+      "name": "南京",
+      "name_en": null,
+      "province": "江苏",
+      "country": "中国",
+      "list_type": "china_general",
+      "image_count": 0
+    }
+  ]
+}

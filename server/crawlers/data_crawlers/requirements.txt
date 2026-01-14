@@ -1,0 +1,11 @@
+# 城市数据爬虫依赖
+
+# HTTP请求
+requests>=2.28.0
+
+# HTML解析
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+
+# 其他
+urllib3>=1.26.0
