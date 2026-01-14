@@ -452,6 +452,7 @@ step4_safe_upload() {
     # 使用 --no-overwrite 选项确保不覆盖
     CMD="python3 -u import_to_db.py --no-overwrite"
     [[ -n "$SKIP_UPLOAD" ]] && CMD="$CMD $SKIP_UPLOAD"
+    [[ -n "$CITY_ID" ]] && CMD="$CMD --city-id $CITY_ID"
     [[ -n "$DRY_RUN" ]] && CMD="$CMD --dry-run"
 
     log_info "执行命令: $CMD"
