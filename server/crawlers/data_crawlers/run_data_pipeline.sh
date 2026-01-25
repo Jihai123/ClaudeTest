@@ -167,12 +167,19 @@ step_filter() {
     fi
 }
 
-# 步骤3: 导入数据库
+# 步骤3: 导入数据库（含自动备份）
 step_import() {
     echo ""
     echo "=========================================="
     echo "步骤3: 导入数据库"
     echo "=========================================="
+
+    # 导入前自动备份
+    if [[ -z "$DRY_RUN" ]]; then
+        info "创建导入前备份..."
+        python3 data_backup.py backup -d "pipeline自动备份 ($(date '+%Y-%m-%d %H:%M'))"
+        success "备份完成"
+    fi
 
     CMD="python3 import_data.py $CITY_ID $FORCE $DRY_RUN"
     info "执行: $CMD"
@@ -182,6 +189,12 @@ step_import() {
     else
         eval $CMD
         success "导入完成"
+    fi
+
+    # 导入后验证
+    if [[ -z "$DRY_RUN" ]]; then
+        info "验证数据..."
+        python3 data_backup.py validate
     fi
 }
 
