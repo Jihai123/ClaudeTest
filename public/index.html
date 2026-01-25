@@ -1478,11 +1478,41 @@
         }
 
         // ===== City Image Helper =====
-        function getCityImageUrl(city) {
-            if (city.cover_image && city.cover_image.image_url) {
+        function getCityImageUrl(city, imageIndex = 1) {
+            // 如果有封面图片且是第一次尝试，使用封面图片
+            if (imageIndex === 1 && city.cover_image && city.cover_image.image_url) {
                 return city.cover_image.image_url;
             }
-            return `${R2_IMAGE_BASE}/${city.id}/${city.id}_1.jpeg`;
+            // 否则尝试按索引获取图片
+            return `${R2_IMAGE_BASE}/${city.id}/${city.id}_${imageIndex}.jpeg`;
+        }
+
+        // 图片加载失败时的重试机制
+        function setupImageFallback(img, cityId, currentIndex = 1) {
+            const maxRetries = 5; // 最多尝试5张图片
+
+            img.addEventListener('error', function() {
+                const nextIndex = currentIndex + 1;
+                if (nextIndex <= maxRetries) {
+                    // 尝试下一张图片
+                    const newUrl = `${R2_IMAGE_BASE}/${cityId}/${cityId}_${nextIndex}.jpeg`;
+                    console.log(`图片加载失败，尝试备用图片: ${newUrl}`);
+                    this.src = newUrl;
+                    // 更新当前索引，以便下次重试
+                    this.dataset.imageIndex = nextIndex;
+                } else {
+                    // 所有图片都失败，隐藏显示占位符
+                    console.log(`城市 ${cityId} 所有图片加载失败，显示占位符`);
+                    this.style.display = 'none';
+                }
+            });
+
+            img.addEventListener('load', function() {
+                this.style.opacity = '1';
+            });
+
+            // 记录当前图片索引
+            img.dataset.imageIndex = currentIndex;
         }
 
         function getGradientStyle(index) {
@@ -1545,12 +1575,16 @@
             try {
                 const params = new URLSearchParams({
                     page: state.page,
-                    limit: state.limit,
-                    list_type: state.currentList
+                    limit: state.limit
                 });
 
+                // 搜索时不限制榜单类型，让用户能找到所有匹配的城市
                 if (state.filters.search) {
                     params.append('search', state.filters.search);
+                    // 搜索时临时移除榜单限制
+                } else {
+                    // 无搜索时按当前选中的榜单筛选
+                    params.append('list_type', state.currentList);
                 }
 
                 const data = await fetchAPI(`/api/cities?${params}`);
@@ -1628,15 +1662,11 @@
                     if (cityId) goToCity(cityId);
                 });
 
-                // 处理图片加载失败
+                // 处理图片加载失败 - 使用备用图片机制
                 const img = card.querySelector('img');
-                if (img) {
-                    img.addEventListener('error', function() {
-                        this.style.display = 'none';
-                    });
-                    img.addEventListener('load', function() {
-                        this.style.opacity = '1';
-                    });
+                const cityId = card.dataset.cityId;
+                if (img && cityId) {
+                    setupImageFallback(img, cityId, 1);
                 }
 
                 // 绑定复选框事件
@@ -1733,15 +1763,10 @@
                     goToCity(city.id);
                 });
 
-                // 处理图片加载失败
+                // 处理图片加载失败 - 使用备用图片机制
                 const img = card.querySelector('img');
                 if (img) {
-                    img.addEventListener('error', function() {
-                        this.style.display = 'none';
-                    });
-                    img.addEventListener('load', function() {
-                        this.style.opacity = '1';
-                    });
+                    setupImageFallback(img, city.id, 1);
                 }
 
                 // 绑定复选框事件

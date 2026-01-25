@@ -2,11 +2,17 @@
 """
 导出城市列表脚本
 从数据库导出所有城市的ID和名称，用于批量爬取图片
+
+用法:
+    python export_cities.py                           # 使用默认数据库
+    python export_cities.py --db /path/to/database.sqlite  # 指定数据库路径
+    python export_cities.py --db remote               # 使用REMOTE_DB_PATH环境变量
 """
 
 import sqlite3
 import json
 import os
+import argparse
 from pathlib import Path
 
 # 加载.env文件
@@ -27,16 +33,36 @@ SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
 OUTPUT_FILE = SCRIPT_DIR / 'cities.json'
 
-# 数据库路径 - 使用绝对路径
-_db_path = os.environ.get('DB_PATH', './database.sqlite')
-if _db_path.startswith('./'):
-    DB_PATH = str(PROJECT_ROOT / _db_path[2:])
-else:
-    DB_PATH = _db_path
+def get_db_path(db_arg=None):
+    """获取数据库路径"""
+    if db_arg:
+        if db_arg == 'remote':
+            # 使用远程数据库路径（从环境变量读取）
+            remote_path = os.environ.get('REMOTE_DB_PATH')
+            if remote_path:
+                print(f"使用远程数据库: {remote_path}")
+                return remote_path
+            else:
+                print("警告: REMOTE_DB_PATH 未设置，使用默认数据库")
+        elif os.path.exists(db_arg):
+            print(f"使用指定数据库: {db_arg}")
+            return db_arg
+        else:
+            print(f"警告: 数据库文件不存在 {db_arg}")
 
-def export_cities():
+    # 默认数据库路径
+    _db_path = os.environ.get('DB_PATH', './database.sqlite')
+    if _db_path.startswith('./'):
+        db_path = str(PROJECT_ROOT / _db_path[2:])
+    else:
+        db_path = _db_path
+
+    print(f"使用默认数据库: {db_path}")
+    return db_path
+
+def export_cities(db_path):
     """导出城市列表"""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # 查询所有城市
@@ -99,4 +125,9 @@ def export_cities():
     return cities
 
 if __name__ == '__main__':
-    export_cities()
+    parser = argparse.ArgumentParser(description='导出城市列表')
+    parser.add_argument('--db', help='数据库路径 (或 "remote" 使用远程数据库)')
+    args = parser.parse_args()
+
+    db_path = get_db_path(args.db)
+    export_cities(db_path)

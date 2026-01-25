@@ -22,6 +22,41 @@
     </view>
   </view>
 
+  <!-- 筛选条件 -->
+  <view class="filter-bar">
+    <!-- 省份/地区筛选 -->
+    <picker
+      mode="selector"
+      range="{{provinceOptions}}"
+      range-key="name"
+      value="{{selectedProvinceIndex}}"
+      bindchange="onProvinceChange"
+    >
+      <view class="filter-item {{selectedProvince ? 'active' : ''}}">
+        <text>{{selectedProvince || '选择省份'}}</text>
+        <text class="filter-arrow">▼</text>
+      </view>
+    </picker>
+
+    <!-- 地区筛选 -->
+    <picker
+      mode="selector"
+      range="{{regionOptions}}"
+      value="{{selectedRegionIndex}}"
+      bindchange="onRegionChange"
+    >
+      <view class="filter-item {{selectedRegion ? 'active' : ''}}">
+        <text>{{selectedRegion || '选择地区'}}</text>
+        <text class="filter-arrow">▼</text>
+      </view>
+    </picker>
+
+    <!-- 清除筛选 -->
+    <view class="filter-clear" wx:if="{{selectedProvince || selectedRegion}}" bindtap="onClearFilters">
+      <text>清除</text>
+    </view>
+  </view>
+
   <!-- 排序选项 -->
   <view class="sort-bar">
     <view

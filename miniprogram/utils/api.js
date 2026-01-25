@@ -74,6 +74,11 @@ class API {
     return this.get('/cities', params)
   }
 
+  // 获取省份/国家列表
+  getProvinces(params = {}) {
+    return this.get('/cities/provinces', params)
+  }
+
   // 获取城市详情
   getCity(id) {
     return this.get(`/cities/${id}`)
