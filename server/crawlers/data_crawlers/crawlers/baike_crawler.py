@@ -2,6 +2,7 @@
 """
 百度百科爬虫
 用于获取城市基础数据（人口、GDP、面积）和城市介绍
+当爬取失败时使用参考数据作为备用
 """
 
 import re
@@ -9,6 +10,7 @@ from bs4 import BeautifulSoup
 from typing import Dict, Any, Optional
 from urllib.parse import quote
 from .base_crawler import BaseCrawler
+from .reference_data import get_city_data
 
 
 class BaikeCrawler(BaseCrawler):
@@ -19,6 +21,19 @@ class BaikeCrawler(BaseCrawler):
 
     def __init__(self, delay: float = 2.0):
         super().__init__(name="BaikeCrawler", delay=delay)
+        self._initialized = False
+
+    def _init_session(self):
+        """初始化会话，访问主页获取Cookie"""
+        if self._initialized:
+            return
+        try:
+            # 先访问主页获取Cookie
+            self.request(self.BASE_URL, headers={'Referer': 'https://www.baidu.com/'})
+            self._initialized = True
+            self.sleep(1)
+        except Exception:
+            pass
 
     def crawl_city(self, city_id: int, city_name: str,
                    province: str = None, **kwargs) -> Dict[str, Any]:
@@ -36,23 +51,52 @@ class BaikeCrawler(BaseCrawler):
                 'features': 城市特色标签
             }
         """
+        # 初始化会话
+        self._init_session()
+
         # 构建搜索词
         search_term = city_name
         if province and city_name not in ['北京', '上海', '天津', '重庆']:
             search_term = f"{city_name}市"
 
         url = self.SEARCH_URL.format(quote(search_term))
-        response = self.request(url)
+        response = self.request(url, headers={'Referer': self.BASE_URL + '/'})
 
         if not response:
             # 尝试不加"市"
+            self.sleep(1)
             url = self.SEARCH_URL.format(quote(city_name))
-            response = self.request(url)
+            response = self.request(url, headers={'Referer': self.BASE_URL + '/'})
 
         if not response:
-            return None
+            # 爬取失败，使用参考数据
+            self.logger.warning(f"  爬取失败，使用参考数据")
+            return self._get_reference_data(city_name)
 
-        return self._parse_baike_page(response.text, city_name)
+        result = self._parse_baike_page(response.text, city_name)
+        if not result or not any(result.values()):
+            # 解析失败，使用参考数据
+            self.logger.warning(f"  解析失败，使用参考数据")
+            return self._get_reference_data(city_name)
+
+        return result
+
+    def _get_reference_data(self, city_name: str) -> Optional[Dict[str, Any]]:
+        """获取参考数据"""
+        ref_data = get_city_data(city_name)
+        if ref_data:
+            self.logger.info(f"  使用参考数据: {city_name}")
+            return {
+                'population': ref_data.get('population'),
+                'gdp': ref_data.get('gdp'),
+                'area': ref_data.get('area'),
+                'description': ref_data.get('description'),
+                'climate_type': ref_data.get('climate'),
+                'famous_places': ref_data.get('famous_places', []),
+                'features': [],
+                'source': 'reference_data',
+            }
+        return None
 
     def _parse_baike_page(self, html: str, city_name: str) -> Dict[str, Any]:
         """解析百度百科页面"""
