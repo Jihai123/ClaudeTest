@@ -1,0 +1,14 @@
+[
+  {
+    "aqi": 70,
+    "aqi_level": "良",
+    "aqi_source": "reference",
+    "hospital_count": 45,
+    "hospital_source": "reference",
+    "university_count": 56,
+    "university_source": "reference",
+    "quality_score": 9.0,
+    "city_id": 1,
+    "city_name": "成都"
+  }
+]
