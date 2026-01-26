@@ -15,6 +15,14 @@ Page({
     isCoastal: false,
     listType: '',  // 榜单类型: world, china_general, china_layflat
 
+    // 省份/地区筛选
+    provinceOptions: [{ name: '全部省份', value: '' }],
+    selectedProvince: '',
+    selectedProvinceIndex: 0,
+    regionOptions: ['全部地区', '华东', '华南', '华北', '西南', '西北', '东北', '华中'],
+    selectedRegion: '',
+    selectedRegionIndex: 0,
+
     // 排序
     sortField: 'overall_score',
     sortOrder: 'DESC',
@@ -32,8 +40,27 @@ Page({
     // 解析页面参数
     this.parseOptions(options)
 
+    // 加载省份列表
+    this.loadProvinces()
+
     // 加载城市数据
     this.loadCities(true)
+  },
+
+  // 加载省份列表
+  async loadProvinces() {
+    try {
+      const result = await api.getProvinces({ list_type: this.data.listType })
+      if (result && result.items) {
+        const provinceOptions = [{ name: '全部省份', value: '' }]
+        result.items.forEach(p => {
+          provinceOptions.push({ name: p, value: p })
+        })
+        this.setData({ provinceOptions })
+      }
+    } catch (error) {
+      console.error('加载省份列表失败:', error)
+    }
   },
 
   // 解析页面参数
@@ -122,6 +149,16 @@ Page({
       // 只有非世界榜才默认显示中国城市
       if (!filters.country && this.data.listType !== 'world') {
         filters.country = '中国'
+      }
+
+      // 省份筛选
+      if (this.data.selectedProvince) {
+        filters.province = this.data.selectedProvince
+      }
+
+      // 地区筛选
+      if (this.data.selectedRegion) {
+        filters.region = this.data.selectedRegion
       }
 
       // 处理搜索
@@ -367,5 +404,42 @@ Page({
     this.loadCities(true).then(() => {
       wx.stopPullDownRefresh()
     })
+  },
+
+  // ================================
+  // 省份/地区筛选
+  // ================================
+
+  // 省份选择变化
+  onProvinceChange(e) {
+    const index = parseInt(e.detail.value)
+    const province = this.data.provinceOptions[index]
+    this.setData({
+      selectedProvinceIndex: index,
+      selectedProvince: province ? province.value : ''
+    })
+    this.loadCities(true)
+  },
+
+  // 地区选择变化
+  onRegionChange(e) {
+    const index = parseInt(e.detail.value)
+    const region = index === 0 ? '' : this.data.regionOptions[index]
+    this.setData({
+      selectedRegionIndex: index,
+      selectedRegion: region
+    })
+    this.loadCities(true)
+  },
+
+  // 清除筛选
+  onClearFilters() {
+    this.setData({
+      selectedProvince: '',
+      selectedProvinceIndex: 0,
+      selectedRegion: '',
+      selectedRegionIndex: 0
+    })
+    this.loadCities(true)
   }
 })

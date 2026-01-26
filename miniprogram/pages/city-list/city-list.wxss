@@ -63,6 +63,45 @@
   flex-shrink: 0;
 }
 
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 20rpx 32rpx;
+  margin-bottom: 2rpx;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  background: #F7F8FA;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #6B7280;
+  margin-right: 20rpx;
+}
+
+.filter-item.active {
+  background: rgba(135, 168, 120, 0.15);
+  color: #87A878;
+  font-weight: 500;
+}
+
+.filter-arrow {
+  font-size: 20rpx;
+  margin-left: 8rpx;
+  color: #9CA3AF;
+}
+
+.filter-clear {
+  padding: 16rpx 24rpx;
+  font-size: 26rpx;
+  color: #EF4444;
+}
+
 /* 排序栏 */
 .sort-bar {
   display: flex;
