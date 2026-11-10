@@ -211,7 +211,7 @@ test('source not fetched or social content never creates fields changes; scores 
     ...p, proposal: { ...changes, field: 'medical_facilities' } });
   assert.equal(response.statusCode, 400);
   response = await x.invoke('POST', '/submissions', {
-    ...p, proposal: { ...changes, field: 'avg_rent', new_value: 1391 } });
+    ...p, proposal: { ...changes, field: 'avg_rent', expected_old_value: 300, new_value: 1391 } });
   assert.equal(response.statusCode, 201);
   assert.equal(response.payload.submission_status, 'pending_manual_review');
   assert.equal(x.city.avg_rent, 300);
