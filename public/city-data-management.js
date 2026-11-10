@@ -105,7 +105,7 @@
         ' / 世界 ' + pretty(scores.world_score) +
         '。本模块不会改动评分或算法。');
       changeField();
-      await loadChanges();
+      await Promise.all([loadChanges(), loadAgentEvidence()]);
     } catch (error) { showMessage('读取城市失败：' + error.message, true); }
   }
   function newValue() {
@@ -265,6 +265,51 @@
       });
     } catch (error) { showMessage('加载变更记录失败：' + error.message, true); }
   }
+  async function loadAgentEvidence() {
+    try {
+      const onlySelected = el('cityAgentEvidenceSelected').checked && selectedCity;
+      const endpoint = '/admin/city-agent/evidence' +
+        (onlySelected ? '?city_id=' + selectedCity.id : '');
+      const data = await api(endpoint);
+      if (data && data.error) throw new Error(data.error);
+      const body = el('cityAgentEvidenceList');
+      body.replaceChildren();
+      if (!data.evidence || !data.evidence.length) {
+        tableEmpty(body, '暂无采集证据', 5);
+        return;
+      }
+      data.evidence.forEach(function (evidence) {
+        const row = document.createElement('tr');
+        cell(row, '#' + evidence.id + ' / ' + evidence.city_name);
+        const source = document.createElement('td');
+        const link = document.createElement('a');
+        link.textContent = '打开来源';
+        link.href = evidence.source_url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        source.appendChild(link);
+        const detail = document.createElement('div');
+        detail.textContent = evidence.source_type + ' · ' + evidence.scope_name +
+          ' · ' + evidence.source_date;
+        source.appendChild(detail);
+        row.appendChild(source);
+        const metric = document.createElement('td');
+        metric.textContent = evidence.metric_key + ': ' +
+          pretty(evidence.metric_value) + ' ' + evidence.metric_unit;
+        const note = document.createElement('div');
+        note.textContent = evidence.source_note;
+        note.style.maxWidth = '300px';
+        note.style.overflowWrap = 'anywhere';
+        metric.appendChild(note);
+        row.appendChild(metric);
+        cell(row, evidence.change_request_id ?
+          '变更 #' + evidence.change_request_id + ' · ' + evidence.change_status :
+          '仅证据；未修改城市数据');
+        cell(row, evidence.created_at);
+        body.appendChild(row);
+      });
+    } catch (error) { showMessage('采集证据加载失败：' + error.message, true); }
+  }
   async function load() {
     if (!initialized) {
       initialized = true;
@@ -273,7 +318,7 @@
         return;
       }
     }
-    await Promise.all([searchCities(), loadChanges()]);
+    await Promise.all([searchCities(), loadChanges(), loadAgentEvidence()]);
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -294,6 +339,8 @@
     el('cityDataStatus').addEventListener('change', loadChanges);
     el('cityDataOnlySelected').addEventListener('change', loadChanges);
     el('cityDataRefresh').addEventListener('click', loadChanges);
+    el('cityAgentEvidenceRefresh').addEventListener('click', loadAgentEvidence);
+    el('cityAgentEvidenceSelected').addEventListener('change', loadAgentEvidence);
   });
   window.cityDataManagement = { load };
 })();
