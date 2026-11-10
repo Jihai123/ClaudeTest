@@ -29,18 +29,20 @@ function governmentAuthority(sourceUrl) {
 async function canAutoApply(body) {
   const policy = autoPolicy();
   if (!body.proposal?.auto_apply || !policy.enabled || !AUTO_FIELDS.has(body.proposal.field) ||
+    body.source_access !== 'fetched' || !body.source_excerpt ||
     body.source_type !== 'government' || typeof body.proposal.new_value !== 'string' ||
     body.proposal.new_value.length < 18 || !governmentAuthority(body.source_url)) {
     return { allowed: false, reason: 'not eligible for autonomous update' };
   }
   const sources = await db.query(
-    "SELECT source_url,metric_value_json FROM city_agent_evidence " +
+    "SELECT source_url,metric_value_json,source_access,source_excerpt,source_date FROM city_agent_evidence " +
     "WHERE city_id=? AND metric_key=? AND source_type='government' " +
     'AND metric_value_json=? ORDER BY id DESC LIMIT 50',
     [body.city_id, body.metric_key, JSON.stringify(body.metric_value)]
   );
   const authority = governmentAuthority(body.source_url);
   const independent = sources.find(row =>
+    row.source_access === 'fetched' && row.source_excerpt &&
     governmentAuthority(row.source_url) &&
     governmentAuthority(row.source_url) !== authority
   );
@@ -111,7 +113,8 @@ function cityId(value) {
 }
 function normalizeSubmission(input) {
   allowedKeys(input, new Set(['external_id', 'city_id', 'scope_name', 'source_url',
-    'source_date', 'source_note', 'source_type', 'metric_key', 'metric_value',
+    'source_date', 'source_note', 'source_type', 'source_access', 'source_excerpt',
+    'observation_period', 'metric_key', 'metric_value',
     'metric_unit', 'proposal']), '提交');
   const data = {
     external_id: externalId(input.external_id),
@@ -121,12 +124,24 @@ function normalizeSubmission(input) {
     source_date: input.source_date,
     source_note: boundedString(input.source_note, 'source_note', 10, 1000),
     source_type: boundedString(input.source_type, 'source_type', 3, 30),
+    source_access: input.source_access === undefined ? 'search_only' :
+      boundedString(input.source_access, 'source_access', 6, 20),
+    source_excerpt: input.source_excerpt === undefined ? null :
+      boundedString(input.source_excerpt, 'source_excerpt', 15, 800),
+    observation_period: input.observation_period === undefined ? null :
+      boundedString(input.observation_period, 'observation_period', 4, 40),
     metric_key: boundedString(input.metric_key, 'metric_key', 2, 80),
     metric_value: input.metric_value,
     metric_unit: boundedString(input.metric_unit, 'metric_unit', 1, 30),
     proposal: null
   };
   if (!ALLOWED_TYPES.has(data.source_type)) throw failure(400, 'source_type不受支持');
+  if (!['fetched', 'search_only'].includes(data.source_access)) {
+    throw failure(400, 'source_access不受支持');
+  }
+  if (data.source_access === 'fetched' && !data.source_excerpt) {
+    throw failure(400, '读取原文后必须提供原文证据片段');
+  }
   if (!/^[a-z][a-z0-9_]{1,79}$/.test(data.metric_key)) throw failure(400, 'metric_key只能使用小写英文和下划线');
   if (!Object.prototype.hasOwnProperty.call(input, 'metric_value') ||
       !(data.metric_value === null ||
@@ -137,6 +152,9 @@ function normalizeSubmission(input) {
   cityData.validSource(data.source_url, data.source_date, data.source_note);
   if (input.proposal !== undefined && input.proposal !== null) {
     allowedKeys(input.proposal, new Set(['field', 'new_value', 'expected_old_value', 'conversion_note', 'auto_apply']), 'proposal');
+    if (data.source_access !== 'fetched') {
+      throw failure(400, '只有已读取原文并提供证据片段的来源才能提出字段修改');
+    }
     if (!PROPOSAL_TYPES.has(data.source_type)) {
       throw failure(400, '自媒体或居民讨论只能入证据库，不能直接提出字段修改申请');
     }
@@ -191,7 +209,8 @@ async function initAgentCityBridge() {
       'external_id TEXT NOT NULL UNIQUE, payload_hash TEXT NOT NULL, ' +
       'city_id INTEGER NOT NULL, scope_name TEXT NOT NULL, ' +
       'source_url TEXT NOT NULL, source_date TEXT NOT NULL, source_note TEXT NOT NULL, ' +
-      'source_type TEXT NOT NULL, metric_key TEXT NOT NULL, ' +
+      'source_type TEXT NOT NULL, source_access TEXT NOT NULL, source_excerpt TEXT, ' +
+      'observation_period TEXT, metric_key TEXT NOT NULL, ' +
       'metric_value_json TEXT NOT NULL, metric_unit TEXT NOT NULL, ' +
       'suggested_field TEXT, expected_old_value_json TEXT, proposed_value_json TEXT, ' +
       'conversion_note TEXT, change_request_id INTEGER UNIQUE, ' +
@@ -273,11 +292,13 @@ router.post('/submissions', async (req, res) => {
       const inserted = await db.run(
         'INSERT INTO city_agent_evidence ' +
         '(external_id,payload_hash,city_id,scope_name,source_url,source_date,source_note,' +
-        'source_type,metric_key,metric_value_json,metric_unit,suggested_field,' +
+        'source_type,source_access,source_excerpt,observation_period,metric_key,' +
+        'metric_value_json,metric_unit,suggested_field,' +
         'expected_old_value_json,proposed_value_json,conversion_note) ' +
-        'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
         [body.external_id, payloadHash, body.city_id, body.scope_name, body.source_url,
-          body.source_date, body.source_note, body.source_type, body.metric_key,
+          body.source_date, body.source_note, body.source_type, body.source_access,
+          body.source_excerpt, body.observation_period, body.metric_key,
           JSON.stringify(body.metric_value), body.metric_unit,
           body.proposal ? body.proposal.field : null,
           body.proposal ? JSON.stringify(old) : null,
@@ -328,7 +349,8 @@ adminRouter.get('/evidence', async (req, res) => {
     const id = req.query.city_id ? cityId(Number(req.query.city_id)) : null;
     const rows = await db.query(
       'SELECT e.id,e.external_id,e.city_id,c.name AS city_name,e.scope_name,' +
-      'e.source_url,e.source_date,e.source_type,e.source_note,e.metric_key,' +
+      'e.source_url,e.source_date,e.source_type,e.source_note,e.source_access,' +
+      'e.source_excerpt,e.observation_period,e.metric_key,' +
       'e.metric_value_json,e.metric_unit,e.suggested_field,e.conversion_note,' +
       'e.change_request_id,e.created_at,r.status AS change_status ' +
       'FROM city_agent_evidence e ' +
