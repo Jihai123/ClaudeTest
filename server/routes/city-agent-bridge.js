@@ -26,10 +26,17 @@ function governmentAuthority(sourceUrl) {
   if (parts.length < 3 || parts.slice(-2).join('.') !== 'gov.cn') return null;
   return parts.slice(-3).join('.');
 }
+function containsMetric(text, value) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return false;
+  return String(text || '').replace(/[\s,，]/g, '').includes(String(value));
+}
 async function canAutoApply(body) {
   const policy = autoPolicy();
   if (!body.proposal?.auto_apply || !policy.enabled || !AUTO_FIELDS.has(body.proposal.field) ||
     body.source_access !== 'fetched' || !body.source_excerpt ||
+    !containsMetric(body.source_excerpt, body.metric_value) ||
+    !containsMetric(body.proposal.new_value, body.metric_value) ||
+    /[<>]|javascript:|data:/i.test(body.proposal.new_value) ||
     body.source_type !== 'government' || typeof body.proposal.new_value !== 'string' ||
     body.proposal.new_value.length < 18 || !governmentAuthority(body.source_url)) {
     return { allowed: false, reason: 'not eligible for autonomous update' };
@@ -43,6 +50,7 @@ async function canAutoApply(body) {
   const authority = governmentAuthority(body.source_url);
   const independent = sources.find(row =>
     row.source_access === 'fetched' && row.source_excerpt &&
+    containsMetric(row.source_excerpt, body.metric_value) &&
     governmentAuthority(row.source_url) &&
     governmentAuthority(row.source_url) !== authority
   );
