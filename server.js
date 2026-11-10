@@ -64,6 +64,7 @@ app.use(`${BASE_PATH}/api/auth`, require('./server/routes/auth'));
 app.use(`${BASE_PATH}/api/cities`, require('./server/routes/cities'));
 app.use(`${BASE_PATH}/api/reviews`, require('./server/routes/reviews'));
 app.use(`${BASE_PATH}/api/admin`, require('./server/routes/admin'));
+app.use(`${BASE_PATH}/api/admin/city-data`, require('./server/routes/city-data-management').router);
 app.use(`${BASE_PATH}/api/images`, require('./server/routes/images'));
 app.use(`${BASE_PATH}/api/tags`, require('./server/routes/tags'));
 app.use(`${BASE_PATH}/api/rankings`, require('./server/routes/rankings'));
@@ -104,6 +105,7 @@ async function startServer() {
   try {
     // 初始化数据库
     await db.init();
+    await require('./server/routes/city-data-management').initCityDataManagement();
     console.log('数据库初始化成功');
 
     app.listen(PORT, () => {
