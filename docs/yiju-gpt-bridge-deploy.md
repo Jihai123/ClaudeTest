@@ -26,7 +26,8 @@
 
 ## 与 ChatGPT 对接
 
-- 参考 docs/yiju-agent-actions.openapi.yaml，在账户支持的 GPT Actions 或其他可连接工具中配置 API。只把 token 传入受保护的 Actions 密钥字段，不把用户的管理员 JWT 交给 GPT。
+- 参考 docs/yiju-agent-actions.openapi.yaml，在账户支持的插件/工作流连接器或仍可编辑的已有 GPT Actions 中配置 API。只把 token 传入受保护的凭据字段，不把用户的管理员 JWT 交给 GPT。
+- **2026 年 11 月产品约束**：官方帮助文档说明，个人 ChatGPT 账户已不能新建 GPT，既有 GPT 正向 Plugins 迁移。本仓库的 OpenAPI 文件只是接口规范，**不是已安装 ChatGPT 连接器**。因此优先验证现有 Work + 可连接插件/浏览器的真实调用链。
 - **不能假设 ChatGPT 定时任务天然支持调用自定义 Actions 或能持续操作登录的 Work 页面。** 先实测“一次 GPT 证据提交 → 查询状态 → 次日定时自动再次执行”，再判定是否真能无人值守。没有可用连接器时，可以暂时通过 GPT → GitHub 证据库继续自动研究，不能宣布后端写入已通。
 - 本轮未创建自动文章发布接口、伪装真人评论或无人值守互动模块；不要把本版本称作全部运营闭环已经上线。
 - 实施完毕仅报告：合并 SHA、生产 SHA、备份恢复验证、受限 API 与端到端实际结果、ChatGPT 连接方式、下一次自动运营运行安排、残余 P0/P1。
