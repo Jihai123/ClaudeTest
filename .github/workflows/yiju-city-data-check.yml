@@ -2,6 +2,8 @@ name: Yiju city data checks
 on:
   pull_request:
     paths:
+      - 'server/routes/auth.js'
+      - 'tests_js/auth-me.test.js'
       - 'public/admin.html'
       - 'public/city-data-management.js'
       - 'server/routes/city-data-management.js'
