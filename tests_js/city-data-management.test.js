@@ -119,7 +119,7 @@ test('city changes require evidence and explicit approval; rollback is guarded',
   assert.ok(!fields.payload.fields.some(item => item.key === 'overall_score'));
 
   const proposal = {
-    city_id: 12, field: 'avg_rent', new_value: 450,
+    city_id: 12, field: 'avg_rent', new_value: 450, expected_old_value: 400,
     source_url: 'https://example.org/rents',
     source_date: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
     source_note: '已核实房租来源及口径'
@@ -131,6 +131,9 @@ test('city changes require evidence and explicit approval; rollback is guarded',
 
   const duplicate = await invoke('POST', '/changes', proposal);
   assert.equal(duplicate.statusCode, 409);
+  const stalePreview = await invoke('POST', '/changes',
+    { ...proposal, expected_old_value: 499 });
+  assert.equal(stalePreview.statusCode, 409, 'stale preview is rejected');
   const unverified = await invoke('POST', '/changes/:id/approve', {}, { id });
   assert.equal(unverified.statusCode, 400);
   assert.equal(city.avg_rent, 400);
@@ -167,7 +170,7 @@ test('unknown is null, not zero, and change of dimension descriptions is reversi
   const { dimension, invoke, init } = setup();
   await init();
   const proposal = {
-    city_id: 12, field: 'medical', new_value: null,
+    city_id: 12, field: 'medical', new_value: null, expected_old_value: '原医疗说明',
     source_url: 'https://example.org/health',
     source_date: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
     source_note: '原字段无可靠来源'
