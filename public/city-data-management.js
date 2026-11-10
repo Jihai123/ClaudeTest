@@ -224,7 +224,8 @@
         note.style.overflowWrap = 'anywhere';
         source.appendChild(note);
         row.appendChild(source);
-        cell(row, change.status);
+        cell(row, change.status === 'approved' && change.reviewed_by === 0 ?
+          '已生效（Agent自动审核）' : change.status);
         cell(row, change.created_at);
         const action = document.createElement('td');
         if (change.status === 'pending') {
@@ -290,7 +291,8 @@
         source.appendChild(link);
         const detail = document.createElement('div');
         detail.textContent = evidence.source_type + ' · ' + evidence.scope_name +
-          ' · ' + evidence.source_date;
+          ' · ' + evidence.source_date + ' · ' + evidence.source_access +
+          (evidence.observation_period ? ' · 统计期 ' + evidence.observation_period : '');
         source.appendChild(detail);
         row.appendChild(source);
         const metric = document.createElement('td');
@@ -301,6 +303,13 @@
         note.style.maxWidth = '300px';
         note.style.overflowWrap = 'anywhere';
         metric.appendChild(note);
+        if (evidence.source_excerpt) {
+          const excerpt = document.createElement('div');
+          excerpt.textContent = '原文片段：' + evidence.source_excerpt;
+          excerpt.style.fontSize = '12px';
+          excerpt.style.color = '#475569';
+          metric.appendChild(excerpt);
+        }
         row.appendChild(metric);
         cell(row, evidence.change_request_id ?
           '变更 #' + evidence.change_request_id + ' · ' + evidence.change_status :
