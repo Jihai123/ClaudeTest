@@ -262,3 +262,49 @@ test('same government organization and daily cap do not bypass human review', as
   assert.equal(response.payload.submission_status, 'pending_manual_review');
   assert.equal(x.city.notes, '旧注释');
 });
+
+test('daily autonomous quota downgrades a fully corroborated update to pending', async () => {
+  const x = harness();
+  await x.init();
+  x.env.YIJU_AGENT_AUTO_APPLY = 'true';
+  x.env.YIJU_AGENT_AUTO_APPLY_DAILY_LIMIT = '1';
+  x.changes.push({ id: 999, city_id: 1, field: 'notes',
+    reviewed_by: 0, status: 'approved' });
+  const p = evidenceRecord('quota-first-official');
+  const a = await x.invoke('POST', '/submissions', {
+    ...p, metric_key: 'medical_capacity_total' });
+  assert.equal(a.statusCode, 201);
+  const b = await x.invoke('POST', '/submissions', {
+    ...p,
+    external_id: 'quota-second-official',
+    source_url: 'https://www.stats.gov.cn/sj/zxfb/report.html',
+    metric_key: 'medical_capacity_total',
+    proposal: { field: 'notes', expected_old_value: '旧注释', new_value: proposedText,
+      conversion_note: '独立政府证据一致但达到每日额度上限。',
+      auto_apply: true }
+  });
+  assert.equal(b.statusCode, 201);
+  assert.equal(b.payload.submission_status, 'pending_manual_review');
+  assert.equal(x.city.notes, '旧注释');
+});
+
+test('untrusted official-looking hostname cannot get auto-update privileges', async () => {
+  const x = harness();
+  await x.init();
+  x.env.YIJU_AGENT_AUTO_APPLY = 'true';
+  const p = evidenceRecord('untrusted-first-record');
+  await x.invoke('POST', '/submissions', {
+    ...p, metric_key: 'population_total', metric_value: 1091100 });
+  const r = await x.invoke('POST', '/submissions', {
+    ...p,
+    external_id: 'untrusted-second-record',
+    source_url: 'https://stats.gov.cn.attacker.example/report',
+    metric_key: 'population_total', metric_value: 1091100,
+    proposal: { field: 'notes', expected_old_value: '旧注释', new_value: proposedText,
+      conversion_note: '看似政府的域名并非政府主域，不能自动生效。',
+      auto_apply: true }
+  });
+  assert.equal(r.statusCode, 201);
+  assert.equal(r.payload.submission_status, 'pending_manual_review');
+  assert.equal(x.city.notes, '旧注释');
+});
