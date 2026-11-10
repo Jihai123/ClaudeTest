@@ -12,6 +12,49 @@ const adminRouter = express.Router();
 const ALLOWED_TYPES = new Set(['government', 'research', 'housing_market', 'media', 'community', 'other']);
 const PROPOSAL_TYPES = new Set(['government', 'research', 'housing_market']);
 const MAX_BODY_CHARS = 6000;
+const AUTO_FIELDS = new Set(['slogan', 'location_intro', 'key_points', 'notes']);
+function autoPolicy() {
+  const enabled = process.env.YIJU_AGENT_AUTO_APPLY === 'true';
+  const count = Number(process.env.YIJU_AGENT_AUTO_APPLY_DAILY_LIMIT || '10');
+  return { enabled, fields: [...AUTO_FIELDS],
+    daily_limit: Number.isInteger(count) && count >= 1 && count <= 100 ? count : 10,
+    requires: 'two independent government source domains matching city and metric value' };
+}
+function governmentAuthority(sourceUrl) {
+  const host = new URL(sourceUrl).hostname.toLowerCase();
+  const parts = host.split('.');
+  if (parts.length < 3 || parts.slice(-2).join('.') !== 'gov.cn') return null;
+  return parts.slice(-3).join('.');
+}
+async function canAutoApply(body) {
+  const policy = autoPolicy();
+  if (!body.proposal?.auto_apply || !policy.enabled || !AUTO_FIELDS.has(body.proposal.field) ||
+    body.source_type !== 'government' || typeof body.proposal.new_value !== 'string' ||
+    body.proposal.new_value.length < 18 || !governmentAuthority(body.source_url)) {
+    return { allowed: false, reason: 'not eligible for autonomous update' };
+  }
+  const sources = await db.query(
+    "SELECT source_url,metric_value_json FROM city_agent_evidence " +
+    "WHERE city_id=? AND metric_key=? AND source_type='government' " +
+    'AND metric_value_json=? ORDER BY id DESC LIMIT 50',
+    [body.city_id, body.metric_key, JSON.stringify(body.metric_value)]
+  );
+  const authority = governmentAuthority(body.source_url);
+  const independent = sources.find(row =>
+    governmentAuthority(row.source_url) &&
+    governmentAuthority(row.source_url) !== authority
+  );
+  if (!independent) return { allowed: false, reason: 'missing independent government corroboration' };
+  const today = await db.get(
+    "SELECT COUNT(*) AS total FROM city_data_change_requests " +
+    "WHERE reviewed_by=0 AND reviewed_at >= date('now')"
+  );
+  if (Number(today?.total || 0) >= policy.daily_limit) {
+    return { allowed: false, reason: 'daily autonomous update limit reached' };
+  }
+  return { allowed: true, reason: 'corroborated by independent government source' };
+}
+
 
 function failure(code, message) {
   const e = new Error(message);
@@ -93,7 +136,7 @@ function normalizeSubmission(input) {
   }
   cityData.validSource(data.source_url, data.source_date, data.source_note);
   if (input.proposal !== undefined && input.proposal !== null) {
-    allowedKeys(input.proposal, new Set(['field', 'new_value', 'expected_old_value', 'conversion_note']), 'proposal');
+    allowedKeys(input.proposal, new Set(['field', 'new_value', 'expected_old_value', 'conversion_note', 'auto_apply']), 'proposal');
     if (!PROPOSAL_TYPES.has(data.source_type)) {
       throw failure(400, '自媒体或居民讨论只能入证据库，不能直接提出字段修改申请');
     }
@@ -107,8 +150,12 @@ function normalizeSubmission(input) {
       field,
       new_value: cityData.normalizeValue(field, input.proposal.new_value),
       expected_old_value: cityData.normalizeValue(field, input.proposal.expected_old_value),
-      conversion_note: boundedString(input.proposal.conversion_note, 'conversion_note', 10, 300)
+      conversion_note: boundedString(input.proposal.conversion_note, 'conversion_note', 10, 300),
+      auto_apply: input.proposal.auto_apply === true
     };
+    if (input.proposal.auto_apply !== undefined && typeof input.proposal.auto_apply !== 'boolean') {
+      throw failure(400, 'auto_apply必须是boolean');
+    }
     if (data.proposal.new_value === data.proposal.expected_old_value) {
       throw failure(409, '新旧值一致，无需修改');
     }
@@ -122,7 +169,9 @@ function resultRow(row, replayed = false) {
     evidence_id: row.id,
     city_id: row.city_id,
     change_request_id: row.change_request_id || null,
-    submission_status: row.change_request_id ? 'pending_manual_review' : 'evidence_only',
+    submission_status: row.change_request_id ?
+      (row.change_status === 'approved' ? 'approved' :
+       row.change_status === 'pending' ? 'pending_manual_review' : 'reviewed') : 'evidence_only',
     review_status: row.change_status || null,
     replayed,
     created_at: row.created_at
@@ -155,6 +204,7 @@ async function initAgentCityBridge() {
 }
 
 router.get('/fields', (req, res) => res.json({
+  autonomy: autoPolicy(),
   fields: [...cityData.getAvailableFields()].map(([key, d]) => ({
     key, label: d.label, type: d.type
   })),
@@ -201,6 +251,7 @@ router.post('/submissions', async (req, res) => {
       const record = await cityData.cityRecord(body.city_id);
       let old = null;
       let proposed = null;
+      let autonomous = { allowed: false, reason: 'no proposal' };
       if (body.proposal) {
         if (body.scope_name !== record.city.name) {
           throw failure(400, '来源行政辖区与目标城市不一致，只允许保存证据，不允许提字段变更');
@@ -217,6 +268,7 @@ router.post('/submissions', async (req, res) => {
           [body.city_id, body.proposal.field]
         );
         if (pending) throw failure(409, '此字段已有待审核变更，禁止重复提交');
+        autonomous = await canAutoApply(body);
       }
       const inserted = await db.run(
         'INSERT INTO city_agent_evidence ' +
@@ -246,12 +298,20 @@ router.post('/submissions', async (req, res) => {
             '；换算：' + body.proposal.conversion_note, 0]
         );
         changeRequestId = change.id;
+        if (autonomous.allowed) {
+          await cityData.setField(body.city_id, body.proposal.field, proposed, old);
+          // reviewed_by=0 explicitly means automated review; source_verified_by remains NULL
+          // because no human has verified the original document.
+          await db.run("UPDATE city_data_change_requests SET status='approved', " +
+            "reviewed_by=0, reviewed_at=CURRENT_TIMESTAMP WHERE id=?", [change.id]);
+        }
         await db.run('UPDATE city_agent_evidence SET change_request_id=? WHERE id=?',
           [change.id, inserted.id]);
       }
       return { existing: false, row: {
         id: inserted.id, external_id: body.external_id, city_id: body.city_id,
-        change_request_id: changeRequestId, change_status: changeRequestId ? 'pending' : null,
+        change_request_id: changeRequestId,
+        change_status: changeRequestId ? (autonomous.allowed ? 'approved' : 'pending') : null,
         created_at: new Date().toISOString()
       } };
     });
