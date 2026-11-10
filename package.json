@@ -16,7 +16,7 @@
     "export-json": "node server/utils/importCitiesData.js export-json",
     "export-csv": "node server/utils/importCitiesData.js export-csv",
     "test": "jest",
-    "test:city-data": "node --test tests_js/city-data-management.test.js"
+    "test:city-data": "node --test tests_js/city-data-management.test.js tests_js/auth-me.test.js"
   },
   "keywords": [
     "cities",
