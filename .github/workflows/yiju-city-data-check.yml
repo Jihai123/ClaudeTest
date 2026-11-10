@@ -1,0 +1,22 @@
+name: Yiju city data checks
+on:
+  pull_request:
+    paths:
+      - 'public/admin.html'
+      - 'public/city-data-management.js'
+      - 'server/routes/city-data-management.js'
+      - 'server.js'
+      - 'tests_js/city-data-management.test.js'
+      - 'package.json'
+      - '.github/workflows/yiju-city-data-check.yml'
+  workflow_dispatch:
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check city management workflows
+        run: npm run test:city-data
