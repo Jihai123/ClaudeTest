@@ -157,7 +157,7 @@ function evidenceRecord(external_id = 'zhangye-medical-2025-v1') {
     source_note: '已查看统计公报全文；记录医疗机构数量，不等于网站医疗评分。',
     metric_key: 'medical_health_institutions_count', metric_value: 1391, metric_unit: '个' };
 }
-const proposedText = '2025年相关统计公报披露，城市医疗卫生机构数量已更新，具体统计口径请参阅政府原始来源。';
+const proposedText = '根据2025年张掖市统计公报，年末医疗卫生机构1391个，统计口径及详细情况请参阅政府原始来源。';
 
 test('no token, invalid token or missing config cannot enter; agent has no approval route', async () => {
   const x = harness();
@@ -228,7 +228,7 @@ test('two independent government sources allow only whitelisted editorial auto-a
   const second = {
     ...p, external_id: 'zhangye-health-second-2025',
     source_url: 'https://www.stats.gov.cn/sj/zxfb/202602/example.html',
-    source_excerpt: '2025年张掖市卫生机构记录作为交叉核验示例；两条来源须经过实际核实。',
+    source_excerpt: '2025年张掖市医疗卫生机构1391个；两条来源还需要核对原文中的统计口径。',
     metric_key: 'health_count', metric_value: 1391,
     proposal: { field: 'notes', new_value: proposedText,
       expected_old_value: '旧注释', conversion_note: '官方双来源相同指标，撰写低风险文字备注。',
