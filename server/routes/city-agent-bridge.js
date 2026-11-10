@@ -231,6 +231,20 @@ router.get('/fields', (req, res) => res.json({
     'tags', 'ranking', 'city_identity']
 }));
 
+
+router.get('/cities', async (req, res) => {
+  try {
+    const q = String(req.query.q || '').trim().slice(0, 80);
+    if (!q) throw failure(400, '请提供城市搜索关键词 q');
+    const rows = await db.query(
+      'SELECT id,name,province,updated_at FROM cities ' +
+      'WHERE name LIKE ? OR province LIKE ? ORDER BY id DESC LIMIT 30',
+      ['%' + q + '%', '%' + q + '%']
+    );
+    res.json({ cities: rows });
+  } catch (e) { replyError(res, e); }
+});
+
 router.get('/cities/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
