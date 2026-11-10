@@ -169,7 +169,8 @@ async function setField(cityId, field, value) {
       '" = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [value, cityId]);
   } else {
     await db.run('UPDATE city_dimensions SET "' + field +
-      '" = ?, updated_at = CURRENT_TIMESTAMP WHERE city_id = ?', [value, cityId]);
+      '" = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ' +
+      '(SELECT id FROM city_dimensions WHERE city_id = ? ORDER BY id LIMIT 1)', [value, cityId]);
     await db.run('UPDATE cities SET updated_at = CURRENT_TIMESTAMP WHERE id = ?', [cityId]);
   }
 }
