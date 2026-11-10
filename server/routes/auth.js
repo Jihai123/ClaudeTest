@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../models/database');
+const { verifyToken } = require('../middleware/auth');
 const { validateRegister, validateLogin } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
 
@@ -174,6 +175,18 @@ router.post('/login', validateLogin, async (req, res) => {
     console.error('登录失败:', error);
     res.status(500).json({ error: '登录失败，请稍后重试' });
   }
+});
+
+// Validate an existing JWT and recover the current user on page reload.
+// The admin console uses this endpoint to restore a saved session.
+router.get('/me', verifyToken, (req, res) => {
+  const user = req.user;
+  res.json({ user: {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    role: user.role
+  } });
 });
 
 module.exports = router;
