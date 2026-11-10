@@ -131,6 +131,7 @@
     if (!source_date || source_note.length < 5) throw new Error('请填写来源日期和至少5字的核验说明');
     return {
       city_id: selectedCity.id, field, new_value,
+      expected_old_value: selectedCity.values[field],
       source_url, source_date, source_note
     };
   }
