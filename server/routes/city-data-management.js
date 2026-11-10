@@ -162,15 +162,23 @@ function queuedTransaction(task) {
   return current;
 }
 
-async function setField(cityId, field, value) {
+async function setField(cityId, field, value, expectedOldValue) {
   const def = availableFields.get(field);
+  let result;
   if (def.table === 'cities') {
-    await db.run('UPDATE cities SET "' + field +
-      '" = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [value, cityId]);
+    result = await db.run('UPDATE cities SET "' + field +
+      '" = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND "' + field + '" IS ?',
+      [value, cityId, expectedOldValue]);
   } else {
-    await db.run('UPDATE city_dimensions SET "' + field +
+    result = await db.run('UPDATE city_dimensions SET "' + field +
       '" = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ' +
-      '(SELECT id FROM city_dimensions WHERE city_id = ? ORDER BY id LIMIT 1)', [value, cityId]);
+      '(SELECT id FROM city_dimensions WHERE city_id = ? ORDER BY id LIMIT 1) ' +
+      'AND "' + field + '" IS ?', [value, cityId, expectedOldValue]);
+  }
+  if (result.changes !== 1) {
+    throw error(409, '数据库旧值与审核记录不一致，更新已停止');
+  }
+  if (def.table === 'city_dimensions') {
     await db.run('UPDATE cities SET updated_at = CURRENT_TIMESTAMP WHERE id = ?', [cityId]);
   }
 }
@@ -261,9 +269,16 @@ router.post('/changes', async (req, res) => {
     }
     const newValue = normalizeValue(field, req.body.new_value);
     validSource(req.body.source_url, req.body.source_date, req.body.source_note);
+    if (!Object.prototype.hasOwnProperty.call(req.body, 'expected_old_value')) {
+      throw error(400, '缺少预览旧值，请先读取当前城市');
+    }
+    const expectedOld = normalizeValue(field, req.body.expected_old_value);
     const result = await queuedTransaction(async () => {
       const record = await cityRecord(cityId);
       const oldValue = currentValue(record, field);
+      if (!equalValues(oldValue, expectedOld)) {
+        throw error(409, '数据已发生变化，请刷新城市后重新预览');
+      }
       if (equalValues(oldValue, newValue)) throw error(409, '新旧值相同，无需申请');
       const pending = await db.get(
         "SELECT id FROM city_data_change_requests WHERE city_id = ? AND field = ? AND status = 'pending'",
@@ -300,7 +315,8 @@ router.post('/changes/:id/approve', async (req, res) => {
       if (!equalValues(before, decodeValue(change.old_value_json))) {
         throw error(409, '线上数据已变化，请重新提交申请，禁止覆盖');
       }
-      await setField(change.city_id, change.field, decodeValue(change.new_value_json));
+      await setField(change.city_id, change.field,
+        decodeValue(change.new_value_json), decodeValue(change.old_value_json));
       await db.run(
         "UPDATE city_data_change_requests SET status='approved', reviewed_by=?, " +
         'reviewed_at=CURRENT_TIMESTAMP, source_verified_by=?, source_verified_at=CURRENT_TIMESTAMP WHERE id=?',
@@ -339,7 +355,8 @@ router.post('/changes/:id/rollback', async (req, res) => {
       if (!equalValues(current, decodeValue(change.new_value_json))) {
         throw error(409, '线上字段已被后续修改，拒绝覆盖式回滚，请人工处理');
       }
-      await setField(change.city_id, change.field, decodeValue(change.old_value_json));
+      await setField(change.city_id, change.field,
+        decodeValue(change.old_value_json), decodeValue(change.new_value_json));
       await db.run(
         "UPDATE city_data_change_requests SET status='rolled_back', " +
         'rolled_back_by=?, rolled_back_at=CURRENT_TIMESTAMP WHERE id=?',
