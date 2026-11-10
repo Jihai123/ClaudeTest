@@ -121,6 +121,22 @@
     .loading { text-align: center; padding: 40px; color: #64748b; }
     .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+    /* City data management: extend existing admin design without changing other tabs */
+    .tabs { overflow-x: auto; }
+    .city-edit-row { display:flex; flex-wrap:wrap; gap:14px; align-items:end; margin:12px 0; }
+    .city-edit-row label { display:flex; flex-direction:column; gap:6px; flex:1; min-width:160px; font-size:13px; }
+    .city-edit-row input, .city-edit-row select, #cityDataSourceNote {
+      width:100%; box-sizing:border-box; padding:9px; border:1px solid #cbd5e1;
+      border-radius:6px; font:inherit; background:white;
+    }
+    #cityData .table-container { overflow-x:auto; margin-top:12px; }
+    #cityData .table-container td { vertical-align:top; }
+    #cityData a { color:#2563eb; text-decoration:underline; }
+    #cityDataChanges td:last-child { min-width:180px; }
+    #cityDataChanges .btn { margin:3px 3px 3px 0; }
+    .city-edit-preview { white-space:pre-wrap; overflow-wrap:anywhere; background:#f1f5f9;
+      border-radius:8px; padding:12px; min-height:30px; }
+    #cityDataMessage { margin-top:10px; font-weight:600; }
   </style>
 </head>
 <body>
@@ -155,6 +171,7 @@
 
     <div class="tabs" id="tabsContainer">
       <div class="tab active" data-tab="dashboard">数据概览</div>
+      <div class="tab" data-tab="cityData">城市数据管理</div>
       <div class="tab" data-tab="reviews">评论管理</div>
       <div class="tab" data-tab="images">图片管理</div>
       <div class="tab" data-tab="users">用户管理</div>
@@ -183,6 +200,71 @@
             <div class="label">用户总数</div>
             <div class="value" id="statUsers">-</div>
             <div class="sub">管理员: <span id="statAdmins">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 城市数据管理：单字段候选、来源核验、审批和回滚 -->
+      <div class="tab-content" id="cityData">
+        <div class="card">
+          <div class="card-header"><h2>城市数据管理</h2>
+            <p style="color:#64748b;font-size:13px;">先提交候选变更，再人工核验来源并审批；评分与标签暂为只读。</p>
+          </div>
+          <div class="card-body">
+            <form id="cityDataSearch" class="city-edit-row" autocomplete="off">
+              <label>搜索城市 <input id="cityDataQuery" placeholder="输入城市或省份"></label>
+              <button class="btn btn-primary" type="submit">搜索</button>
+            </form>
+            <div class="table-container">
+              <table><thead><tr><th>ID</th><th>城市</th><th>省份</th><th>最近更新时间</th><th>操作</th></tr></thead>
+                <tbody id="cityDataList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2>申请单字段变更</h2></div>
+          <div class="card-body">
+            <p>已选择：<strong id="cityDataSelectedCity">请在上方选择城市</strong></p>
+            <p id="cityDataReadOnlyScores" style="color:#64748b;font-size:13px;"></p>
+            <form id="cityDataProposalForm" autocomplete="off">
+              <div class="city-edit-row">
+                <label>可修改字段 <select id="cityDataField" required></select></label>
+                <label>当前值 <span id="cityDataOldValue">先选择城市</span></label>
+                <label>拟更新为 <input id="cityDataNewValue" placeholder="填写新值；留空表示未知"></label>
+              </div>
+              <div class="city-edit-row">
+                <label>原始来源（HTTPS） <input id="cityDataSourceUrl" type="url" placeholder="https://..." required></label>
+                <label>数据统计日期 <input id="cityDataSourceDate" type="date" required></label>
+              </div>
+              <label style="display:block;margin-top:10px;">来源核验说明
+                <textarea id="cityDataSourceNote" rows="3" maxlength="1000" required
+                  placeholder="说明统计口径、单位、查证位置；不得编造来源"></textarea>
+              </label>
+              <div class="city-edit-row">
+                <button type="button" class="btn btn-primary" id="cityDataPreviewButton">预览差异</button>
+                <button type="submit" class="btn btn-success" id="cityDataPropose" disabled>提交待审核</button>
+              </div>
+              <pre id="cityDataPreview" class="city-edit-preview"></pre>
+              <p id="cityDataMessage" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2>变更记录与人工审批</h2></div>
+          <div class="card-body">
+            <div class="city-edit-row">
+              <label>状态 <select id="cityDataStatus">
+                <option value="">全部</option><option value="pending">待审核</option>
+                <option value="approved">已生效</option><option value="rejected">已拒绝</option>
+                <option value="rolled_back">已回滚</option></select></label>
+              <label><input id="cityDataOnlySelected" type="checkbox"> 仅当前城市</label>
+              <button type="button" class="btn btn-primary" id="cityDataRefresh">刷新记录</button>
+            </div>
+            <div class="table-container"><table>
+              <thead><tr><th>申请/城市</th><th>字段</th><th>变更前 → 变更后</th><th>原始来源与日期</th><th>状态</th><th>提交时间</th><th>审核/回滚</th></tr></thead>
+              <tbody id="cityDataChanges"></tbody>
+            </table></div>
           </div>
         </div>
       </div>
@@ -417,6 +499,7 @@
 
       // 加载对应数据
       if (tabName === 'dashboard') loadStats();
+      if (tabName === 'cityData' && window.cityDataManagement) window.cityDataManagement.load();
       if (tabName === 'reviews') loadReviews(1);
       if (tabName === 'images') { loadProvinces(); loadImages(1); }
       if (tabName === 'users') loadUsers(1);
@@ -949,5 +1032,6 @@
       document.getElementById(id).classList.remove('show');
     }
   </script>
+  <script src="city-data-management.js"></script>
 </body>
 </html>
