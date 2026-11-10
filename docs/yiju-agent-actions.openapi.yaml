@@ -1,0 +1,184 @@
+openapi: 3.0.3
+info:
+  title: 易居 GPT 城市证据与运营接口
+  version: 0.2.0
+  description: |
+    只读城市资料、检索、提交外部证据和可审计的字段变更建议。
+    自动生效仅适用于服务器已启用且满足多来源校验的低风险文字字段。
+    绝不提供审批、回滚、评分、排行、标签、评论或发布的直接权限。
+servers:
+  - url: https://yiju.zhibeimao.com/api/agent/city-data
+security:
+  - AgentToken: []
+components:
+  securitySchemes:
+    AgentToken:
+      type: http
+      scheme: bearer
+      description: 在 GPT Actions / 授权连接器配置独立 API 密钥；不要把密钥放进聊天或文档。
+  schemas:
+    EvidenceSubmission:
+      type: object
+      additionalProperties: false
+      required:
+        - external_id
+        - city_id
+        - scope_name
+        - source_url
+        - source_date
+        - source_note
+        - source_type
+        - source_access
+        - metric_key
+        - metric_value
+        - metric_unit
+      properties:
+        external_id:
+          type: string
+          minLength: 8
+          maxLength: 120
+          description: GPT 生成的稳定任务标识；同一标识相同内容幂等。
+          example: zhangye-health-2025-001
+        city_id:
+          type: integer
+          minimum: 1
+          example: 951
+        scope_name:
+          type: string
+          example: 张掖市
+        source_url:
+          type: string
+          format: uri
+          description: 公开可访问的 HTTPS 来源。
+        source_date:
+          type: string
+          format: date
+          description: 证据来源的统计/公布日期（不能晚于今天），明确口径见备注。
+        source_note:
+          type: string
+          minLength: 10
+          maxLength: 1000
+          description: 说明来源、行政辖区、统计口径与可信度。
+        source_type:
+          type: string
+          enum: [government, research, housing_market, media, community, other]
+        source_access:
+          type: string
+          enum: [fetched, search_only]
+          description: fetched 必须真实读取正文并提供 source_excerpt；仅搜索摘要不得提变更。
+        source_excerpt:
+          type: string
+          minLength: 15
+          maxLength: 800
+          description: 实际读取的原始依据片段，不要捏造。
+        observation_period:
+          type: string
+          maxLength: 40
+          example: '2025'
+        metric_key:
+          type: string
+          example: medical_health_institutions_count
+        metric_value:
+          nullable: true
+          oneOf:
+            - type: number
+            - type: string
+              maxLength: 300
+        metric_unit:
+          type: string
+          example: 个
+        proposal:
+          type: object
+          additionalProperties: false
+          description: 可省略，表示只归档证据。给定时只允许白名单字段和已读取正文。
+          required: [field, new_value, expected_old_value, conversion_note]
+          properties:
+            field:
+              type: string
+              example: location_intro
+            new_value:
+              nullable: true
+              description: 字段拟变更的新值，须符合 /fields 返回的类型和限制。
+            expected_old_value:
+              nullable: true
+              description: 从 /cities/{id} 获取的旧值，以避免过期覆盖。
+            conversion_note:
+              type: string
+              minLength: 10
+              maxLength: 300
+              description: 说明原始数据如何映射到此字段，评分数值不允许直接映射。
+            auto_apply:
+              type: boolean
+              default: false
+              description: 仅在后端显式启用且两处不同政府机关来源指标一致时允许部分文字字段自动生效；否则待人工审核。
+paths:
+  /fields:
+    get:
+      operationId: yijuGetEditableFields
+      summary: 获取可编辑字段和自动执行策略
+      responses:
+        '200':
+          description: 当前可修改字段、只读范围、自动审核策略
+  /cities:
+    get:
+      operationId: yijuSearchCity
+      summary: 用城市名或省份搜索城市 ID
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: {type: string, maxLength: 80}
+      responses:
+        '200':
+          description: 匹配的城市名称、行政区和 ID
+  /cities/{id}:
+    get:
+      operationId: yijuReadCityFields
+      summary: 读取城市受控字段和最新旧值
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: integer, minimum: 1}
+      responses:
+        '200':
+          description: 城市基本字段与只读值
+  /submissions:
+    post:
+      operationId: yijuSubmitEvidence
+      summary: 提交证据并按策略创建待审核变更或低风险自动生效
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvidenceSubmission'
+      responses:
+        '201':
+          description: 首次成功提交
+        '200':
+          description: 同一 external_id、同一内容的幂等重放
+        '400':
+          description: 格式或来源不合法
+        '401':
+          description: API 密钥不正确
+        '409':
+          description: 重复冲突、旧值已变化或已有待审核变更
+        '413':
+          description: 提交过大
+        '503':
+          description: 受限 Agent 接口尚未启用
+  /submissions/{external_id}:
+    get:
+      operationId: yijuReadSubmissionStatus
+      summary: 按稳定 ID 查询证据归档和变更状态
+      parameters:
+        - in: path
+          name: external_id
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: 已归档证据 ID、变更申请 ID、人工审核或自动生效状态
+        '404':
+          description: 未找到记录
