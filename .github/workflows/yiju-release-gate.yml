@@ -1,0 +1,40 @@
+name: Yiju release gate (production deployment)
+
+on:
+  push:
+    branches:
+      - 'claude/livable-cities-ranking-0112UFYCzLLMXat6n8Tjc83c'
+  pull_request:
+    branches:
+      - 'claude/livable-cities-ranking-0112UFYCzLLMXat6n8Tjc83c'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yiju-release-gate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  production-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies in isolated CI
+        run: npm ci --no-audit --no-fund
+      - name: City data and admin regressions
+        run: npm run test:city-data
+      - name: Real isolated SQLite regression
+        run: npm run test:city-data:sqlite
+      - name: SEO, pagination and canonical regressions
+        run: node --test tests_js/seo-sitemap.test.js tests_js/seo-live-links.test.js tests_js/layflat-pagination.test.js
+      - name: Safe deployment poller compiles and standard-library tests pass
+        run: |
+          python3 -m py_compile scripts/deploy/yiju_auto_deploy.py
+          python3 -m unittest discover -s tests_py -p 'test_yiju_autodeploy.py' -v
