@@ -28,12 +28,16 @@ function governmentAuthority(sourceUrl) {
 }
 function containsMetric(text, value) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return false;
-  return String(text || '').replace(/[\s,，]/g, '').includes(String(value));
+  // Compare complete numeric tokens: 11391, -1391 and 1391.5 do not attest 1391.
+  const tokens = String(text || '').replace(/−/g, '-').match(
+    /[+-]?(?:\d{1,3}(?:[,，]\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?/g
+  ) || [];
+  return tokens.some(token => Number(token.replace(/[,，]/g, '')) === value);
 }
 async function canAutoApply(body) {
   const policy = autoPolicy();
   if (!body.proposal?.auto_apply || !policy.enabled || !AUTO_FIELDS.has(body.proposal.field) ||
-    body.source_access !== 'fetched' || !body.source_excerpt ||
+    body.source_access !== 'fetched' || !body.source_excerpt || !body.observation_period ||
     !containsMetric(body.source_excerpt, body.metric_value) ||
     !containsMetric(body.proposal.new_value, body.metric_value) ||
     /[<>]|javascript:|data:/i.test(body.proposal.new_value) ||
@@ -42,7 +46,8 @@ async function canAutoApply(body) {
     return { allowed: false, reason: 'not eligible for autonomous update' };
   }
   const sources = await db.query(
-    "SELECT source_url,metric_value_json,source_access,source_excerpt,source_date FROM city_agent_evidence " +
+    'SELECT source_url,metric_value_json,source_access,source_excerpt,source_date,' +
+    'scope_name,observation_period,metric_unit FROM city_agent_evidence ' +
     "WHERE city_id=? AND metric_key=? AND source_type='government' " +
     'AND metric_value_json=? ORDER BY id DESC LIMIT 50',
     [body.city_id, body.metric_key, JSON.stringify(body.metric_value)]
@@ -50,6 +55,9 @@ async function canAutoApply(body) {
   const authority = governmentAuthority(body.source_url);
   const independent = sources.find(row =>
     row.source_access === 'fetched' && row.source_excerpt &&
+    row.scope_name === body.scope_name &&
+    row.observation_period === body.observation_period &&
+    row.metric_unit === body.metric_unit &&
     containsMetric(row.source_excerpt, body.metric_value) &&
     governmentAuthority(row.source_url) &&
     governmentAuthority(row.source_url) !== authority

@@ -110,7 +110,7 @@ components:
             auto_apply:
               type: boolean
               default: false
-              description: 仅在后端显式启用且两处不同政府机关来源指标一致时允许部分文字字段自动生效；否则待人工审核。
+              description: 仅在后端显式启用且两处不同政府机关来源的城市、行政范围、指标、完整数值、单位及非空统计期均一致时允许部分文字字段自动生效；否则待人工审核。
 paths:
   /fields:
     get:

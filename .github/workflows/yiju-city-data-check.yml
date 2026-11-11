@@ -9,6 +9,8 @@ on:
       - 'server/routes/city-data-management.js'
       - 'server/routes/city-agent-bridge.js'
       - 'tests_js/city-agent-bridge.test.js'
+      - 'tests_js/city-agent-sqlite.integration.test.js'
+      - 'package-lock.json'
       - 'docs/yiju-agent-actions.openapi.yaml'
       - 'docs/yiju-gpt-bridge-deploy.md'
       - '.env.example'
@@ -27,3 +29,6 @@ jobs:
           node-version: '20'
       - name: Check city management workflows
         run: npm run test:city-data
+      - run: npm ci --no-audit --no-fund
+      - name: Verify real SQLite, HTTP, authorization and autonomous safety gates
+        run: npm run test:city-data:sqlite

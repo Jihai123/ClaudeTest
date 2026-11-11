@@ -7,7 +7,7 @@
 - GPT API：GET /api/agent/city-data/fields，GET /cities?q=张掖，GET /cities/951，POST /submissions，GET /submissions/{external_id}。从属于 /api/agent/city-data。
 - 管理员证据箱：GET /api/admin/city-agent/evidence，JWT + 管理员权限。前端新增 GPT 证据收件箱。
 - GPT 可无需人工自动检索城市、归档公开证据、幂等去重、读取审批状态、申请数据变更。
-- 显式配置 YIJU_AGENT_AUTO_APPLY=true 后，少量低风险文字字段（slogan、location_intro、key_points、notes）可**根据后端确定性规则自动应用**。必须具备两处**不同政府机关域名**的 HTTPS 已读取证据，同一个 city_id、metric_key、metric_value，提供真实来源片段，文字不少于 18 字，读取时旧值必须一致，且没有同字段待审申请。每日全站自动生效条数受 YIJU_AGENT_AUTO_APPLY_DAILY_LIMIT 限制（默认10、最大100）；冲突、来源不足及超额自动转人工待审。
+- 显式配置 YIJU_AGENT_AUTO_APPLY=true 后，少量低风险文字字段（slogan、location_intro、key_points、notes）可**根据后端确定性规则自动应用**。必须具备两处**不同政府机关域名**的 HTTPS 已读取证据，同一个 city_id、scope_name、metric_key、metric_value、metric_unit 和非空 observation_period，提供真实来源片段，文字不少于 18 字，读取时旧值必须一致，且没有同字段待审申请。来源片段与新文字均须包含完整数值（11391、-1391、1391.5 均不能印证1391）。每日全站自动生效条数受 YIJU_AGENT_AUTO_APPLY_DAILY_LIMIT 限制（默认10、最大100）；来源口径不一致、统计期缺失、来源不足及超额自动转人工待审；旧值冲突或同字段已有待审返回409。
 - 自动操作使用 reviewed_by=0 明确标识机器审核，source_verified_by 仍为 NULL（不冒充人工核验）。写库使用现有事务 + 原字段 CAS 保护，管理员可在原有后台回滚。
 - GPT 永远不能直接访问批准、拒绝、回滚、评分、排行、城市身份、标签、真实居民评论写入或公开发布接口。数字成本字段可以提申请但不可自动生效。社区内容只存证据，不能直接申请字段修改。零评分不等于零机构，机构数不可写到 medical_facilities 评分字段。
 - **自动核对的只是域名、来源阅读声明、数值一致、变更冲突和频次，不能替代全面的事实核验。** GPT 必须在调用前真实打开来源，不能把搜索摘要当作已读原文。所有实际来源、统计年份、行政层级和单位必须匹配。
@@ -16,7 +16,7 @@
 
 1. 查看生产 SSH 实际目录、PM2 进程、Node 版本、数据库绝对路径、当前 Git SHA、工作树更改和代理配置；不要根据历史目录猜测。
 2. 使用 SQLite 在线备份 API 或 sqlite3 .backup 备份生产库，确认备份 PRAGMA integrity_check 为 ok，并在独立副本执行恢复读取。保留原 PM2、nginx、版本配置及回滚窗口；不能覆盖未提交更改。
-3. 部署前先运行 npm run test:city-data（包括 #107 + 新 bridge）。再在**隔离数据库**运行 initCityDataManagement、initAgentCityBridge，实测鉴权、幂等、来源分类、待审、自动应用、日配额和回滚。失败停止上线。
+3. 部署前先运行 npm ci、npm run test:city-data（包括 #107 + 新 bridge）及 npm run test:city-data:sqlite。后者使用真实 Express、JWT、SQLite 和独立临时库验证鉴权、幂等、来源口径、待审、自动应用、并发日配额、故障原子回滚和管理员回滚，测试材料均为合成夹具。再对生产备份的隔离副本运行 initCityDataManagement、initAgentCityBridge，确认生产 Node/SQLite 兼容与既有数据不变。真实材料端到端验收仍需另行执行；失败停止上线。
 4. 默认配置 YIJU_AGENT_AUTO_APPLY=false，不要一上线就自动应用文字。上线后完成只读和证据归档验收，再根据用户的“分级尽量自动”的授权设置为 true，默认每日不超过 10 条低风险文字字段自动更新。
 5. 在服务器用 openssl rand -hex 32 生成独立随机 API token；以 printf 与 sha256sum 计算十六进制 SHA-256，仅将摘要存为生产环境变量 YIJU_AGENT_API_KEY_SHA256。**原始 token 不要写进源码、GitHub、终端记录、CI 日志或聊天**，只放在私有 GPT Action / 连接器凭据配置中。移除摘要会让 Agent API 返回 503，便于紧急停机；改密钥时旧 token 失效。
 6. 只发布 PR 合并后的确定 SHA，重启原 Node 服务，不部署新 Agent 容器。确认 /api/health 正常、/admin.html 出现城市数据管理和 GPT 证据收件箱、/api/auth/me 的未认证行为符合预期。
