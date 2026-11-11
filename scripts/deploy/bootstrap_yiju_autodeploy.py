@@ -125,19 +125,6 @@ def discover():
             "table_count": tables}
 
 
-def install_cron(existing, wrapper):
-    if CRON_MARKER in existing:
-        lines = existing.splitlines()
-        managed = [i for i, line in enumerate(lines) if line.strip() == CRON_MARKER]
-        if len(managed) != 1 or not managed[0] or CRON_SCHEDULE not in lines[managed[0]-1]:
-            raise Blocked("Existing yiju-autodeploy cron is ambiguous; refusing to overwrite")
-        return existing, False
-    quoted = shlex.quote(str(wrapper))
-    addition = CRON_SCHEDULE + " " + quoted + " >> " + shlex.quote(str(wrapper.parent.parent.parent / "state" / "yiju-autodeploy" / "cron.log")) + " 2>&1"
-    # The log path will be corrected by caller's absolute state path.
-    return (existing.rstrip() + "\n" if existing.strip() else "") + addition + "\n" + CRON_MARKER + "\n", True
-
-
 def bootstrap(info):
     home = Path.home()
     lib = home / ".local/lib/yiju-autodeploy"
@@ -211,10 +198,13 @@ def bootstrap(info):
     if not result.get("publicSmoke", {}).get("sitemapUrls", 0) >= 500:
         raise Blocked("Public sitemap acceptance missing")
     # Install the cron job only after a real, green first release.
-    try:
-        old_cron = run("crontab", "-l")
-    except Blocked:
+    cron_read = subprocess.run(["crontab", "-l"], capture_output=True, text=True, timeout=20)
+    if cron_read.returncode == 0:
+        old_cron = cron_read.stdout
+    elif cron_read.returncode == 1 and "no crontab for" in cron_read.stderr.lower():
         old_cron = ""
+    else:
+        raise Blocked("Cannot inspect existing crontab; refusing to replace other jobs")
     line = CRON_SCHEDULE + " " + shlex.quote(str(wrapper)) + \
         " >> " + shlex.quote(str(state / "cron.log")) + " 2>&1"
     if CRON_MARKER not in old_cron:
