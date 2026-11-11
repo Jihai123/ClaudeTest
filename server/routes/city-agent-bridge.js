@@ -284,7 +284,7 @@ router.get('/submissions/:external_id', async (req, res) => {
   } catch (e) { replyError(res, e); }
 });
 
-router.post('/submissions', async (req, res) => {
+async function submitSubmission(req, res) {
   try {
     const body = normalizeSubmission(req.body);
     const payloadHash = crypto.createHash('sha256')
@@ -370,10 +370,23 @@ router.post('/submissions', async (req, res) => {
       resultRow(outcome.row, outcome.existing)
     );
   } catch (e) { replyError(res, e); }
-});
+}
+router.post('/submissions', submitSubmission);
 
 // The evidence inbox is available ONLY to existing human admin users.
 adminRouter.use(verifyToken, verifyAdmin);
+// Same evidence validation and idempotency as the Agent API, but through the
+// already-authenticated admin browser. This path is strictly evidence-only:
+// no proposal / no automatic approval / no city field edits / no API key exposure.
+adminRouter.post('/evidence', (req, res) => {
+  if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'proposal')) {
+    return res.status(400).json({ error: '浏览器收件箱只允许归档证据，禁止提交字段变更' });
+  }
+  if (JSON.stringify(req.body || {}).length > MAX_BODY_CHARS) {
+    return res.status(413).json({ error: '提交过大' });
+  }
+  return submitSubmission(req, res);
+});
 adminRouter.get('/evidence', async (req, res) => {
   try {
     const id = req.query.city_id ? cityId(Number(req.query.city_id)) : null;
