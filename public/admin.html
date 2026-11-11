@@ -267,6 +267,45 @@
           </div>
         </div>
         <div class="card">
+          <div class="card-header"><h2>GPT 证据归档入口</h2>
+            <p style="color:#64748b;font-size:13px;">通过当前管理员登录会话归档一条公开资料证据。仅证据入库，不会修改城市、评分或自动审批。</p>
+          </div>
+          <div class="card-body">
+            <form id="cityAgentSubmitForm" autocomplete="off">
+              <p id="cityAgentSubmitCity" role="status">请先在上方搜索并选择城市（必须确认榜单和城市 ID）</p>
+              <div class="city-edit-row">
+                <label>证据唯一编号 <input id="cityAgentExternalId" maxlength="120" required placeholder="例如 gpt-zhangye-health-2025-01"></label>
+                <label>指标键 <input id="cityAgentMetricKey" maxlength="80" required placeholder="例如 medical_health_institutions_count"></label>
+                <label>指标值 <input id="cityAgentMetricValue" maxlength="300" placeholder="数字、文字；留空表示未知 null"></label>
+                <label>单位 <input id="cityAgentMetricUnit" maxlength="30" required placeholder="例如 个"></label>
+              </div>
+              <div class="city-edit-row">
+                <label>原始来源 URL <input id="cityAgentSourceUrl" type="url" maxlength="1000" required placeholder="https://..."></label>
+                <label>来源日期 <input id="cityAgentSourceDate" type="date" required></label>
+                <label>统计期 <input id="cityAgentObservationPeriod" maxlength="40" placeholder="例如 2025"></label>
+                <label>来源类型 <select id="cityAgentSourceType">
+                  <option value="government">政府统计</option><option value="research">研究机构</option>
+                  <option value="housing_market">住房市场</option><option value="media">媒体</option>
+                  <option value="community">公开讨论</option><option value="other">其他</option>
+                </select></label>
+                <label>原文是否已读取 <select id="cityAgentSourceAccess">
+                  <option value="search_only">仅搜索线索</option><option value="fetched">已实际读取原文</option>
+                </select></label>
+              </div>
+              <label style="display:block;margin-top:10px;">来源核对说明
+                <textarea id="cityAgentSourceNote" rows="2" maxlength="1000" required placeholder="说明行政范围、统计口径、来源可靠性，至少10字"></textarea>
+              </label>
+              <label style="display:block;margin-top:10px;">实际读取到的原文片段（已读取原文时必填）
+                <textarea id="cityAgentSourceExcerpt" rows="2" maxlength="800" placeholder="不得根据搜索摘要编造"></textarea>
+              </label>
+              <div class="city-edit-row">
+                <button class="btn btn-success" type="submit" id="cityAgentSubmitButton">归档证据（不改城市）</button>
+              </div>
+              <p id="cityAgentSubmitStatus" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+        <div class="card">
           <div class="card-header"><h2>变更记录与人工审批</h2></div>
           <div class="card-body">
             <div class="city-edit-row">
@@ -1048,6 +1087,6 @@
       document.getElementById(id).classList.remove('show');
     }
   </script>
-  <script src="city-data-management.js?v=20261111-evidence-filter"></script>
+  <script src="city-data-management.js?v=20261111-agent-intake"></script>
 </body>
 </html>
