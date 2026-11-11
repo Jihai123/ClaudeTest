@@ -22,7 +22,7 @@ import tempfile
 ORIGIN = "https://github.com/Jihai123/ClaudeTest.git"
 BRANCH = "claude/livable-cities-ranking-0112UFYCzLLMXat6n8Tjc83c"
 # Verified merge of PR #120: independent, immutable deployer source.
-PINNED_RUNNER_SHA = "8e10e73a45bad72007cc3c9ab1a1b81d16d388c3"
+PINNED_RUNNER_SHA = "69d42ad3a12db191d674a2fe8c68380c8c182392"
 CRON_MARKER = "# yiju-autodeploy managed"
 CRON_SCHEDULE = "*/10 * * * *"
 
