@@ -125,6 +125,15 @@ def discover():
             "table_count": tables}
 
 
+def read_crontab():
+    cron_read = subprocess.run(["crontab", "-l"], capture_output=True, text=True, timeout=20)
+    if cron_read.returncode == 0:
+        return cron_read.stdout
+    if cron_read.returncode == 1 and "no crontab for" in cron_read.stderr.lower():
+        return ""
+    raise Blocked("Cannot inspect existing crontab; refusing to replace other jobs")
+
+
 def bootstrap(info):
     home = Path.home()
     lib = home / ".local/lib/yiju-autodeploy"
@@ -198,13 +207,7 @@ def bootstrap(info):
     if not result.get("publicSmoke", {}).get("sitemapUrls", 0) >= 500:
         raise Blocked("Public sitemap acceptance missing")
     # Install the cron job only after a real, green first release.
-    cron_read = subprocess.run(["crontab", "-l"], capture_output=True, text=True, timeout=20)
-    if cron_read.returncode == 0:
-        old_cron = cron_read.stdout
-    elif cron_read.returncode == 1 and "no crontab for" in cron_read.stderr.lower():
-        old_cron = ""
-    else:
-        raise Blocked("Cannot inspect existing crontab; refusing to replace other jobs")
+    old_cron = read_crontab()
     line = CRON_SCHEDULE + " " + shlex.quote(str(wrapper)) + \
         " >> " + shlex.quote(str(state / "cron.log")) + " 2>&1"
     if CRON_MARKER not in old_cron:
