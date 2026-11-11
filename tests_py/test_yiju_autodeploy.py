@@ -59,6 +59,14 @@ class DeploymentGateTests(unittest.TestCase):
                 self.assertEqual(live.execute("select count(*) from cities").fetchone()[0], 1)
             self.assertFalse(list(root.glob("yiju-restore-*")))
 
+    def test_refuses_root_and_uses_old_git_symbolic_ref(self):
+        with patch.object(DEPLOY.os, "geteuid", return_value=0):
+            with self.assertRaisesRegex(RuntimeError, "Refusing root"):
+                DEPLOY.ensure_preflight({"app_dir": Path("/tmp/not-used")})
+        source = PATH.read_text(encoding="utf8")
+        self.assertIn('run("git", "symbolic-ref", "--short", "HEAD", cwd=app)', source)
+        self.assertNotIn('"branch", "--show-current"', source)
+
     def test_preflight_fails_on_public_config_permissions(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
