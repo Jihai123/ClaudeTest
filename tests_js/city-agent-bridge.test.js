@@ -308,3 +308,30 @@ test('untrusted official-looking hostname cannot get auto-update privileges', as
   assert.equal(r.payload.submission_status, 'pending_manual_review');
   assert.equal(x.city.notes, '旧注释');
 });
+
+test('admin JWT browser intake archives only evidence even when machine key is disabled', async () => {
+  const x = harness(); await x.init();
+  x.env.YIJU_AGENT_API_KEY_SHA256 = '';
+  const p = evidenceRecord('browser-proof-zhangye-2025');
+  let reply = await x.invoke('POST','/evidence',p,{}, {admin:true});
+  assert.equal(reply.statusCode,201);
+  assert.equal(reply.payload.submission_status,'evidence_only');
+  assert.equal(x.evidence.length,1);
+  assert.equal(x.changes.length,0);
+  reply = await x.invoke('POST','/evidence',p,{}, {admin:true});
+  assert.equal(reply.statusCode,200);
+  assert.equal(reply.payload.replayed,true);
+  assert.equal(x.evidence.length,1);
+  reply = await x.invoke('POST','/evidence',{
+    ...p, external_id:'browser-proof-denied-2025',
+    proposal:{field:'notes', new_value:'不允许修改', expected_old_value:'旧注释',
+      conversion_note:'不允许证据录入修改城市',auto_apply:true}
+  },{}, {admin:true});
+  assert.equal(reply.statusCode,400);
+  assert.equal(x.changes.length,0);
+  assert.equal(x.city.notes,'旧注释');
+  reply = await x.invoke('POST','/evidence',{
+    ...p, external_id:'browser-proof-oversize-2025',source_note:'x'.repeat(6500)
+  },{}, {admin:true});
+  assert.equal(reply.statusCode,413);
+});

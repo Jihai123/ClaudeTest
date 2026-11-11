@@ -107,6 +107,7 @@
   async function chooseCity(id) {
     const version = ++citySelectionVersion;
     selectedCity = null;
+    updateEvidenceIntakeCity();
     changeField();
     setText('cityDataSelectedCity', '正在读取城市（ID ' + id + '）');
     setText('cityDataReadOnlyScores', '');
@@ -117,6 +118,7 @@
       const city = await request('/cities/' + id);
       if (version !== citySelectionVersion) return;
       selectedCity = city;
+      updateEvidenceIntakeCity();
       setText('cityDataSelectedCity', selectedCity.name + '（ID ' + selectedCity.id + '）' +
         (selectedCity.province ? ' · ' + selectedCity.province : ''));
       const scores = selectedCity.readonly_scores || {};
@@ -297,6 +299,81 @@
       }
     }
   }
+  // Agent-facing browser fallback for evidence intake: no machine token in JS.
+  // The server's admin-only route refuses any proposal / field write.
+  function updateEvidenceIntakeCity() {
+    const node = el('cityAgentSubmitCity');
+    node.textContent = selectedCity ?
+      '准备归档至：' + selectedCity.name + '（城市 ID ' + selectedCity.id +
+      ' · ' + (selectedCity.province || '') + '）。不同榜单同名城市不自动合并。' :
+      '请先在上方搜索并选择城市（必须确认榜单和城市 ID）';
+  }
+  function metricValue(raw) {
+    const value = String(raw || '').trim();
+    if (!value) return null; // unknown is NULL, never zero
+    if (/^[+-]?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(value)) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) throw new Error('数值超出支持范围');
+      return numeric;
+    }
+    return value;
+  }
+  function evidenceDraft() {
+    if (!selectedCity) throw new Error('请先选中具体榜单的城市 ID');
+    const read = id => el(id).value.trim();
+    const access = read('cityAgentSourceAccess');
+    const excerpt = read('cityAgentSourceExcerpt');
+    if (access === 'fetched' && excerpt.length < 15) {
+      throw new Error('已读取原文时，必须填写真实原文片段（至少15字）');
+    }
+    if (access === 'search_only' && excerpt) {
+      throw new Error('仅搜索线索不能填写原文片段；请选择实际读取原文或清空片段');
+    }
+    const data = {
+      external_id: read('cityAgentExternalId'),
+      city_id: selectedCity.id,
+      scope_name: selectedCity.name,
+      source_url: read('cityAgentSourceUrl'),
+      source_date: read('cityAgentSourceDate'),
+      source_note: read('cityAgentSourceNote'),
+      source_type: read('cityAgentSourceType'),
+      source_access: access,
+      metric_key: read('cityAgentMetricKey'),
+      metric_value: metricValue(read('cityAgentMetricValue')),
+      metric_unit: read('cityAgentMetricUnit')
+    };
+    if (excerpt) data.source_excerpt = excerpt;
+    const period = read('cityAgentObservationPeriod');
+    if (period) data.observation_period = period;
+    return data; // There is deliberately no 'proposal' property in this form.
+  }
+  async function submitAgentEvidence(event) {
+    event.preventDefault();
+    const status = el('cityAgentSubmitStatus');
+    const button = el('cityAgentSubmitButton');
+    if (button.disabled) return;
+    try {
+      const payload = evidenceDraft();
+      button.disabled = true;
+      status.textContent = '正在归档证据…';
+      const answer = await api('/admin/city-agent/evidence', {
+        method: 'POST', body: JSON.stringify(payload)
+      });
+      if (answer && answer.error) throw new Error(answer.error);
+      if (!answer || !answer.evidence_id || answer.change_request_id) {
+        throw new Error('入库响应异常：本表单只允许保存证据');
+      }
+      status.textContent = '归档成功：证据 #' + answer.evidence_id +
+        ' · 城市 ID ' + answer.city_id +
+        (answer.replayed ? '（相同证据已存在，无重复写入）' : '（新入库）') +
+        '；城市原有数值未修改。';
+      await loadAgentEvidence();
+    } catch (error) {
+      status.textContent = '归档失败：' + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  }
   async function loadAgentEvidence() {
     const version = ++evidenceRequestVersion;
     const selection = citySelectionVersion;
@@ -403,6 +480,7 @@
     el('cityDataOnlySelected').addEventListener('change', loadChanges);
     el('cityDataRefresh').addEventListener('click', loadChanges);
     el('cityAgentEvidenceRefresh').addEventListener('click', loadAgentEvidence);
+    el('cityAgentSubmitForm').addEventListener('submit', submitAgentEvidence);
     el('cityAgentEvidenceSelected').addEventListener('change', loadAgentEvidence);
   });
   window.cityDataManagement = { load };

@@ -243,6 +243,80 @@ test('agent bridge SQLite integration', async t => {
     assert.deepEqual(search.body.cities.map(row => row.id), [1490, 951]);
     assert.deepEqual(await db.query('SELECT * FROM city_agent_evidence ORDER BY id'), before);
   });
+  const browserSubmit = (body, key = adminToken) => request('/api/admin/city-agent/evidence', {
+    method: 'POST', body, key
+  });
+  await t.test('browser POST requires a real admin JWT, not a machine key or regular user', async () => {
+    for (const key of [null, token, 'invalid-jwt']) {
+      assert.equal((await browserSubmit(evidence(), key)).status, 401);
+    }
+    assert.equal((await browserSubmit(evidence(), userToken)).status, 403);
+  });
+  await t.test('browser archives without machine key, replays and rejects conflicting content', async () => {
+    const count = (await db.get('SELECT count(*) n FROM city_agent_evidence')).n;
+    const changes = await db.query('SELECT * FROM city_data_change_requests ORDER BY id');
+    const city = await db.get('SELECT * FROM cities WHERE id=951');
+    const body = evidence({ scope_name: '张掖市' });
+    const saved = process.env.YIJU_AGENT_API_KEY_SHA256;
+    delete process.env.YIJU_AGENT_API_KEY_SHA256;
+    try {
+      assert.equal((await request(prefix + '/fields')).status, 503);
+      const first = await browserSubmit(body);
+      assert.equal(first.status, 201);
+      assert.equal(first.body.submission_status, 'evidence_only');
+      assert.equal(first.body.change_request_id, null);
+      const replay = await browserSubmit(body);
+      assert.equal(replay.status, 200); assert.equal(replay.body.replayed, true);
+      assert.equal(replay.body.evidence_id, first.body.evidence_id);
+      assert.equal((await browserSubmit({ ...body, metric_value: 42 })).status, 409);
+    } finally { process.env.YIJU_AGENT_API_KEY_SHA256 = saved; }
+    assert.equal((await db.get('SELECT count(*) n FROM city_agent_evidence')).n, count + 1);
+    assert.deepEqual(await db.query('SELECT * FROM city_data_change_requests ORDER BY id'), changes);
+    assert.deepEqual(await db.get('SELECT * FROM cities WHERE id=951'), city);
+    assert.equal((await submit(body)).body.replayed, true, 'idempotency is shared with machine API');
+  });
+  await t.test('browser rejects every proposal shape and oversized or invalid evidence before writing', async () => {
+    const before = await db.query('SELECT * FROM city_agent_evidence ORDER BY id');
+    for (const value of [null, false, {}, [], proposal()]) {
+      assert.equal((await browserSubmit(evidence({ proposal: value }))).status, 400);
+    }
+    assert.equal((await browserSubmit(evidence({ source_note: 'x'.repeat(6500) }))).status, 413);
+    assert.equal((await browserSubmit(evidence({ source_url: 'http://example.invalid/fixture' }))).status, 400);
+    assert.equal((await browserSubmit(evidence({ source_access: 'fetched', source_excerpt: undefined }))).status, 400);
+    assert.equal((await browserSubmit(evidence({ city_id: 99999999 }))).status, 404);
+    assert.deepEqual(await db.query('SELECT * FROM city_agent_evidence ORDER BY id'), before);
+  });
+  await t.test('browser evidence uses exact 951/1490 IDs and does not remap historical associations', async () => {
+    const legacy = await db.query('SELECT * FROM city_agent_evidence WHERE city_id=1490 ORDER BY id');
+    const first = await browserSubmit(evidence({ city_id: 951, scope_name: '张掖市' }));
+    const second = await browserSubmit(evidence({ city_id: 1490, scope_name: '张掖' }));
+    assert.equal(first.status, 201); assert.equal(second.status, 201);
+    const filtered = await request('/api/admin/city-agent/evidence?city_id=951', { key: adminToken });
+    assert.ok(filtered.body.evidence.some(e => e.id === first.body.evidence_id));
+    assert.ok(filtered.body.evidence.every(e => e.city_id === 951));
+    assert.ok(!filtered.body.evidence.some(e => e.id === second.body.evidence_id));
+    const after = await db.query('SELECT * FROM city_agent_evidence WHERE city_id=1490 AND id<>? ORDER BY id', [second.body.evidence_id]);
+    assert.deepEqual(after, legacy);
+  });
+  await t.test('concurrent browser retries archive once and never create change requests', async () => {
+    const body = evidence({ scope_name: '张掖市' });
+    const before = (await db.get('SELECT count(*) n FROM city_data_change_requests')).n;
+    const results = await Promise.all(Array.from({ length: 5 }, () => browserSubmit(body)));
+    assert.equal(results.filter(r => r.status === 201).length, 1);
+    assert.equal(results.filter(r => r.status === 200 && r.body.replayed).length, 4);
+    assert.equal((await db.get('SELECT count(*) n FROM city_data_change_requests')).n, before);
+  });
+  await t.test('browser SQLite insert failure rolls back atomically and the next request recovers', async () => {
+    const body = evidence({ scope_name: '张掖市' });
+    const before = await db.query('SELECT * FROM city_agent_evidence ORDER BY id');
+    await db.run("CREATE TRIGGER fail_browser BEFORE INSERT ON city_agent_evidence BEGIN SELECT RAISE(ABORT, 'injected browser fault'); END");
+    try {
+      assert.equal((await browserSubmit(body)).status, 500);
+      assert.deepEqual(await db.query('SELECT * FROM city_agent_evidence ORDER BY id'), before);
+    } finally { await db.run('DROP TRIGGER fail_browser'); }
+    assert.equal((await browserSubmit(body)).status, 201);
+    assert.equal((await db.get('PRAGMA integrity_check')).integrity_check, 'ok');
+  });
   await t.test('public city list, detail and rankings still read; scores are unchanged', async () => {
     assert.equal((await request('/api/cities?sort=overall_score&limit=5')).body.cities[0].id, 951);
     assert.equal((await request('/api/cities/951')).status, 200);
