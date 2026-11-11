@@ -21,6 +21,11 @@ class BootstrapTests(unittest.TestCase):
         self.assertEqual(BOOTSTRAP.BRANCH,
                          "claude/livable-cities-ranking-0112UFYCzLLMXat6n8Tjc83c")
 
+    def test_bootstrap_git_217_compatibility(self):
+        source = FILE.read_text(encoding="utf8")
+        self.assertIn('"symbolic-ref", "--short", "HEAD"', source)
+        self.assertNotIn('"branch", "--show-current"', source)
+
     def test_refuses_root(self):
         with patch.object(BOOTSTRAP.os, "geteuid", return_value=0):
             with self.assertRaisesRegex(BOOTSTRAP.Blocked, "Refusing root"):
