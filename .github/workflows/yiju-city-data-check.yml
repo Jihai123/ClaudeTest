@@ -16,6 +16,9 @@ on:
       - 'docs/yiju-gpt-bridge-deploy.md'
       - '.env.example'
       - 'server.js'
+      - 'server/routes/sitemap.js'
+      - 'public/robots.txt'
+      - 'tests_js/seo-sitemap.test.js'
       - 'tests_js/city-data-management.test.js'
       - 'package.json'
       - '.github/workflows/yiju-city-data-check.yml'
@@ -30,6 +33,8 @@ jobs:
           node-version: '20'
       - name: Check city management workflows
         run: npm run test:city-data
+      - name: Check SEO sitemap and robots content
+        run: node --test tests_js/seo-sitemap.test.js
       - run: npm ci --no-audit --no-fund
       - name: Verify real SQLite, HTTP, authorization and autonomous safety gates
         run: npm run test:city-data:sqlite
