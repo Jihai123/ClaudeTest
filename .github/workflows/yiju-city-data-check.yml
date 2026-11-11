@@ -8,6 +8,8 @@ on:
       - 'public/city-data-management.js'
       - 'server/routes/city-data-management.js'
       - 'server/routes/city-agent-bridge.js'
+      - 'server/routes/cities.js'
+      - 'tests_js/layflat-pagination.test.js'
       - 'tests_js/city-agent-bridge.test.js'
       - 'tests_js/city-agent-sqlite.integration.test.js'
       - 'tests_js/city-evidence-ui.test.js'
@@ -30,6 +32,8 @@ jobs:
           node-version: '20'
       - name: Check city management workflows
         run: npm run test:city-data
+      - name: Check deterministic city pagination
+        run: node --test tests_js/layflat-pagination.test.js
       - run: npm ci --no-audit --no-fund
       - name: Verify real SQLite, HTTP, authorization and autonomous safety gates
         run: npm run test:city-data:sqlite
