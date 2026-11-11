@@ -5,8 +5,12 @@ const db = require('../models/database');
 // 生成动态Sitemap
 router.get('/sitemap.xml', async (req, res) => {
   try {
-    const baseURL = process.env.BASE_URL || 'https://tangping.com';
-    const now = new Date().toISOString();
+    const baseURL = process.env.SITEMAP_BASE_URL || 'https://yiju.zhibeimao.com';
+    const now = new Date().toISOString().slice(0, 10);
+    const xmlDate = (value) => {
+      const parsed = value ? new Date(String(value).replace(' ', 'T')) : null;
+      return parsed && Number.isFinite(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : now;
+    };
 
     // 获取所有已审核的城市
     const cities = await db.query(
@@ -52,7 +56,7 @@ router.get('/sitemap.xml', async (req, res) => {
 
     // 所有城市详情页
     cities.forEach(city => {
-      const lastmod = city.updated_at || now;
+      const lastmod = xmlDate(city.updated_at);
       sitemap += `  <url>
     <loc>${baseURL}/city-detail.html?id=${city.id}</loc>
     <lastmod>${lastmod}</lastmod>
@@ -65,7 +69,7 @@ router.get('/sitemap.xml', async (req, res) => {
     sitemap += '</urlset>';
 
     // 设置响应头
-    res.header('Content-Type', 'application/xml');
+    res.header('Content-Type', 'application/xml; charset=utf-8');
     res.header('Cache-Control', 'public, max-age=3600'); // 缓存1小时
     res.send(sitemap);
 
