@@ -6,6 +6,10 @@
   let selectedCity = null;
   let previewFingerprint = null;
   let initialized = false;
+  let citySelectionVersion = 0;
+  let searchRequestVersion = 0;
+  let changesRequestVersion = 0;
+  let evidenceRequestVersion = 0;
 
   function el(id) { return document.getElementById(id); }
   function setText(id, value) { el(id).textContent = value == null ? '' : String(value); }
@@ -68,9 +72,11 @@
     changeField();
   }
   async function searchCities() {
+    const version = ++searchRequestVersion;
     try {
       const q = encodeURIComponent(el('cityDataQuery').value.trim());
       const data = await request('/cities?q=' + q + '&limit=30');
+      if (version !== searchRequestVersion) return;
       const body = el('cityDataList');
       body.replaceChildren();
       if (!data.cities || !data.cities.length) {
@@ -80,7 +86,8 @@
       data.cities.forEach(function (city) {
         const row = document.createElement('tr');
         cell(row, city.id);
-        cell(row, city.name);
+        const listNames = { china_general: '综合榜', china_layflat: '躺平榜', world: '世界榜' };
+        cell(row, city.name + (listNames[city.list_type] ? ' · ' + listNames[city.list_type] : ''));
         cell(row, city.province);
         cell(row, city.updated_at);
         const actions = document.createElement('td');
@@ -93,12 +100,25 @@
         row.appendChild(actions);
         body.appendChild(row);
       });
-    } catch (error) { showMessage('城市查询失败：' + error.message, true); }
+    } catch (error) {
+      if (version === searchRequestVersion) showMessage('城市查询失败：' + error.message, true);
+    }
   }
   async function chooseCity(id) {
+    const version = ++citySelectionVersion;
+    selectedCity = null;
+    changeField();
+    setText('cityDataSelectedCity', '正在读取城市（ID ' + id + '）');
+    setText('cityDataReadOnlyScores', '');
+    ++changesRequestVersion;
+    ++evidenceRequestVersion;
+    if (el('cityAgentEvidenceSelected').checked) loadAgentEvidence();
     try {
-      selectedCity = await request('/cities/' + id);
-      setText('cityDataSelectedCity', selectedCity.name + '（ID ' + selectedCity.id + '）');
+      const city = await request('/cities/' + id);
+      if (version !== citySelectionVersion) return;
+      selectedCity = city;
+      setText('cityDataSelectedCity', selectedCity.name + '（ID ' + selectedCity.id + '）' +
+        (selectedCity.province ? ' · ' + selectedCity.province : ''));
       const scores = selectedCity.readonly_scores || {};
       setText('cityDataReadOnlyScores', '只读评分：综合 ' + pretty(scores.overall_score) +
         ' / 躺平 ' + pretty(scores.layflat_score) +
@@ -106,7 +126,11 @@
         '。本模块不会改动评分或算法。');
       changeField();
       await Promise.all([loadChanges(), loadAgentEvidence()]);
-    } catch (error) { showMessage('读取城市失败：' + error.message, true); }
+    } catch (error) {
+      if (version !== citySelectionVersion) return;
+      setText('cityDataSelectedCity', '城市读取失败（ID ' + id + '），请重新选择');
+      showMessage('读取城市失败：' + error.message, true);
+    }
   }
   function newValue() {
     const def = fields.find(function (f) { return f.key === el('cityDataField').value; });
@@ -194,11 +218,14 @@
     return button;
   }
   async function loadChanges() {
+    const version = ++changesRequestVersion;
+    const selection = citySelectionVersion;
     try {
       const status = encodeURIComponent(el('cityDataStatus').value);
       const city = el('cityDataOnlySelected').checked && selectedCity ?
         '&city_id=' + selectedCity.id : '';
       const data = await request('/changes?status=' + status + city);
+      if (version !== changesRequestVersion || selection !== citySelectionVersion) return;
       const body = el('cityDataChanges');
       body.replaceChildren();
       if (!data.changes || !data.changes.length) {
@@ -264,24 +291,46 @@
         row.appendChild(action);
         body.appendChild(row);
       });
-    } catch (error) { showMessage('加载变更记录失败：' + error.message, true); }
+    } catch (error) {
+      if (version === changesRequestVersion && selection === citySelectionVersion) {
+        showMessage('加载变更记录失败：' + error.message, true);
+      }
+    }
   }
   async function loadAgentEvidence() {
+    const version = ++evidenceRequestVersion;
+    const selection = citySelectionVersion;
+    const onlySelected = el('cityAgentEvidenceSelected').checked;
+    const city = selectedCity;
+    const body = el('cityAgentEvidenceList');
+    setText('cityAgentEvidenceContext', onlySelected ?
+      (city ? '按城市 ID ' + city.id + ' 精确筛选 · ' + city.name : '仅当前城市：请先选择城市') :
+      '全部城市的证据；按城市 ID 关联，名称相近的城市不会自动合并。');
+    body.replaceChildren();
+    if (onlySelected && !city) {
+      tableEmpty(body, '请先在上方选择城市，再按城市 ID 筛选证据。', 5);
+      return;
+    }
+    tableEmpty(body, '正在读取采集证据…', 5);
     try {
-      const onlySelected = el('cityAgentEvidenceSelected').checked && selectedCity;
       const endpoint = '/admin/city-agent/evidence' +
-        (onlySelected ? '?city_id=' + selectedCity.id : '');
+        (onlySelected ? '?city_id=' + city.id : '');
       const data = await api(endpoint);
+      if (version !== evidenceRequestVersion || selection !== citySelectionVersion) return;
       if (data && data.error) throw new Error(data.error);
-      const body = el('cityAgentEvidenceList');
       body.replaceChildren();
       if (!data.evidence || !data.evidence.length) {
-        tableEmpty(body, '暂无采集证据', 5);
+        tableEmpty(body, onlySelected ?
+          '城市 ID ' + city.id + '（' + city.name + '）暂无关联证据；名称相近的城市记录不会合并。' :
+          '暂无采集证据', 5);
         return;
       }
       data.evidence.forEach(function (evidence) {
         const row = document.createElement('tr');
-        cell(row, '#' + evidence.id + ' / ' + evidence.city_name);
+        row.dataset.evidenceId = String(evidence.id);
+        row.dataset.cityId = String(evidence.city_id);
+        cell(row, '证据 #' + evidence.id + ' / ' + evidence.city_name +
+          '（城市 ID ' + evidence.city_id + '）');
         const source = document.createElement('td');
         const link = document.createElement('a');
         link.textContent = '打开来源';
@@ -317,7 +366,12 @@
         cell(row, evidence.created_at);
         body.appendChild(row);
       });
-    } catch (error) { showMessage('采集证据加载失败：' + error.message, true); }
+    } catch (error) {
+      if (version !== evidenceRequestVersion || selection !== citySelectionVersion) return;
+      body.replaceChildren();
+      tableEmpty(body, '采集证据读取失败，请刷新重试。', 5);
+      showMessage('采集证据加载失败：' + error.message, true);
+    }
   }
   async function load() {
     if (!initialized) {

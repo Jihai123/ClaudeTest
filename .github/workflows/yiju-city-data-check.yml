@@ -10,6 +10,7 @@ on:
       - 'server/routes/city-agent-bridge.js'
       - 'tests_js/city-agent-bridge.test.js'
       - 'tests_js/city-agent-sqlite.integration.test.js'
+      - 'tests_js/city-evidence-ui.test.js'
       - 'package-lock.json'
       - 'docs/yiju-agent-actions.openapi.yaml'
       - 'docs/yiju-gpt-bridge-deploy.md'
