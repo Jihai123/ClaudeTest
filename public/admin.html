@@ -259,6 +259,7 @@
               <label><input type="checkbox" id="cityAgentEvidenceSelected"> 仅当前城市</label>
               <button type="button" class="btn btn-primary" id="cityAgentEvidenceRefresh">刷新采集证据</button>
             </div>
+            <p id="cityAgentEvidenceContext" role="status" aria-live="polite"></p>
             <div class="table-container"><table>
               <thead><tr><th>城市</th><th>来源及范围</th><th>证据指标</th><th>关联变更</th><th>采集时间</th></tr></thead>
               <tbody id="cityAgentEvidenceList"></tbody>
@@ -1047,6 +1048,6 @@
       document.getElementById(id).classList.remove('show');
     }
   </script>
-  <script src="city-data-management.js"></script>
+  <script src="city-data-management.js?v=20261111-evidence-filter"></script>
 </body>
 </html>

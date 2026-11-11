@@ -220,6 +220,29 @@ test('agent bridge SQLite integration', async t => {
     assert.equal(results.filter(r => r.status === 200 && r.body.replayed).length, 4);
     assert.equal((await db.get('SELECT count(*) n FROM city_agent_evidence')).n, 1);
   });
+  await t.test('historical evidence filters by exact city ID across similar city names without reassignment', async () => {
+    await reset();
+    await db.run("UPDATE cities SET name='张掖市' WHERE id=951");
+    await db.run("INSERT INTO cities(id,name,province,list_type,status) VALUES(1490,'张掖','甘肃省','china_general','approved'),(1216,'北京','北京','china_general','approved')");
+    for (let i = 0; i < 10; i++) {
+      const zhangye = i === 0 || i === 5;
+      assert.equal((await submit(evidence({ city_id: zhangye ? 1490 : 1216,
+        scope_name: zhangye ? '张掖' : '北京' }))).status, 201);
+    }
+    const before = await db.query('SELECT * FROM city_agent_evidence ORDER BY id');
+    const global = await request('/api/admin/city-agent/evidence', { key: adminToken });
+    assert.equal(global.body.evidence.length, 10);
+    for (const id of [951, 1490, 1216, 951, 1490]) {
+      const result = await request('/api/admin/city-agent/evidence?city_id=' + id, { key: adminToken });
+      assert.equal(result.status, 200);
+      assert.equal(result.body.evidence.length, id === 951 ? 0 : id === 1490 ? 2 : 8);
+      assert.ok(result.body.evidence.every(row => row.city_id === id));
+      assert.ok(result.body.evidence.every(row => row.change_request_id === null));
+    }
+    const search = await request('/api/admin/city-data/cities?q=' + encodeURIComponent('张掖'), { key: adminToken });
+    assert.deepEqual(search.body.cities.map(row => row.id), [1490, 951]);
+    assert.deepEqual(await db.query('SELECT * FROM city_agent_evidence ORDER BY id'), before);
+  });
   await t.test('public city list, detail and rankings still read; scores are unchanged', async () => {
     assert.equal((await request('/api/cities?sort=overall_score&limit=5')).body.cities[0].id, 951);
     assert.equal((await request('/api/cities/951')).status, 200);
