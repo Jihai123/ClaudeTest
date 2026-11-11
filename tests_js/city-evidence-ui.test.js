@@ -38,9 +38,14 @@ function harness() {
   for (const [, id] of html.matchAll(/id="([^"]+)"/g)) nodes.set(id, new Element('div'));
   const el = id => { assert.ok(nodes.has(id), 'missing DOM node ' + id); return nodes.get(id); };
   el('cityDataField').value = 'notes'; el('cityDataQuery').value = '张掖';
-  const calls = [], interceptors = [];
-  const api = async endpoint => {
+  const calls = [], interceptors = [], submitted = [];
+  const api = async (endpoint, options) => {
     calls.push(endpoint);
+    if (endpoint === '/admin/city-agent/evidence' && options && options.method === 'POST') {
+      const draft = JSON.parse(options.body);
+      submitted.push(draft);
+      return { evidence_id: 11, city_id: draft.city_id, change_request_id: null, replayed: false };
+    }
     const intercept = interceptors.findIndex(item => item.match(endpoint));
     if (intercept !== -1) return interceptors.splice(intercept, 1)[0].response.promise;
     if (endpoint.endsWith('/fields')) return { fields: [{ key: 'notes', label: '备注', type: 'text' }] };
@@ -69,7 +74,7 @@ function harness() {
   const ids = () => el('cityAgentEvidenceList').children.map(row => Number(row.dataset.evidenceId)).filter(Number.isFinite);
   const filter = checked => { el('cityAgentEvidenceSelected').checked = checked; el('cityAgentEvidenceSelected').fire('change'); };
   const refresh = () => el('cityAgentEvidenceRefresh').fire('click');
-  return { el, calls, hold, choose, ids, filter, refresh, load: () => window.cityDataManagement.load() };
+  return { el, calls, submitted, hold, choose, ids, filter, refresh, load: () => window.cityDataManagement.load() };
 }
 
 test('global historical evidence displays explicit city identities; 951 does not inherit 1490 records', async () => {
@@ -138,4 +143,43 @@ test('late city search cannot replace newer search results', async () => {
   ui.el('cityDataSearch').fire('submit');
   ui.el('cityDataQuery').value = '北京'; ui.el('cityDataSearch').fire('submit'); await settle();
   old.resolve({ cities: [] }); await settle(); assert.match(ui.el('cityDataList').textContent, /1490/);
+});
+
+test('authenticated browser intake binds exact city id and submits only evidence', async () => {
+  const ui = harness(); await ui.load();
+  ui.choose(951); await settle();
+  assert.match(ui.el('cityAgentSubmitCity').textContent, /ID 951/);
+  const values = {
+    cityAgentExternalId:'yiju-browser-zhangye-medical-2025-v1',
+    cityAgentMetricKey:'medical_health_institutions_count',
+    cityAgentMetricValue:'1391',cityAgentMetricUnit:'个',
+    cityAgentSourceUrl:'https://www.zhangye.gov.cn/sjfb/tjgb/202606/t20260602_1549566.html',
+    cityAgentSourceDate:'2026-06-02',cityAgentObservationPeriod:'2025',
+    cityAgentSourceType:'government',cityAgentSourceAccess:'fetched',
+    cityAgentSourceNote:'已经读取政府统计公报，统计范围为张掖市，不是医疗评分',
+    cityAgentSourceExcerpt:'2025年末张掖市医疗卫生机构共1391个；这是医疗机构数量。'
+  };
+  Object.entries(values).forEach(([k,v])=>{ui.el(k).value=v});
+  ui.el('cityAgentSubmitForm').fire('submit'); await settle();
+  assert.equal(ui.submitted.length,1);
+  assert.equal(ui.submitted[0].city_id,951);
+  assert.equal(ui.submitted[0].scope_name,'张掖市');
+  assert.equal(ui.submitted[0].metric_value,1391);
+  assert.ok(!('proposal' in ui.submitted[0]));
+  assert.match(ui.el('cityAgentSubmitStatus').textContent,/归档成功/);
+  ui.choose(1490); await settle();
+  assert.match(ui.el('cityAgentSubmitCity').textContent,/ID 1490/);
+});
+
+test('browser intake rejects unselected city and invented fetched text', async () => {
+  const ui=harness(); await ui.load();
+  ui.el('cityAgentSubmitForm').fire('submit'); await settle();
+  assert.equal(ui.submitted.length,0);
+  assert.match(ui.el('cityAgentSubmitStatus').textContent,/请先选中/);
+  ui.choose(951); await settle();
+  ui.el('cityAgentSourceAccess').value='fetched';
+  ui.el('cityAgentSourceExcerpt').value='';
+  ui.el('cityAgentSubmitForm').fire('submit'); await settle();
+  assert.equal(ui.submitted.length,0);
+  assert.match(ui.el('cityAgentSubmitStatus').textContent,/必须填写真实原文/);
 });
