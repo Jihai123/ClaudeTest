@@ -1,5 +1,5 @@
-# 躺平榜 - Robots.txt
-# 允许所有搜索引擎抓取
+# 易居城市指南 - Robots.txt
+# 抓取策略以实际外部响应为准；若 CDN 追加机器人规则，须独立核查
 
 User-agent: *
 Allow: /
@@ -15,7 +15,7 @@ Disallow: /api/
 Disallow: /upload-images.html
 
 # 指定Sitemap位置
-Sitemap: https://tangping.com/sitemap.xml
+Sitemap: https://yiju.zhibeimao.com/sitemap.xml
 
 # 搜索引擎抓取速度（建议值）
 # 百度
