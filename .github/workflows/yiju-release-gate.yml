@@ -36,5 +36,5 @@ jobs:
         run: node --test tests_js/seo-sitemap.test.js tests_js/seo-live-links.test.js tests_js/layflat-pagination.test.js
       - name: Safe deployment poller compiles and standard-library tests pass
         run: |
-          python3 -m py_compile scripts/deploy/yiju_auto_deploy.py
-          python3 -m unittest discover -s tests_py -p 'test_yiju_autodeploy.py' -v
+          python3 -m py_compile scripts/deploy/yiju_auto_deploy.py scripts/deploy/bootstrap_yiju_autodeploy.py
+          python3 -m unittest discover -s tests_py -p 'test_yiju_*.py' -v
