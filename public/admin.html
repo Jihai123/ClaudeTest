@@ -251,6 +251,21 @@
           </div>
         </div>
         <div class="card">
+          <div class="card-header"><h2>GPT 采集证据收件箱</h2>
+            <p style="color:#64748b;font-size:13px;">以下数据为 Agent 采集的候选证据，并非已核实事实；没有字段映射的证据只归档、不改分数。</p>
+          </div>
+          <div class="card-body">
+            <div class="city-edit-row">
+              <label><input type="checkbox" id="cityAgentEvidenceSelected"> 仅当前城市</label>
+              <button type="button" class="btn btn-primary" id="cityAgentEvidenceRefresh">刷新采集证据</button>
+            </div>
+            <div class="table-container"><table>
+              <thead><tr><th>城市</th><th>来源及范围</th><th>证据指标</th><th>关联变更</th><th>采集时间</th></tr></thead>
+              <tbody id="cityAgentEvidenceList"></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div class="card">
           <div class="card-header"><h2>变更记录与人工审批</h2></div>
           <div class="card-body">
             <div class="city-edit-row">

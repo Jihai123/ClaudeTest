@@ -367,4 +367,9 @@ router.post('/changes/:id/rollback', async (req, res) => {
   } catch (e) { respondError(res, e); }
 });
 
-module.exports = { router, initCityDataManagement, normalizeValue, FIELD_DEFINITIONS };
+// Shared only with the agent intake module; approvals remain admin-only.
+module.exports = {
+  router, initCityDataManagement, normalizeValue, validSource, FIELD_DEFINITIONS,
+  cityRecord, currentValue, queuedTransaction, setField,
+  getAvailableFields: () => new Map(availableFields)
+};
