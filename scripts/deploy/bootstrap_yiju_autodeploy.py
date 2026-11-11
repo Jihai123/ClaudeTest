@@ -90,7 +90,7 @@ def discover():
                        "git@github.com:Jihai123/ClaudeTest.git",
                        "ssh://git@github.com/Jihai123/ClaudeTest.git"):
         raise Blocked("Git origin not approved")
-    if run("git", "-C", str(app), "branch", "--show-current") != BRANCH:
+    if run("git", "-C", str(app), "symbolic-ref", "--short", "HEAD") != BRANCH:
         raise Blocked("Production is not on the exact expected branch")
     if run("git", "-C", str(app), "status", "--porcelain", "--untracked-files=no"):
         raise Blocked("Production tracked worktree contains local changes")

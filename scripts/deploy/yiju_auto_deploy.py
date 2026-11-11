@@ -76,6 +76,9 @@ def config_at(location):
 
 
 def ensure_preflight(cfg):
+    # A GitHub pull-and-execute runner must never have server-wide root privileges.
+    if os.geteuid() == 0:
+        raise RuntimeError("Refusing root automatic deployment; isolate yijucity service user first")
     app = cfg["app_dir"]
     remote = run("git", "remote", "get-url", "origin", cwd=app)
     allowed = (
@@ -86,7 +89,7 @@ def ensure_preflight(cfg):
     )
     if remote not in allowed:
         raise RuntimeError("Unexpected origin URL; refusing untrusted remote")
-    if run("git", "branch", "--show-current", cwd=app) != cfg["branch"]:
+    if run("git", "symbolic-ref", "--short", "HEAD", cwd=app) != cfg["branch"]:
         raise RuntimeError("Production checkout must be on the exact default branch")
     if run("git", "status", "--porcelain", "--untracked-files=no", cwd=app):
         raise RuntimeError("Production tracked files have local changes; stop, preserve changes")
