@@ -17,7 +17,7 @@ class BootstrapTests(unittest.TestCase):
     def test_pinned_runner_source_and_unique_expected_branch(self):
         self.assertEqual(len(BOOTSTRAP.PINNED_RUNNER_SHA), 40)
         self.assertEqual(BOOTSTRAP.PINNED_RUNNER_SHA,
-                         "8e10e73a45bad72007cc3c9ab1a1b81d16d388c3")
+                         "69d42ad3a12db191d674a2fe8c68380c8c182392")
         self.assertEqual(BOOTSTRAP.BRANCH,
                          "claude/livable-cities-ranking-0112UFYCzLLMXat6n8Tjc83c")
 
