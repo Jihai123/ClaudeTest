@@ -323,20 +323,23 @@ router.get('/', optionalAuth, async (req, res) => {
 
     let orderByClause = '';
 
-    // 躺平榜：如果用户没有指定排序字段，则使用随机排序
-    // 如果用户指定了排序字段（如avg_rent），则使用指定的排序
-    const userSpecifiedSort = req.query.sort && req.query.sort !== 'overall_score';
-
+    // 躺平榜首页保留多样化展示，但每次请求的 RANDOM() 会令不同分页
+    // 重排，产生跨页重复与遗漏。改为以 UTC 日期为种子的稳定伪随机顺序。
+    // 同一天的所有页保持一致；显式传 sort（含 overall_score）则尊重排序。
+    // c.id 是唯一的，必须作为稳定的最后 tie-breaker。
+    const userSpecifiedSort = req.query.sort !== undefined && req.query.sort !== '';
     if (list_type === 'china_layflat' && !userSpecifiedSort) {
-      orderByClause = 'ORDER BY RANDOM()';
+      const utcDay = Math.floor(Date.now() / 86400000);
+      const multiplier = (1103515245 ^ utcDay) >>> 0;
+      const offsetSeed = (utcDay * 12345) % 2147483647;
+      orderByClause =
+        `ORDER BY ((c.id * ${multiplier} + ${offsetSeed}) % 2147483647) ASC, c.id ASC`;
     } else {
-      // 如果指定了榜单类型，使用对应的评分字段
       if (list_type === 'world' && sort === 'overall_score') {
         sortField = 'world_score';
       }
-      const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-      // 使用正确的表前缀
-      orderByClause = `ORDER BY ${sortTablePrefix}.${sortField} ${sortOrder}`;
+      const sortOrder = String(order).toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+      orderByClause = `ORDER BY ${sortTablePrefix}.${sortField} ${sortOrder}, c.id ASC`;
     }
 
     const query = `
