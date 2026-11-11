@@ -5,7 +5,7 @@ const db = require('../models/database');
 // 生成动态Sitemap
 router.get('/sitemap.xml', async (req, res) => {
   try {
-    const baseURL = process.env.BASE_URL || 'https://yiju.zhibeimao.com';
+    const baseURL = process.env.SITEMAP_BASE_URL || 'https://yiju.zhibeimao.com';
     const now = new Date().toISOString().slice(0, 10);
     const xmlDate = (value) => {
       const parsed = value ? new Date(String(value).replace(' ', 'T')) : null;
