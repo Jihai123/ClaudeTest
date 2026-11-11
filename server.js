@@ -57,6 +57,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 静态文件服务
+// Prefer the database-backed sitemap whenever Node handles this route.
+// public/sitemap.xml is a fallback snapshot for sites where nginx serves static files directly.
+app.use(BASE_PATH || '/', require('./server/routes/sitemap'));
 app.use(BASE_PATH || '/', express.static(path.join(__dirname, 'public')));
 
 // API路由
@@ -72,9 +75,6 @@ app.use(`${BASE_PATH}/api/images`, require('./server/routes/images'));
 app.use(`${BASE_PATH}/api/tags`, require('./server/routes/tags'));
 app.use(`${BASE_PATH}/api/rankings`, require('./server/routes/rankings'));
 app.use(`${BASE_PATH}/api`, require('./server/routes/upload')); // 图片上传
-
-// SEO路由 - Sitemap
-app.use(BASE_PATH || '/', require('./server/routes/sitemap'));
 
 // 健康检查
 app.get(`${BASE_PATH}/api/health`, (req, res) => {

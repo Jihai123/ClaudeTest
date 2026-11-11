@@ -17,6 +17,13 @@ on:
       - '.env.example'
       - 'server.js'
       - 'server/routes/sitemap.js'
+      - 'server/routes/cities.js'
+      - 'public/sitemap.xml'
+      - 'public/index.html'
+      - 'public/city-compare.html'
+      - 'public/upload-images.html'
+      - 'tests_js/seo-live-links.test.js'
+      - 'tests_js/layflat-pagination.test.js'
       - 'public/robots.txt'
       - 'tests_js/seo-sitemap.test.js'
       - 'tests_js/city-data-management.test.js'
@@ -35,6 +42,10 @@ jobs:
         run: npm run test:city-data
       - name: Check SEO sitemap and robots content
         run: node --test tests_js/seo-sitemap.test.js
+      - name: Check live SEO links and static sitemap fallback
+        run: node --test tests_js/seo-live-links.test.js
+      - name: Check stable layflat pagination
+        run: node --test tests_js/layflat-pagination.test.js
       - run: npm ci --no-audit --no-fund
       - name: Verify real SQLite, HTTP, authorization and autonomous safety gates
         run: npm run test:city-data:sqlite
