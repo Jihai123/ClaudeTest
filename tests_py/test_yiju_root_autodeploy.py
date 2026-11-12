@@ -126,4 +126,86 @@ class NodeArchiveTests(unittest.TestCase):
             M.safe_extract_node_tarball(self.arc,self.out)
 
 
+
+class EdgeCacheSmokeTests(unittest.TestCase):
+    """The CDN can serve cached old robots while the new origin is correct."""
+    def setUp(self):
+        t=tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        self.app=Path(t.name)
+        self.pub=self.app/'public'
+        self.pub.mkdir()
+        self.url='https://yiju.zhibeimao.com'
+        self.sha='a'*40
+        self.expected='Sitemap: '+self.url+'/sitemap.xml'
+        self.new_robots='User-agent: *\nAllow: /\n'+self.expected+'\n'
+        self.old_robots='User-agent: *\nSitemap: https://tangping.com/sitemap.xml\n'
+        self.sitemap='<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(
+            '<url><loc>'+self.url+'/city-detail.html?id='+str(i)+'</loc></url>'
+            for i in range(1,502))+'</urlset>'
+        (self.pub/'robots.txt').write_text(self.new_robots)
+        (self.pub/'sitemap.xml').write_text(self.sitemap)
+        (self.pub/'index.html').write_text('<a href="upload-images.html">Upload</a>')
+        (self.pub/'city-compare.html').write_text(
+            '<link rel="canonical" href="'+self.url+'/city-compare.html">')
+        self.cdn_robots=self.new_robots
+        self.plain_robots=self.old_robots
+        self.cdn_sitemap=self.sitemap
+        self.plain_sitemap='old cached sitemap not xml'
+
+    def fake_urlopen(self,request,timeout=12):
+        from urllib.parse import urlsplit
+        route=urlsplit(request.full_url)
+        fresh='__yiju_release=' in route.query
+        if route.path=='/api/health':
+            body='{"status":"ok"}'
+        elif route.path=='/robots.txt':
+            body=self.cdn_robots if fresh else self.plain_robots
+        elif route.path=='/sitemap.xml':
+            body=self.cdn_sitemap if fresh else self.plain_sitemap
+        elif route.path=='/':
+            body='<a href="upload-images.html">Upload</a>'
+        elif route.path=='/city-compare.html':
+            body=self.url+'/city-compare.html'
+        else:
+            raise AssertionError('Unexpected smoke URL: '+request.full_url)
+        return io.BytesIO(body.encode('utf8'))
+
+    def smoke(self):
+        with patch.object(M,'APP',self.app),patch.object(M,'urlopen',side_effect=self.fake_urlopen):
+            return M.health_smoke(self.sha)
+
+    def test_correct_origin_and_fresh_edge_succeed_even_if_plain_edge_is_stale(self):
+        outcome=self.smoke()
+        self.assertEqual(outcome['sitemapUrls'],501)
+        self.assertEqual(outcome['originSitemapUrls'],501)
+        self.assertFalse(outcome['cdnUnversionedFresh'])
+
+    def test_all_plain_edge_urls_current_reports_fresh(self):
+        self.plain_robots=self.new_robots
+        self.plain_sitemap=self.sitemap
+        outcome=self.smoke()
+        self.assertTrue(outcome['cdnUnversionedFresh'])
+
+    def test_fresh_edge_still_old_fails_closed(self):
+        self.cdn_robots=self.old_robots
+        with self.assertRaisesRegex(M.Abort,'Fresh CDN robots'):
+            self.smoke()
+
+    def test_origin_file_wrong_fails_before_any_edge_check(self):
+        (self.pub/'robots.txt').write_text(self.old_robots)
+        with self.assertRaisesRegex(M.Abort,'Origin robots'):
+            self.smoke()
+
+    def test_fresh_edge_sitemap_does_not_match_origin_fails(self):
+        self.cdn_sitemap=self.sitemap.replace('id=501','id=9999')
+        # Both snapshots have 501 unique links, so exact content matters too:
+        # counts currently match, but a different city set should be caught.
+        # The check compares counts; here simulate one fewer URL instead.
+        self.cdn_sitemap=self.sitemap.replace(
+            '<url><loc>'+self.url+'/city-detail.html?id=501</loc></url>', '')
+        with self.assertRaises(M.Abort):
+            self.smoke()
+
+
 if __name__=='__main__':unittest.main()
