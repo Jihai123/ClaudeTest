@@ -19,12 +19,20 @@ concurrency:
 jobs:
   production-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['16.20.2', '20']
+    env:
+      # Node 16 has fetch() only behind this flag; the isolated SQLite test uses fetch.
+      # This is a test-only flag, not a production Node runtime change.
+      NODE_OPTIONS: ${{ matrix.node-version == '16.20.2' && '--experimental-fetch' || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - name: Install dependencies in isolated CI
         run: npm ci --no-audit --no-fund
