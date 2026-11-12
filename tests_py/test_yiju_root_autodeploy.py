@@ -1,5 +1,6 @@
 """Synthetic tests: root autopull cannot overwrite live Git while constructing staging."""
 import importlib.util
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -59,5 +60,70 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(len(M.NODE_SHA256),64)
         self.assertEqual(M.SERVICE,'yijucity')
         self.assertIn('Jihai123/ClaudeTest',M.REPO)
+
+
+class NodeArchiveTests(unittest.TestCase):
+    """Regression for valid archive-root member and untrusted path controls."""
+    def setUp(self):
+        t=tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        self.root=Path(t.name)
+        self.arc=self.root/'node.tar.gz'
+        self.out=self.root/'node'
+        self.out.mkdir()
+        self.prefix='node-'+M.NODE_VER+'-linux-x64-glibc-217'
+
+    def write_tar(self,entries):
+        with tarfile.open(self.arc,'w:gz') as tar:
+            for name,kind,data in entries:
+                member=tarfile.TarInfo(name)
+                if kind=='dir':
+                    member.type=tarfile.DIRTYPE
+                elif kind=='file':
+                    payload=data.encode('utf8')
+                    member.type=tarfile.REGTYPE
+                    member.size=len(payload)
+                elif kind=='symlink':
+                    member.type=tarfile.SYMTYPE
+                    member.linkname=data
+                elif kind=='hardlink':
+                    member.type=tarfile.LNKTYPE
+                    member.linkname=data
+                if kind=='file':
+                    tar.addfile(member,io.BytesIO(payload))
+                else:
+                    tar.addfile(member)
+
+    def test_top_level_directory_entry_is_legal(self):
+        p=self.prefix
+        self.write_tar([(p+'/','dir',''),(p+'/bin/','dir',''),
+                        (p+'/bin/node','file','node-executable'),
+                        (p+'/lib/','dir',''),
+                        (p+'/lib/npm-cli.js','file','npm-script'),
+                        (p+'/bin/npm','symlink','../lib/npm-cli.js')])
+        M.safe_extract_node_tarball(self.arc,self.out)
+        self.assertEqual((self.out/'bin/node').read_text(),'node-executable')
+        self.assertEqual((self.out/'bin/npm').read_text(),'npm-script')
+        self.assertFalse((self.out/p).exists(),'root should be flattened')
+
+    def test_escape_and_wrong_root_are_rejected(self):
+        for path in ('other/bin/node',self.prefix+'/../../outside'):
+            self.write_tar([(path,'file','bad')])
+            with self.assertRaises(M.Abort):
+                M.safe_extract_node_tarball(self.arc,self.out)
+
+    def test_unsafe_links_are_rejected(self):
+        for kind,value in [('symlink','../../../outside'),('hardlink','bin/node')]:
+            self.write_tar([(self.prefix+'/','dir',''),
+                            (self.prefix+'/bin/','dir',''),
+                            (self.prefix+'/bin/npm',kind,value)])
+            with self.assertRaises(M.Abort):
+                M.safe_extract_node_tarball(self.arc,self.out)
+
+    def test_root_only_archive_is_rejected(self):
+        self.write_tar([(self.prefix+'/','dir','')])
+        with self.assertRaises(M.Abort):
+            M.safe_extract_node_tarball(self.arc,self.out)
+
 
 if __name__=='__main__':unittest.main()
