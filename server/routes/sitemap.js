@@ -64,6 +64,22 @@ router.get('/sitemap.xml', async (req, res) => {
     <priority>0.8</priority>
   </url>\n`;
 
+    // 精选站内工具与经来源核验的城市资料页。
+    // 仅加入已存在的永久静态页，避免Nginx静态与动态sitemap遗漏互相矛盾。
+    const guides = [
+      { path: '/city-compare.html', changefreq: 'monthly' },
+      { path: '/verified-city-facts.html', changefreq: 'monthly' },
+      { path: '/zhangye-city-facts-2025.html', changefreq: 'monthly' }
+    ];
+    guides.forEach(guide => {
+      sitemap += `  <url>
+    <loc>${baseURL}${guide.path}</loc>
+    <lastmod>2026-11-12</lastmod>
+    <changefreq>${guide.changefreq}</changefreq>
+    <priority>0.7</priority>
+  </url>\n`;
+    });
+
     // 所有城市详情页
     cities.forEach(city => {
       const lastmod = xmlDate(city.updated_at);
