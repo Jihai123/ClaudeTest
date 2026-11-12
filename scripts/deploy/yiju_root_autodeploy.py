@@ -263,8 +263,31 @@ def ensure_free_space():
         raise Abort('Less than 2GiB free, cannot preserve rollback')
 
 
+
+def verify_local_drift():
+    manifest = STATE / 'deployed-manifest.json'
+    if not manifest.is_file(): return
+    expected = json.loads(manifest.read_text(encoding='utf-8'))
+    for name, digest in expected.items():
+        path = APP / name
+        if not path.is_file() or sha256_file(path) != digest:
+            raise Abort('Deployed tracked file has new local edits; refusing to overwrite: ' + name)
+
+
+def save_local_manifest(tracked):
+    expected = {}
+    for name in sorted(tracked):
+        path = APP / name
+        if not path.is_file(): raise Abort('Missing tracked file after deployment: ' + name)
+        expected[name] = sha256_file(path)
+    temp = STATE / 'deployed-manifest.tmp'
+    temp.write_text(json.dumps(expected, ensure_ascii=False), encoding='utf-8')
+    os.replace(temp, STATE / 'deployed-manifest.json')
+
+
 def run_deploy(target, old, checks_done):
     if not checks_done: checks()
+    verify_local_drift()
     ensure_free_space()
     stage = None
     try:
@@ -303,6 +326,7 @@ def run_deploy(target, old, checks_done):
                 except Exception as exc:
                     failure = exc
             if failure is not None: raise failure
+            save_local_manifest(tracked)
             write_state({'status':'DEPLOYED', 'sha':target, 'previous':old,
                          'backup':str(backup), 'sitemap_urls':public_urls})
         except Exception as exc:
