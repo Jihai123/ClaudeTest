@@ -316,6 +316,17 @@ def health_smoke(target):
     if not isinstance(target,str) or len(target)!=40 or any(c not in '0123456789abcdef' for c in target):
         raise Abort('Invalid release SHA for smoke')
 
+    # Root can read mode-0600 files, but the unprivileged Nginx worker cannot.
+    # Reject a deployment that would appear healthy to root while hiding pages.
+    public_root = APP / 'public'
+    if not (public_root.stat().st_mode & 0o001):
+        raise Abort('Origin public static directory is not traversable by Nginx')
+    for asset in ('robots.txt', 'sitemap.xml', 'index.html',
+                  'city-compare.html', 'verified-city-facts.html'):
+        path = public_root / asset
+        if path.is_file() and not (path.stat().st_mode & 0o004):
+            raise Abort('Origin static file not readable by Nginx: ' + asset)
+
     def load(route):
         with urlopen(Request(BASE+route,headers={
             'User-Agent':'YijuReleaseCheck/3.0',
@@ -336,17 +347,6 @@ def health_smoke(target):
         raise Abort('Origin homepage still has dead upload link')
     if 'https://yiju.zhibeimao.com/city-compare.html' not in (origin/'city-compare.html').read_text(encoding='utf8'):
         raise Abort('Origin compare canonical not fixed')
-
-    # Root can read mode-0600 files, but the unprivileged Nginx worker cannot.
-    # Reject a deployment that would appear healthy to root while hiding pages.
-    public_root = APP / 'public'
-    if not (public_root.stat().st_mode & 0o001):
-        raise Abort('Origin public static directory is not traversable by Nginx')
-    for asset in ('robots.txt', 'sitemap.xml', 'index.html',
-                  'city-compare.html', 'verified-city-facts.html'):
-        path = public_root / asset
-        if path.is_file() and not (path.stat().st_mode & 0o004):
-            raise Abort('Origin static file not readable by Nginx: ' + asset)
 
     # Public, externally routed API health is critical for working business
     # features. A failure here still triggers full code/PM2 rollback.
