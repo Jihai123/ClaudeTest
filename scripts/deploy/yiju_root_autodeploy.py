@@ -325,13 +325,7 @@ def one_cycle():
     if not release_gate(target):
         print('WAITING_FOR_CI',target[:12]);return
     try:
-        try:
         run_deploy(target,latest.get('sha','2c34c3fc3406302514de722bd3843a97575cfdb4'),True)
-    except Exception as exc:
-        current=json.loads((STATE/'status.json').read_text()) if (STATE/'status.json').exists() else {}
-        if current.get('status') not in ('ROLLED_BACK','FAILED_ROLLBACK'):
-            write_state({'status':'BLOCKED_SHA','sha':target,'error':str(exc)})
-        raise
     except Exception as exc:
         current=json.loads((STATE/'status.json').read_text()) if (STATE/'status.json').exists() else {}
         if current.get('status') not in ('ROLLED_BACK','FAILED_ROLLBACK'):
