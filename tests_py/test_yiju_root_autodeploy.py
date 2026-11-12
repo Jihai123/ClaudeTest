@@ -94,17 +94,17 @@ class CronPythonRuntimeTests(unittest.TestCase):
 
     def test_existing_cron_is_repaired_without_touching_other_jobs(self):
         here = Path('/root/yiju-autodeploy.py')
-        old = ('MAILTO=root@example.invalid\\n'
-               '0 1 * * * echo unrelated\\n'
+        old = ('MAILTO=root@example.invalid\n'
+               '0 1 * * * echo unrelated\n'
                '*/10 * * * * PATH=/usr/bin:/bin /usr/bin/python3 '
                '/root/yiju-autodeploy.py --once >> '
-               '/root/yiju-autodeploy/cron.log 2>&1 # yiju-gpt-autodeploy\\n')
+               '/root/yiju-autodeploy/cron.log 2>&1 # yiju-gpt-autodeploy\n')
         desired = ('*/10 * * * * PATH=/root/.nvm/versions/node/bin:/usr/bin '
                    '/opt/python313/bin/python3 /root/yiju-autodeploy.py --once >> '
                    '/root/yiju-autodeploy/cron.log 2>&1 # yiju-gpt-autodeploy')
         changed = M.updated_yiju_crontab(old, desired, here)
-        self.assertTrue(changed.startswith('MAILTO=root@example.invalid\\n'
-                                            '0 1 * * * echo unrelated\\n'))
+        self.assertTrue(changed.startswith('MAILTO=root@example.invalid\n'
+                                            '0 1 * * * echo unrelated\n'))
         self.assertEqual(changed.count('# yiju-gpt-autodeploy'), 1)
         self.assertIn(desired, changed)
         self.assertEqual(M.updated_yiju_crontab(changed, desired, here), changed)
@@ -112,7 +112,7 @@ class CronPythonRuntimeTests(unittest.TestCase):
     def test_duplicate_or_unexpected_existing_cron_is_rejected(self):
         here = Path('/root/yiju-autodeploy.py')
         desired = '*/10 * * * * echo new # yiju-gpt-autodeploy'
-        bad = '0 * * * * echo invalid # yiju-gpt-autodeploy\\n'
+        bad = '0 * * * * echo invalid # yiju-gpt-autodeploy\n'
         with self.assertRaises(M.Abort):
             M.updated_yiju_crontab(bad, desired, here)
         with self.assertRaises(M.Abort):
