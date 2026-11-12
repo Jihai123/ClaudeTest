@@ -271,6 +271,22 @@ def copy_code(stage,tracked):
         if not src.is_file():raise Abort('Missing staged Git file: '+name)
         dst.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(src,dst)
+        if Path(name).parts[0] == 'public':
+            # Git worktree checkout under umask 077 leaves static files at 0600.
+            # Nginx serves APP/public as an unprivileged worker, not root.
+            # Change permissions ONLY for tracked public web assets, not source,
+            # database, .env, existing untracked files or backup directories.
+            current = APP / 'public'
+            while True:
+                if current.is_symlink() or not current.is_dir():
+                    raise Abort('Unsafe public static directory: ' + str(current))
+                current.chmod(0o755)
+                if current == dst.parent:
+                    break
+                relative = dst.parent.relative_to(current)
+                current = current / relative.parts[0]
+            dst.chmod(0o644)
+
 
 
 def restore_code(directory,tracked):
@@ -320,6 +336,17 @@ def health_smoke(target):
         raise Abort('Origin homepage still has dead upload link')
     if 'https://yiju.zhibeimao.com/city-compare.html' not in (origin/'city-compare.html').read_text(encoding='utf8'):
         raise Abort('Origin compare canonical not fixed')
+
+    # Root can read mode-0600 files, but the unprivileged Nginx worker cannot.
+    # Reject a deployment that would appear healthy to root while hiding pages.
+    public_root = APP / 'public'
+    if not (public_root.stat().st_mode & 0o001):
+        raise Abort('Origin public static directory is not traversable by Nginx')
+    for asset in ('robots.txt', 'sitemap.xml', 'index.html',
+                  'city-compare.html', 'verified-city-facts.html'):
+        path = public_root / asset
+        if path.is_file() and not (path.stat().st_mode & 0o004):
+            raise Abort('Origin static file not readable by Nginx: ' + asset)
 
     # Public, externally routed API health is critical for working business
     # features. A failure here still triggers full code/PM2 rollback.
