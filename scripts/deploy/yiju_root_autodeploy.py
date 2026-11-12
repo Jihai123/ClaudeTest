@@ -269,25 +269,83 @@ def restore_code(directory,tracked):
         else: arc.extractall(APP)
 
 
-def health_smoke():
-    def load(url):
-        with urlopen(Request(url,headers={'User-Agent':'YijuReleaseCheck/1.0'}),timeout=12) as res:
-            return res.read()
-    obj=json.loads(load(BASE+'/api/health'))
-    if obj.get('status')!='ok':raise Abort('Health check failed')
-    robot=load(BASE+'/robots.txt').decode('utf8')
-    if 'Sitemap: https://yiju.zhibeimao.com/sitemap.xml' not in robot:
-        raise Abort('Old robots still served by reverse proxy')
-    xml=ET.fromstring(load(BASE+'/sitemap.xml'))
+def sitemap_urls(payload):
+    xml=ET.fromstring(payload)
     urls=[el.text for el in xml.findall('.//{*}loc')]
-    if len(urls)<500 or len(set(urls))!=len(urls):raise Abort('Sitemap not ready')
-    main=load(BASE+'/').decode('utf8')
-    if 'href="upload-images.html"' not in main:raise Abort('Homepage still has dead upload link')
-    compare=load(BASE+'/city-compare.html').decode('utf8')
-    if 'https://yiju.zhibeimao.com/city-compare.html' not in compare:
-        raise Abort('Compare canonical not fixed')
+    if len(urls)<500 or len(set(urls))!=len(urls):
+        raise Abort('Sitemap missing city URLs or contains duplicates')
     return len(urls)
 
+
+def health_smoke(target):
+    """Validate origin files and public CDN bypass independently.
+
+    Nginx serves static files directly from APP/public. Cloudflare can retain
+    old unversioned /robots.txt for up to four hours. A *new SHA-scoped URL*
+    checks if Cloudflare can fetch the new origin; stale unversioned CDN copies
+    are reported, never used as evidence that the newly deployed origin failed.
+    The health endpoint must still answer successfully.
+    """
+    if not isinstance(target,str) or len(target)!=40 or any(c not in '0123456789abcdef' for c in target):
+        raise Abort('Invalid release SHA for cache-busted smoke')
+
+    def load(route):
+        with urlopen(Request(BASE+route,headers={
+            'User-Agent':'YijuReleaseCheck/2.0',
+            'Cache-Control':'no-cache',
+            'Pragma':'no-cache'
+        }),timeout=12) as res:
+            return res.read()
+
+    expected='Sitemap: https://yiju.zhibeimao.com/sitemap.xml'
+    # Source-of-truth: confirmed Nginx document root, not the CDN cache.
+    origin=APP/'public'
+    local_robots=(origin/'robots.txt').read_text(encoding='utf8')
+    if expected not in local_robots or 'tangping.com' in local_robots:
+        raise Abort('Origin robots.txt is not the new version')
+    origin_urls=sitemap_urls((origin/'sitemap.xml').read_bytes())
+    if 'href="upload-images.html"' not in (origin/'index.html').read_text(encoding='utf8'):
+        raise Abort('Origin homepage still has dead upload link')
+    if 'https://yiju.zhibeimao.com/city-compare.html' not in (origin/'city-compare.html').read_text(encoding='utf8'):
+        raise Abort('Origin compare canonical not fixed')
+
+    health=json.loads(load('/api/health'))
+    if health.get('status')!='ok':
+        raise Abort('Public health endpoint not responding')
+
+    # Unique per upstream commit: avoids an old Cloudflare cache key, without
+    # weakening the check of public, user-facing URLs.
+    cache_key='?__yiju_release='+target
+    robot=load('/robots.txt'+cache_key).decode('utf8')
+    if expected not in robot or 'Sitemap: https://tangping.com' in robot:
+        raise Abort('Fresh CDN robots does not reflect deployed origin')
+    public_urls=sitemap_urls(load('/sitemap.xml'+cache_key))
+    if public_urls!=origin_urls:
+        raise Abort('Fresh CDN sitemap differs from origin snapshot')
+    main=load('/'+cache_key).decode('utf8')
+    if 'href="upload-images.html"' not in main:
+        raise Abort('Fresh CDN homepage still has dead upload link')
+    compare=load('/city-compare.html'+cache_key).decode('utf8')
+    if 'https://yiju.zhibeimao.com/city-compare.html' not in compare:
+        raise Abort('Fresh CDN compare canonical not fixed')
+
+    # Audit unversioned SEO paths. These may be stale at Cloudflare for a
+    # configured TTL, but are not a reason to restore correct origin files.
+    plain_fresh=False
+    plain_error=None
+    try:
+        plain_robot=load('/robots.txt').decode('utf8')
+        plain_sitemap=sitemap_urls(load('/sitemap.xml'))
+        plain_fresh=(expected in plain_robot and
+                     'Sitemap: https://tangping.com' not in plain_robot and
+                     plain_sitemap==origin_urls)
+    except Exception as exc:
+        plain_error=type(exc).__name__
+    if not plain_fresh:
+        print('CDN_STALE: unversioned robots/sitemap not refreshed; origin and fresh CDN URLs verified',flush=True)
+
+    return {'sitemapUrls':public_urls,'originSitemapUrls':origin_urls,
+            'cdnUnversionedFresh':plain_fresh,'cdnUnversionedError':plain_error}
 
 def ensure_free_space():
     if shutil.disk_usage(APP).free<2*1024**3:
@@ -351,7 +409,7 @@ def run_deploy(target, old, checks_done):
             for _ in range(3):
                 time.sleep(4)
                 try:
-                    public_urls = health_smoke()
+                    smoke = health_smoke(target)
                     failure = None
                     break
                 except Exception as exc:
@@ -359,7 +417,7 @@ def run_deploy(target, old, checks_done):
             if failure is not None: raise failure
             save_local_manifest(tracked)
             write_state({'status':'DEPLOYED', 'sha':target, 'previous':old,
-                         'backup':str(backup), 'sitemap_urls':public_urls})
+                         'backup':str(backup), 'sitemap_urls':smoke['sitemapUrls'], 'cdn':smoke})
         except Exception as exc:
             if changed:
                 try:
