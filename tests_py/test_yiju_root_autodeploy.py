@@ -63,6 +63,67 @@ class ReleaseTests(unittest.TestCase):
 
 
 
+class PublicStaticPermissionTests(unittest.TestCase):
+    """Nginx must read deployed static pages; private code remains restrictive."""
+
+    def test_public_assets_readable_even_if_staging_worktree_is_0600(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app, stage = root/'app', root/'stage'
+            app.mkdir()
+            stage.mkdir()
+            files = ('public/index.html', 'public/verified-city-facts.html',
+                     'public/assets/main.css', 'server.js')
+            for name in files:
+                src = stage/name
+                src.parent.mkdir(parents=True, exist_ok=True)
+                src.write_text('test')
+                src.chmod(0o600)
+            # Simulate a restrictive new directory created by deployment.
+            (stage/'public').chmod(0o700)
+            (stage/'public/assets').chmod(0o700)
+            with patch.object(M, 'APP', app):
+                M.copy_code(stage, set(files))
+            for name in files[:3]:
+                self.assertEqual((app/name).stat().st_mode & 0o777, 0o644)
+            for name in ('public', 'public/assets'):
+                self.assertEqual((app/name).stat().st_mode & 0o777, 0o755)
+            self.assertEqual((app/'server.js').stat().st_mode & 0o777, 0o600)
+
+    def test_already_deployed_public_modes_can_be_repaired_from_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app, state = root/'app', root/'state'
+            (app/'public').mkdir(parents=True)
+            state.mkdir()
+            (app/'public'/'verified-city-facts.html').write_text('verified')
+            (app/'public'/'verified-city-facts.html').chmod(0o600)
+            (app/'public').chmod(0o700)
+            (app/'server.js').write_text('private code')
+            (app/'server.js').chmod(0o600)
+            names = ('public/verified-city-facts.html', 'server.js')
+            manifest = {name: M.sha256_file(app/name) for name in names}
+            (state/'deployed-manifest.json').write_text(json.dumps(manifest))
+            with patch.object(M, 'APP', app), patch.object(M, 'STATE', state):
+                M.repair_deployed_public_permissions()
+            self.assertEqual((app/'public').stat().st_mode & 0o777, 0o755)
+            self.assertEqual((app/'public/verified-city-facts.html').stat().st_mode & 0o777, 0o644)
+            self.assertEqual((app/'server.js').stat().st_mode & 0o777, 0o600)
+
+    def test_smoke_rejects_private_static_file_even_if_root_can_read_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            app = Path(tmp)
+            pub = app/'public'
+            pub.mkdir()
+            for filename in ('robots.txt', 'sitemap.xml', 'index.html',
+                             'city-compare.html', 'verified-city-facts.html'):
+                (pub/filename).write_text('placeholder')
+            (pub/'verified-city-facts.html').chmod(0o600)
+            with patch.object(M, 'APP', app):
+                with self.assertRaisesRegex(M.Abort, 'not readable by Nginx'):
+                    M.health_smoke('a'*40)
+
+
 class CronPythonRuntimeTests(unittest.TestCase):
     """Production cron must use a Python with a real SQLite online backup API."""
 

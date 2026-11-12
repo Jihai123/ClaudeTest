@@ -264,6 +264,28 @@ def backup_code(directory,tracked):
     (directory/'missing-before.json').write_text(json.dumps(missing))
 
 
+def normalize_tracked_public_permissions(name):
+    """Only Git-tracked web assets are published; never touch private/untracked data."""
+    relative = Path(name)
+    if not relative.parts or relative.parts[0] != 'public':
+        return
+    if '..' in relative.parts or relative.is_absolute():
+        raise Abort('Unsafe public static filename: ' + name)
+    dst = APP / relative
+    if dst.is_symlink() or not dst.is_file():
+        raise Abort('Invalid deployed public static file: ' + str(dst))
+    current = APP / 'public'
+    while True:
+        if current.is_symlink() or not current.is_dir():
+            raise Abort('Unsafe public static directory: ' + str(current))
+        current.chmod(0o755)
+        if current == dst.parent:
+            break
+        remainder = dst.parent.relative_to(current)
+        current = current / remainder.parts[0]
+    dst.chmod(0o644)
+
+
 def copy_code(stage,tracked):
     for name in sorted(tracked):
         src=stage/name;dst=APP/name
@@ -271,6 +293,20 @@ def copy_code(stage,tracked):
         if not src.is_file():raise Abort('Missing staged Git file: '+name)
         dst.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(src,dst)
+        # Worktree checkout under umask 077 creates mode-0600 assets.
+        # Nginx uses an unprivileged worker and requires public modes.
+        normalize_tracked_public_permissions(name)
+
+
+def repair_deployed_public_permissions():
+    """Repair earlier release modes even if its SHA is already marked deployed."""
+    manifest = STATE / 'deployed-manifest.json'
+    if not manifest.is_file():
+        raise Abort('No deployed file manifest for safe permission repair')
+    verify_local_drift()
+    for name in json.loads(manifest.read_text(encoding='utf-8')):
+        normalize_tracked_public_permissions(name)
+
 
 
 def restore_code(directory,tracked):
@@ -299,6 +335,17 @@ def health_smoke(target):
     """
     if not isinstance(target,str) or len(target)!=40 or any(c not in '0123456789abcdef' for c in target):
         raise Abort('Invalid release SHA for smoke')
+
+    # Root can read mode-0600 files, but the unprivileged Nginx worker cannot.
+    # Reject a deployment that would appear healthy to root while hiding pages.
+    public_root = APP / 'public'
+    if not (public_root.stat().st_mode & 0o001):
+        raise Abort('Origin public static directory is not traversable by Nginx')
+    for asset in ('robots.txt', 'sitemap.xml', 'index.html',
+                  'city-compare.html', 'verified-city-facts.html'):
+        path = public_root / asset
+        if path.is_file() and not (path.stat().st_mode & 0o004):
+            raise Abort('Origin static file not readable by Nginx: ' + asset)
 
     def load(route):
         with urlopen(Request(BASE+route,headers={
@@ -475,7 +522,10 @@ def one_cycle():
     target=git('rev-parse',f'refs/remotes/origin/{BRANCH}').stdout.strip()
     latest=json.loads((STATE/'status.json').read_text()) if (STATE/'status.json').exists() else {}
     if latest.get('status')=='DEPLOYED' and latest.get('sha')==target:
-        print('UP_TO_DATE',target[:12]);return
+        # Old fixed runners copied worktree mode 0600. Repair with the
+        # verified deployed manifest instead of redeploying or clearing state.
+        repair_deployed_public_permissions()
+        print('UP_TO_DATE',target[:12], 'PUBLIC_MODES_VERIFIED');return
     if latest.get('status') in ('ROLLED_BACK','FAILED_ROLLBACK','BLOCKED_SHA') and latest.get('sha')==target:
         print('BLOCKED_SHA',target[:12]);return
     if not release_gate(target):
