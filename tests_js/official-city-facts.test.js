@@ -37,3 +37,22 @@ test('published source notes distinguish units from site scores and include upda
   assert.match(page,/2026年11月12日/);
   assert.match(page,/noopener noreferrer/);
 });
+
+test('Zhangye 2025 published facts have official source, correct city ID and sitemap discovery',()=>{
+  const zhangye=fs.readFileSync(path.join(root,'public/zhangye-city-facts-2025.html'),'utf8');
+  assert.match(zhangye,/<html lang="zh-CN">/);
+  assert.match(zhangye,/rel="canonical" href="https:\/\/yiju\.zhibeimao\.com\/zhangye-city-facts-2025\.html"/);
+  assert.match(zhangye,/张掖市政府|张掖市人民政府/);
+  assert.match(zhangye,/www\.zhangye\.gov\.cn\/sjfb\/tjgb\/202606\/t20260602_1549566\.html/);
+  assert.match(zhangye,/city-detail\.html\?id=951/);
+  assert.doesNotMatch(zhangye,/city-detail\.html\?id=1490/);
+  for(const fact of ['109.11 万人','734.35 亿元','58.03%',
+                     '37,787 元','23,531 元','29,824 元','1,391 个',
+                     '43 个','1.14 万张','63 个','7.9℃','98.7%','216.9 毫米']) {
+    assert.ok(zhangye.includes(fact), 'Missing source-backed Zhangye figure: ' + fact);
+  }
+  assert.match(zhangye,/剔除沙尘天气影响后/);
+  assert.match(zhangye,/不改变排名/);
+  assert.match(page,/href="\/zhangye-city-facts-2025\.html"/);
+  assert.match(sitemap,/<loc>https:\/\/yiju\.zhibeimao\.com\/zhangye-city-facts-2025\.html<\/loc>/);
+});
