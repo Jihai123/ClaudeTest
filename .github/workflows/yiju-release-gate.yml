@@ -23,11 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['16.20.2', '20']
-    env:
-      # Node 16 has fetch() only behind this flag; the isolated SQLite test uses fetch.
-      # This is a test-only flag, not a production Node runtime change.
-      NODE_OPTIONS: ${{ matrix.node-version == '16.20.2' && '--experimental-fetch' || '' }}
+        node-version: ['22', '24']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
