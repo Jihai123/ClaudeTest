@@ -14,6 +14,7 @@ import fcntl
 import hashlib
 import json
 import os
+import shlex
 from pathlib import Path
 import shutil
 import sqlite3
@@ -224,6 +225,18 @@ def test_stage(work):
     run(['npm','run','test:city-data:sqlite'],cwd=work,env=env,timeout=360)
     for file in ('tests_js/seo-sitemap.test.js','tests_js/seo-live-links.test.js','tests_js/layflat-pagination.test.js'):
         run(['node','--test',file],cwd=work,env=env,timeout=120)
+
+
+def require_sqlite_online_backup():
+    """Never run production deployment with a Python sqlite3 lacking online backup."""
+    connection = sqlite3.connect(':memory:')
+    try:
+        if not callable(getattr(connection, 'backup', None)):
+            raise Abort('Python interpreter ' + sys.executable +
+                        ' lacks sqlite3.Connection.backup (requires Python 3.7+); '
+                        'use a verified newer Python interpreter and re-install the cron entry')
+    finally:
+        connection.close()
 
 
 def backup_db(directory):
@@ -455,6 +468,7 @@ def run_deploy(target, old, checks_done):
 
 
 def one_cycle():
+    require_sqlite_online_backup()
     checks()
     ensure_node()
     git('fetch','--no-tags','origin',f'refs/heads/{BRANCH}:refs/remotes/origin/{BRANCH}')
@@ -473,6 +487,49 @@ def one_cycle():
         if current.get('status') not in ('ROLLED_BACK','FAILED_ROLLBACK'):
             write_state({'status':'BLOCKED_SHA','sha':target,'error':str(exc)})
         raise
+
+
+def cron_release_line(here):
+    """Pin the working Python and PM2/Node directories; cron has a minimal PATH."""
+    pm2_executable = shutil.which('pm2')
+    node_executable = shutil.which('node')
+    if not pm2_executable or not node_executable:
+        raise Abort('Cannot install cron: pm2 or node missing from current PATH')
+    paths = [str(Path(pm2_executable).parent), str(Path(node_executable).parent),
+             '/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin',
+             '/sbin', '/bin']
+    if any(not p.startswith('/') or '\n' in p or '\r' in p or '%' in p for p in paths):
+        raise Abort('Unsafe executable directory in cron PATH')
+    cron_path = ':'.join(dict.fromkeys(paths))
+    python_executable = str(Path(sys.executable).resolve())
+    if not Path(python_executable).is_file():
+        raise Abort('Python interpreter does not exist: ' + python_executable)
+    return ('*/10 * * * * PATH=' + shlex.quote(cron_path) +
+            ' ' + shlex.quote(python_executable) +
+            ' ' + shlex.quote(str(here)) +
+            ' --once >> ' + shlex.quote(str(STATE / 'cron.log')) +
+            ' 2>&1 # yiju-gpt-autodeploy')
+
+
+def updated_yiju_crontab(old_text, desired, here):
+    """Replace only the known Yiju line; preserve every unrelated cron entry."""
+    marker = '# yiju-gpt-autodeploy'
+    lines = old_text.splitlines(keepends=True)
+    matches = [i for i, line in enumerate(lines) if marker in line]
+    if len(matches) > 1:
+        raise Abort('Multiple Yiju cron entries; refusing to change crontab')
+    if not matches:
+        return old_text.rstrip('\n') + '\n' + desired + '\n'
+    i = matches[0]
+    existing = lines[i].rstrip('\r\n')
+    if existing == desired:
+        return old_text
+    if (not existing.startswith('*/10 * * * * ') or
+            str(here) + ' --once' not in existing or
+            not existing.endswith(marker)):
+        raise Abort('Unexpected Yiju cron command; preserving existing crontab')
+    lines[i] = desired + '\n'
+    return ''.join(lines)
 
 
 def main():
@@ -495,16 +552,20 @@ def main():
             if not current.is_file() or json.loads(current.read_text()).get('status')!='DEPLOYED':
                 raise Abort('First successful deployment required before enabling cron')
             here=Path(__file__).resolve()
-            marker='# yiju-gpt-autodeploy'
-            line='*/10 * * * * /usr/bin/python3 '+str(here)+' --once >> '+str(STATE/'cron.log')+' 2>&1 '+marker
+            line=cron_release_line(here)
             old=run(['crontab','-l'],check=False)
             if old.returncode not in (0,1):raise Abort('Cannot inspect crontab')
             if old.returncode==1 and 'no crontab for' not in old.stderr.lower():
                 raise Abort('Crontab read failed; preserving existing jobs')
             old_text=old.stdout if old.returncode==0 else ''
-            if marker not in old_text:
+            next_text=updated_yiju_crontab(old_text,line,here)
+            if next_text!=old_text:
+                snapshot=STATE/('crontab-before-runtime-fix-' +
+                                datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '.txt')
+                snapshot.write_text(old_text,encoding='utf-8')
+                snapshot.chmod(0o600)
                 fd,tmp=tempfile.mkstemp(prefix='yiju-cron-',dir=STATE)
-                with os.fdopen(fd,'w') as f:f.write(old_text.rstrip()+'\n'+line+'\n')
+                with os.fdopen(fd,'w') as f:f.write(next_text)
                 try:run(['crontab',tmp])
                 finally:os.unlink(tmp)
             print('AUTODEPLOY_ENABLED: every 10 minutes, yijucity only')

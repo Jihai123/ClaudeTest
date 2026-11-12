@@ -62,6 +62,63 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn('Jihai123/ClaudeTest',M.REPO)
 
 
+
+class CronPythonRuntimeTests(unittest.TestCase):
+    """Production cron must use a Python with a real SQLite online backup API."""
+
+    def test_legacy_python_without_online_backup_fails_closed(self):
+        class OldConnection:
+            closed = False
+            def close(self):
+                self.closed = True
+        old = OldConnection()
+        with patch.object(M.sqlite3, 'connect', return_value=old):
+            with self.assertRaisesRegex(M.Abort, 'sqlite3.Connection.backup'):
+                M.require_sqlite_online_backup()
+        self.assertTrue(old.closed)
+
+    def test_current_python_has_online_backup(self):
+        M.require_sqlite_online_backup()
+
+    def test_cron_line_pins_current_python_and_both_node_directories(self):
+        binaries = {
+            'pm2': '/root/.nvm/versions/node/v16.20.2/bin/pm2',
+            'node': '/opt/yiju-node22/bin/node',
+        }
+        with patch.object(M.shutil, 'which', side_effect=lambda name: binaries.get(name)):
+            line = M.cron_release_line(Path('/root/yiju-autodeploy.py'))
+        self.assertIn('PATH=/root/.nvm/versions/node/v16.20.2/bin:/opt/yiju-node22/bin:', line)
+        self.assertIn(str(Path(M.sys.executable).resolve()), line)
+        self.assertIn('/root/yiju-autodeploy.py --once', line)
+        self.assertTrue(line.endswith('# yiju-gpt-autodeploy'))
+
+    def test_existing_cron_is_repaired_without_touching_other_jobs(self):
+        here = Path('/root/yiju-autodeploy.py')
+        old = ('MAILTO=root@example.invalid\n'
+               '0 1 * * * echo unrelated\n'
+               '*/10 * * * * PATH=/usr/bin:/bin /usr/bin/python3 '
+               '/root/yiju-autodeploy.py --once >> '
+               '/root/yiju-autodeploy/cron.log 2>&1 # yiju-gpt-autodeploy\n')
+        desired = ('*/10 * * * * PATH=/root/.nvm/versions/node/bin:/usr/bin '
+                   '/opt/python313/bin/python3 /root/yiju-autodeploy.py --once >> '
+                   '/root/yiju-autodeploy/cron.log 2>&1 # yiju-gpt-autodeploy')
+        changed = M.updated_yiju_crontab(old, desired, here)
+        self.assertTrue(changed.startswith('MAILTO=root@example.invalid\n'
+                                            '0 1 * * * echo unrelated\n'))
+        self.assertEqual(changed.count('# yiju-gpt-autodeploy'), 1)
+        self.assertIn(desired, changed)
+        self.assertEqual(M.updated_yiju_crontab(changed, desired, here), changed)
+
+    def test_duplicate_or_unexpected_existing_cron_is_rejected(self):
+        here = Path('/root/yiju-autodeploy.py')
+        desired = '*/10 * * * * echo new # yiju-gpt-autodeploy'
+        bad = '0 * * * * echo invalid # yiju-gpt-autodeploy\n'
+        with self.assertRaises(M.Abort):
+            M.updated_yiju_crontab(bad, desired, here)
+        with self.assertRaises(M.Abort):
+            M.updated_yiju_crontab(bad + bad, desired, here)
+
+
 class NodeArchiveTests(unittest.TestCase):
     """Regression for valid archive-root member and untrusted path controls."""
     def setUp(self):
