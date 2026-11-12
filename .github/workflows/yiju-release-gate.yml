@@ -40,6 +40,8 @@ jobs:
         run: npm run test:city-data:sqlite
       - name: SEO, pagination and canonical regressions
         run: node --test tests_js/seo-sitemap.test.js tests_js/seo-live-links.test.js tests_js/layflat-pagination.test.js
+      - name: Official city facts page and sitemap discovery regression
+        run: node --test tests_js/official-city-facts.test.js
       - name: SEO sitemap regression in production Asia/Shanghai timezone
         env:
           TZ: Asia/Shanghai
