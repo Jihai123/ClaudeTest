@@ -38,6 +38,10 @@ jobs:
         run: npm run test:city-data:sqlite
       - name: SEO, pagination and canonical regressions
         run: node --test tests_js/seo-sitemap.test.js tests_js/seo-live-links.test.js tests_js/layflat-pagination.test.js
+      - name: SEO sitemap regression in production Asia/Shanghai timezone
+        env:
+          TZ: Asia/Shanghai
+        run: node --test tests_js/seo-sitemap.test.js
       - name: Safe deployment poller compiles and standard-library tests pass
         run: |
           python3 -m py_compile scripts/deploy/yiju_auto_deploy.py scripts/deploy/bootstrap_yiju_autodeploy.py

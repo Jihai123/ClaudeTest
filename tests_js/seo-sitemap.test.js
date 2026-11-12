@@ -59,6 +59,20 @@ test('sitemap URL uses canonical Yiju host and W3C valid lastmod dates', async (
   assert.doesNotMatch(response.body, /admin\.html|\/api\/|token=/);
 });
 
+test('SQLite DATETIME lastmod preserves its calendar day and rejects invalid dates', async () => {
+  const cities = [
+    { id: 100, name: '测试城市', updated_at: '2025-11-30 00:15:00' },
+    { id: 101, name: '测试城市二', updated_at: '2025-02-30 03:35:54' }
+  ];
+  const response = await buildRouter({ cities }).get();
+  const first = response.body.match(/<loc>[^<]*id=100<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/);
+  const invalid = response.body.match(/<loc>[^<]*id=101<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/);
+  assert.ok(first, 'first city entry missing');
+  assert.ok(invalid, 'second city entry missing');
+  assert.equal(first[1], '2025-11-30', 'SQLite calendar day must not shift when TZ is Asia/Shanghai');
+  assert.equal(invalid[1], new Date().toISOString().slice(0, 10), 'invalid calendar date must fall back to today');
+});
+
 test('robots advertises a sitemap on the live Yiju domain', () => {
   const robots = fs.readFileSync(path.join(__dirname, '../public/robots.txt'), 'utf8');
   assert.match(robots, /^Sitemap: https:\/\/yiju\.zhibeimao\.com\/sitemap\.xml$/m);
