@@ -90,6 +90,26 @@ class PublicStaticPermissionTests(unittest.TestCase):
                 self.assertEqual((app/name).stat().st_mode & 0o777, 0o755)
             self.assertEqual((app/'server.js').stat().st_mode & 0o777, 0o600)
 
+    def test_already_deployed_public_modes_can_be_repaired_from_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app, state = root/'app', root/'state'
+            (app/'public').mkdir(parents=True)
+            state.mkdir()
+            (app/'public'/'verified-city-facts.html').write_text('verified')
+            (app/'public'/'verified-city-facts.html').chmod(0o600)
+            (app/'public').chmod(0o700)
+            (app/'server.js').write_text('private code')
+            (app/'server.js').chmod(0o600)
+            names = ('public/verified-city-facts.html', 'server.js')
+            manifest = {name: M.sha256_file(app/name) for name in names}
+            (state/'deployed-manifest.json').write_text(json.dumps(manifest))
+            with patch.object(M, 'APP', app), patch.object(M, 'STATE', state):
+                M.repair_deployed_public_permissions()
+            self.assertEqual((app/'public').stat().st_mode & 0o777, 0o755)
+            self.assertEqual((app/'public/verified-city-facts.html').stat().st_mode & 0o777, 0o644)
+            self.assertEqual((app/'server.js').stat().st_mode & 0o777, 0o600)
+
     def test_smoke_rejects_private_static_file_even_if_root_can_read_it(self):
         with tempfile.TemporaryDirectory() as tmp:
             app = Path(tmp)
