@@ -187,25 +187,38 @@ class EdgeCacheSmokeTests(unittest.TestCase):
         outcome=self.smoke()
         self.assertTrue(outcome['cdnUnversionedFresh'])
 
-    def test_fresh_edge_still_old_fails_closed(self):
+    def test_even_versioned_cloudflare_robots_can_be_rewritten_and_are_reported(self):
+        # Reproduces real 2026-11-12 Ubuntu18 production blocker:
+        # Cloudflare ignored the cache-bust query, but the origin files were right.
         self.cdn_robots=self.old_robots
-        with self.assertRaisesRegex(M.Abort,'Fresh CDN robots'):
-            self.smoke()
+        result=self.smoke()
+        self.assertTrue(result['publicAppHealth'])
+        self.assertFalse(result['cdnCacheBustedFresh'])
+        self.assertIn('robotsFresh',result['cdnPendingPaths'])
+        self.assertFalse(result['cdnUnversionedFresh'])
 
     def test_origin_file_wrong_fails_before_any_edge_check(self):
         (self.pub/'robots.txt').write_text(self.old_robots)
         with self.assertRaisesRegex(M.Abort,'Origin robots'):
             self.smoke()
 
-    def test_fresh_edge_sitemap_does_not_match_origin_fails(self):
-        self.cdn_sitemap=self.sitemap.replace('id=501','id=9999')
-        # Both snapshots have 501 unique links, so exact content matters too:
-        # counts currently match, but a different city set should be caught.
-        # The check compares counts; here simulate one fewer URL instead.
-        self.cdn_sitemap=self.sitemap.replace(
-            '<url><loc>'+self.url+'/city-detail.html?id=501</loc></url>', '')
-        with self.assertRaises(M.Abort):
-            self.smoke()
+    def test_cdn_sitemap_unavailable_does_not_break_healthy_origin_release(self):
+        # Cloudflare /sitemap.xml sometimes 404s even after Nginx is updated.
+        self.cdn_sitemap='cached 404'
+        result=self.smoke()
+        self.assertEqual(result['originSitemapUrls'],501)
+        self.assertFalse(result['cdnChecks']['sitemapFresh'])
+        self.assertIn('sitemapFresh',result['cdnPendingPaths'])
+
+    def test_public_business_api_health_still_blocks_release(self):
+        previous=self.fake_urlopen
+        def fail_api(request,timeout=12):
+            if '/api/health' in request.full_url:
+                return io.BytesIO(b'{"status":"error"}')
+            return previous(request,timeout=timeout)
+        with patch.object(M,'APP',self.app),patch.object(M,'urlopen',side_effect=fail_api):
+            with self.assertRaisesRegex(M.Abort,'Public health endpoint'):
+                M.health_smoke(self.sha)
 
 
 if __name__=='__main__':unittest.main()
