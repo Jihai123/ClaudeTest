@@ -263,53 +263,71 @@ def ensure_free_space():
         raise Abort('Less than 2GiB free, cannot preserve rollback')
 
 
-def run_deploy(target,old,checks_done):
-    if not checks_done:checks()
+def run_deploy(target, old, checks_done):
+    if not checks_done: checks()
     ensure_free_space()
-    stage,tracked=stage_release(target)
-    test_stage(stage)
-    backup=STATE/('backup-'+datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%d%H%M%S'))
-    backup.mkdir(mode=0o700)
-    backup_db(backup)
-    backup_code(backup,tracked)
-    # Prepare replacement dependencies while the existing site is still live.
-    next_modules=APP/'.yiju-modules-next'
-    if next_modules.exists():raise Abort('Pending node_modules staging dir exists, refusing replacement')
-    shutil.copytree(stage/'node_modules',next_modules,symlinks=True)
-    old_pm=pm2()['pm2_env'].get('exec_interpreter','node')
-    (backup/'previous-interpreter.txt').write_text(old_pm)
-    modules_old=backup/'node_modules'
-    changed=False
+    stage = None
     try:
-        run(['pm2','stop',SERVICE],timeout=50)
-        changed=True
-        if (APP/'node_modules').is_dir():shutil.move(str(APP/'node_modules'),str(modules_old))
-        shutil.move(str(next_modules),str(APP/'node_modules'))
-        copy_code(stage,tracked)
-        run(['pm2','restart',SERVICE,'--interpreter',str(NODE_DIR/'bin/node'),'--update-env'],timeout=70)
-        interpreter=pm2()['pm2_env'].get('exec_interpreter','')
-        if interpreter!=str(NODE_DIR/'bin/node'):
-            raise Abort('PM2 did not change interpreter to isolated Node22')
-        time.sleep(4)
-        public_urls=health_smoke()
-        write_state({'status':'DEPLOYED','sha':target,'previous':old,'backup':str(backup),'sitemap_urls':public_urls})
-    except Exception as exc:
-        if changed:
-            try:
-                run(['pm2','stop',SERVICE],timeout=40,check=False)
-                restore_code(backup,tracked)
-                if (APP/'node_modules').is_dir():shutil.rmtree(APP/'node_modules')
-                if modules_old.is_dir():shutil.move(str(modules_old),str(APP/'node_modules'))
-                run(['pm2','restart',SERVICE,'--interpreter',old_pm,'--update-env'],timeout=70)
-            except Exception:
-                write_state({'status':'FAILED_ROLLBACK','sha':target,'error':str(exc)})
-                raise
-        write_state({'status':'ROLLED_BACK','sha':target,'error':str(exc)})
-        raise
+        stage, tracked = stage_release(target)
+        test_stage(stage)
+        backup = STATE / ('backup-' + datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%d%H%M%S'))
+        backup.mkdir(mode=0o700)
+        backup_db(backup)
+        backup_code(backup, tracked)
+        # Keep the old modules and files recoverable, and prepare new ones before downtime.
+        next_modules = APP / '.yiju-modules-next'
+        if next_modules.exists(): raise Abort('Pending modules directory already exists')
+        shutil.copytree(stage / 'node_modules', next_modules, symlinks=True)
+        old_pm = pm2()['pm2_env'].get('exec_interpreter', 'node')
+        (backup / 'previous-interpreter.txt').write_text(old_pm)
+        modules_old = backup / 'node_modules'
+        changed = False
+        try:
+            run(['pm2', 'stop', SERVICE], timeout=50)
+            changed = True
+            if (APP / 'node_modules').is_dir():
+                shutil.move(str(APP / 'node_modules'), str(modules_old))
+            shutil.move(str(next_modules), str(APP / 'node_modules'))
+            copy_code(stage, tracked)
+            run(['pm2', 'restart', SERVICE, '--interpreter', str(NODE_DIR / 'bin/node'), '--update-env'], timeout=70)
+            interpreter = pm2()['pm2_env'].get('exec_interpreter', '')
+            if interpreter != str(NODE_DIR / 'bin/node'):
+                raise Abort('PM2 interpreter did not switch to isolated Node22')
+            failure = None
+            for _ in range(3):
+                time.sleep(4)
+                try:
+                    public_urls = health_smoke()
+                    failure = None
+                    break
+                except Exception as exc:
+                    failure = exc
+            if failure is not None: raise failure
+            write_state({'status':'DEPLOYED', 'sha':target, 'previous':old,
+                         'backup':str(backup), 'sitemap_urls':public_urls})
+        except Exception as exc:
+            if changed:
+                try:
+                    run(['pm2', 'stop', SERVICE], timeout=40, check=False)
+                    restore_code(backup, tracked)
+                    if (APP / 'node_modules').is_dir(): shutil.rmtree(APP / 'node_modules')
+                    if modules_old.is_dir(): shutil.move(str(modules_old), str(APP / 'node_modules'))
+                    run(['pm2', 'restart', SERVICE, '--interpreter', old_pm, '--update-env'], timeout=70)
+                except Exception as rollback_exc:
+                    write_state({'status':'FAILED_ROLLBACK', 'sha':target,
+                                 'error':str(exc), 'rollback_error':str(rollback_exc)})
+                    raise
+            write_state({'status':'ROLLED_BACK', 'sha':target, 'error':str(exc)})
+            raise
+        finally:
+            if next_modules.exists(): shutil.rmtree(next_modules, ignore_errors=True)
     finally:
-        if next_modules.exists():shutil.rmtree(next_modules,ignore_errors=True)
-        try:git('worktree','remove','--force',str(stage))
-        except Exception:pass
+        if stage is not None:
+            try: git('worktree', 'remove', '--force', str(stage))
+            except Exception: pass
+            # Remove only our generated staging directory, not any live checkout.
+            if stage.parent.parent == STATE:
+                shutil.rmtree(stage.parent, ignore_errors=True)
 
 
 def one_cycle():
