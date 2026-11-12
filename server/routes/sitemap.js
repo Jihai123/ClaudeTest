@@ -8,7 +8,17 @@ router.get('/sitemap.xml', async (req, res) => {
     const baseURL = process.env.SITEMAP_BASE_URL || 'https://yiju.zhibeimao.com';
     const now = new Date().toISOString().slice(0, 10);
     const xmlDate = (value) => {
-      const parsed = value ? new Date(String(value).replace(' ', 'T')) : null;
+      const raw = value == null ? '' : String(value).trim();
+      // SQLite DATETIME values have no timezone. Preserve their calendar date:
+      // parsing as local time and then calling toISOString() shifts the day
+      // on hosts east of UTC (for example Asia/Shanghai).
+      const match = raw.match(/^(\d{4}-\d{2}-\d{2})(?:$|[ T]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?$)/);
+      if (match) {
+        const calendarDay = new Date(match[1] + 'T00:00:00Z');
+        return Number.isFinite(calendarDay.getTime()) &&
+          calendarDay.toISOString().slice(0, 10) === match[1] ? match[1] : now;
+      }
+      const parsed = raw ? new Date(raw) : null;
       return parsed && Number.isFinite(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : now;
     };
 
