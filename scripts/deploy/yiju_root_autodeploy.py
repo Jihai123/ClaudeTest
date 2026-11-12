@@ -107,6 +107,10 @@ def checks():
         s=json.loads((RESCUE/'summary.json').read_text())
         if sha256_file(RESCUE/'production-tracked.patch') != s['patch_sha256']:
             raise Abort('Local override patch changed since backup')
+        if not (STATE/'deployed-manifest.json').is_file():
+            live_diff=git('diff','--binary','HEAD').stdout.encode('utf-8')
+            if hashlib.sha256(live_diff).hexdigest()!=s['patch_sha256']:
+                raise Abort('Live tracked changes differ from rescue patch; refusing first deployment')
     return p
 
 
