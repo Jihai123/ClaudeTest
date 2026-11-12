@@ -121,6 +121,47 @@ def pm2():
     return apps[0]
 
 
+def safe_extract_node_tarball(archive, directory):
+    """Extract a pinned, SHA-256-checked Node archive with a single root.
+
+    Allow its legitimate top-level directory entry, but reject hardlinks,
+    special files, sibling roots, traversal and escaping symlinks. This is
+    compatible with Python 3.6 on Ubuntu 18.
+    """
+    expected='node-'+NODE_VER+'-linux-x64-glibc-217'
+    dest=directory.resolve()
+    members=[]
+    with tarfile.open(archive,'r:gz') as tar:
+        for member in tar.getmembers():
+            raw=member.name
+            parts=Path(raw).parts
+            if raw.startswith('/') or '..' in parts or not parts or parts[0]!=expected:
+                raise Abort('Unexpected member in Node archive')
+            if len(parts)==1:
+                if not member.isdir():
+                    raise Abort('Unexpected member in Node archive')
+                continue
+            if not (member.isfile() or member.isdir() or member.issym()):
+                raise Abort('Unexpected member in Node archive')
+            member.name='/'.join(parts[1:])
+            out=(dest/member.name).resolve()
+            if not str(out).startswith(str(dest)+'/'):
+                raise Abort('Archive path traversal blocked')
+            if member.issym():
+                if member.linkname.startswith('/'):
+                    raise Abort('Archive symlink escapes Node directory')
+                symlink_target=out.parent.joinpath(member.linkname).resolve()
+                if not str(symlink_target).startswith(str(dest)+'/'):
+                    raise Abort('Archive symlink escapes Node directory')
+            members.append(member)
+        if not members:
+            raise Abort('Empty Node archive')
+        if sys.version_info >= (3,12):
+            tar.extractall(directory, members=members, filter='data')
+        else:
+            tar.extractall(directory, members=members)
+
+
 def ensure_node():
     executable=NODE_DIR/'bin/node'
     if executable.is_file() and run([str(executable),'-v']).stdout.strip()==NODE_VER:
@@ -136,24 +177,10 @@ def ensure_node():
     if sha256_file(target)!=NODE_SHA256: raise Abort('Pinned Node22 checksum mismatch')
     NODE_DIR.mkdir(parents=True,exist_ok=False,mode=0o755)
     try:
-        # Verify no traversal entries and extract into isolated /opt only.
-        with tarfile.open(target,'r:gz') as tar:
-            for member in tar.getmembers():
-                parts=Path(member.name).parts
-                if '..' in parts or len(parts)<2 or member.isln():
-                    raise Abort('Unexpected member in Node archive')
-                member.name='/'.join(parts[1:])
-                target=(NODE_DIR/member.name).resolve()
-                if str(target)!=str(NODE_DIR) and not str(target).startswith(str(NODE_DIR)+'/'):
-                    raise Abort('Archive path traversal blocked')
-                if member.issym():
-                    symlink_target=(NODE_DIR/member.name).parent.joinpath(member.linkname).resolve()
-                    if not str(symlink_target).startswith(str(NODE_DIR)+'/'):
-                        raise Abort('Archive symlink escapes Node directory')
-            if sys.version_info >= (3,12):
-                tar.extractall(NODE_DIR,filter='data')
-            else:
-                tar.extractall(NODE_DIR)
+        # The official-style archive contains an entry for its top-level
+        # directory, e.g. "node-v22.../". Path.parts has length 1 for it.
+        # This is valid, not an attacker path; skip extracting just that root.
+        safe_extract_node_tarball(target, NODE_DIR)
         if run([str(executable),'-v']).stdout.strip()!=NODE_VER:
             raise Abort('Node22 binary failed to start on host')
     except Exception:
