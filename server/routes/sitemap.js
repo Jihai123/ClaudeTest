@@ -69,7 +69,9 @@ router.get('/sitemap.xml', async (req, res) => {
     const guides = [
       { path: '/city-compare.html', changefreq: 'monthly' },
       { path: '/verified-city-facts.html', changefreq: 'monthly' },
-      { path: '/zhangye-city-facts-2025.html', changefreq: 'monthly' }
+      { path: '/zhangye-city-facts-2025.html', changefreq: 'monthly' },
+      { path: '/city-living-checklist.html', changefreq: 'monthly' },
+      { path: '/2025-city-evidence-atlas.html', changefreq: 'monthly' }
     ];
     guides.forEach(guide => {
       sitemap += `  <url>
