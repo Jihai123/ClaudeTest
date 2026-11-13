@@ -1,0 +1,380 @@
+{
+  "schema_version": "yiju.city_government_facts.v1",
+  "statistical_year": 2025,
+  "verified_on": "2026-11-13",
+  "scope": "每项均按其政府原文注明的市级行政辖区、统计年份和单位使用；不自动映射为易居既有评分或租金",
+  "cities": [
+    {
+      "id": 1021,
+      "name": "大理市",
+      "province": "云南",
+      "list_type": "china_layflat",
+      "focus": "先查居民收入与社区生活配套",
+      "tip": "租房前明确古城、下关及周边地段，分别核对房型与淡旺季价格；市级居民收入不等于旅居者收入。",
+      "sources": [
+        {
+          "key": "dl",
+          "title": "大理市2025年政府工作报告",
+          "date": "2026-02-28",
+          "url": "https://www.yndali.gov.cn/dlsrmzf/c103329/pc/content/2044250884077051904/content_2044250884077051904.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 632.88,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "dl",
+          "note": "2025年大理市市域口径，不是大理州"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 51005,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "dl",
+          "note": "当地城镇居民年度人均，不是工资"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 27046,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "dl",
+          "note": "本市农村居民群体"
+        },
+        {
+          "key": "community_daycare_centers_2025_count",
+          "label": "社区日间照料中心",
+          "value": 16,
+          "unit": "个",
+          "category": "养老",
+          "source": "dl",
+          "note": "政府报告提到依托的既有中心"
+        },
+        {
+          "key": "elderly_canteens_2025_count",
+          "label": "老年幸福食堂",
+          "value": 7,
+          "unit": "个",
+          "category": "养老",
+          "source": "dl",
+          "note": "设施总量不能代替住所周边服务可达性"
+        }
+      ]
+    },
+    {
+      "id": 1063,
+      "name": "黄山市",
+      "province": "安徽",
+      "list_type": "china_layflat",
+      "focus": "先看真实城区而非景区宣传",
+      "tip": "黄山市与黄山风景区并非相同居住范围；选屯溪等具体城区时应核对就医、交通和长期房源。",
+      "sources": [
+        {
+          "key": "hs",
+          "title": "黄山市统计局2025年国民经济和社会发展统计公报（PDF）",
+          "date": "2026-04-30",
+          "url": "https://www.huangshan.gov.cn/group1/M00/1C/28/wKiM92nyza2APO9XAAopjvU8d3Q769.pdf"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1204.9,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "hs",
+          "note": "黄山市全市，非黄山景区"
+        },
+        {
+          "key": "retail_sales_2025_billion_cny",
+          "label": "社会消费品零售总额",
+          "value": 568.1,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "hs",
+          "note": "商业规模，不等于家庭年度消费"
+        },
+        {
+          "key": "new_urban_jobs_2025_ten_thousand",
+          "label": "城镇新增就业",
+          "value": 1.52,
+          "unit": "万人",
+          "category": "就业",
+          "source": "hs",
+          "note": "新增岗位就业人数统计，并非岗位库存"
+        },
+        {
+          "key": "rail_passenger_trips_2025_ten_thousand",
+          "label": "铁路旅客运输量（含高铁）",
+          "value": 796.2,
+          "unit": "万人次",
+          "category": "交通",
+          "source": "hs",
+          "note": "年度全市铁路运输量，非单日班次"
+        }
+      ]
+    },
+    {
+      "id": 897,
+      "name": "鹤岗市",
+      "province": "黑龙江",
+      "list_type": "china_layflat",
+      "focus": "以真实医疗覆盖和养老机构替代口号",
+      "tip": "城区内各医院科室、医保结算和冬季供暖费用需分别核验；卫生机构数不等于医院数量。",
+      "sources": [
+        {
+          "key": "hg",
+          "title": "鹤岗市2025年国民经济和社会发展统计公报",
+          "date": "2026-08-06",
+          "url": "https://www.hegang.gov.cn/hegang/tjgb/202608/92535.shtml"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 392.2,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "hg",
+          "note": "全市2025年统计值"
+        },
+        {
+          "key": "medical_health_institutions_count",
+          "label": "卫生机构",
+          "value": 737,
+          "unit": "个",
+          "category": "医疗",
+          "source": "hg",
+          "note": "含医院和基层机构，非医疗评分"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 42,
+          "unit": "个",
+          "category": "医疗",
+          "source": "hg",
+          "note": "医院包含在卫生机构数量中，不重复加总"
+        },
+        {
+          "key": "healthcare_beds_2025",
+          "label": "卫生机构床位",
+          "value": 7312,
+          "unit": "张",
+          "category": "医疗",
+          "source": "hg",
+          "note": "全市卫生机构床位，与养老床位区分"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 117,
+          "unit": "家",
+          "category": "养老",
+          "source": "hg",
+          "note": "全市养老机构数量"
+        },
+        {
+          "key": "eldercare_beds_2025",
+          "label": "养老机构床位",
+          "value": 6176,
+          "unit": "张",
+          "category": "养老",
+          "source": "hg",
+          "note": "不能直接推断入住率或可用床位"
+        }
+      ]
+    },
+    {
+      "id": 1238,
+      "name": "西安市",
+      "province": "陕西",
+      "list_type": "china_general",
+      "focus": "大城市规模不等于社区便利程度",
+      "tip": "优先查具体区县的通勤、医院、物业和租金，不要以全市平均值代替小区实际体验。",
+      "sources": [
+        {
+          "key": "xa-pop",
+          "title": "西安市人民政府：人口状况",
+          "date": "2026-08-03",
+          "url": "https://www.xa.gov.cn/sq/csgk/rkzk/1.html"
+        },
+        {
+          "key": "xa-eco",
+          "title": "西安市人民政府：市情简介",
+          "date": "2026-06-03",
+          "url": "https://www.xa.gov.cn/sq/csgk/sqjj/60ae0019f8fd1c0bdc2c0952.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 1323.63,
+          "unit": "万人",
+          "category": "人口",
+          "source": "xa-pop",
+          "note": "1%人口抽样调查推算，非户籍人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 81.01,
+          "unit": "%",
+          "category": "人口",
+          "source": "xa-pop",
+          "note": "城镇常住人口比例"
+        },
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值（初步核算）",
+          "value": 13902.67,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "xa-eco",
+          "note": "全市宏观经济规模，非个人收入"
+        }
+      ]
+    },
+    {
+      "id": 965,
+      "name": "阳泉市",
+      "province": "山西",
+      "list_type": "china_layflat",
+      "focus": "资源型城市先查就业与医疗服务",
+      "tip": "先分别核实市区和矿区的住房、交通、医院与公共服务；2025年度经济总量不等于人均可支配收入。",
+      "sources": [
+        {
+          "key": "yq",
+          "title": "阳泉市统计局：2025年经济运行情况分析",
+          "date": "2026-02-03",
+          "url": "https://tjj.yq.gov.cn/tjfx/202602/t20260203_2167950.html"
+        },
+        {
+          "key": "yq2",
+          "title": "阳泉市统计局：2025年全市经济稳中有进",
+          "date": "2026-02-03",
+          "url": "https://tjj.yq.gov.cn/tjfx/202602/t20260203_2167958.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 870.6,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "yq2",
+          "note": "2025年全市，不是工资水平"
+        },
+        {
+          "key": "retail_sales_2025_billion_cny",
+          "label": "社会消费品零售总额",
+          "value": 204.5,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "yq",
+          "note": "社会消费总量，不是单人支出"
+        },
+        {
+          "key": "industry_structure_service_share_2025_pct",
+          "label": "第三产业GDP占比",
+          "value": 56.8,
+          "unit": "%",
+          "category": "经济",
+          "source": "yq",
+          "note": "2025年三次产业结构2.1:41.1:56.8"
+        },
+        {
+          "key": "new_urban_jobs_2025_count",
+          "label": "城镇新增就业",
+          "value": 17030,
+          "unit": "人",
+          "category": "就业",
+          "source": "yq2",
+          "note": "年度新增就业数量，不是当前可招聘职位"
+        }
+      ]
+    },
+    {
+      "id": 951,
+      "name": "张掖市",
+      "province": "甘肃",
+      "list_type": "china_layflat",
+      "focus": "低成本判断先核实租房和沙尘口径",
+      "tip": "核查真实房源位置、冬季采暖、医院科室与异地医保，不能把剔除沙尘后的空气比例当作全年无沙尘。",
+      "sources": [
+        {
+          "key": "zy",
+          "title": "张掖市2025年国民经济和社会发展统计公报",
+          "date": "2026-06-02",
+          "url": "https://www.zhangye.gov.cn/sjfb/tjgb/202606/t20260602_1549566.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 109.11,
+          "unit": "万人",
+          "category": "人口",
+          "source": "zy",
+          "note": "张掖市全市，不是甘州区"
+        },
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 734.35,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "zy",
+          "note": "2025年初步核算"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 1391,
+          "unit": "个",
+          "category": "医疗",
+          "source": "zy",
+          "note": "包含基层机构与医院，非医疗设施评分"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 37787,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "zy",
+          "note": "居民年度人均，不是平均工资"
+        },
+        {
+          "key": "good_air_days_excluding_dust_2025_pct",
+          "label": "剔除沙尘影响后的空气优良天数比例",
+          "value": 98.7,
+          "unit": "%",
+          "category": "环境",
+          "source": "zy",
+          "note": "已剔除沙尘天气影响，不代表全年无沙尘"
+        },
+        {
+          "key": "annual_avg_temperature_2025_c",
+          "label": "2025年全年平均气温",
+          "value": 7.9,
+          "unit": "℃",
+          "category": "气候",
+          "source": "zy",
+          "note": "仅为2025单年均温，非多年气候平均"
+        }
+      ]
+    }
+  ]
+}
