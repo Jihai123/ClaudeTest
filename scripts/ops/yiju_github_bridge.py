@@ -203,13 +203,30 @@ def execute(event, token, sender=api_request):
             reviewed.get("city_id") != payload["city_id"] or
             not isinstance(reviewed.get("evidence_id"), int)):
         fail("status_readback_mismatch")
+    # Server resultRow() uses review_status/submission_status, not change_status.
+    # Do not mistake an accepted proposal for an applied field change.
+    change_id = reviewed.get("change_request_id")
+    review_status = reviewed.get("review_status")
+    submission_status = reviewed.get("submission_status")
+    if change_id is None:
+        if submission_status != "evidence_only" or review_status is not None:
+            fail("missing_evidence_only_status")
+    else:
+        if (not isinstance(change_id, int) or isinstance(change_id, bool) or
+                change_id < 1 or review_status not in {
+                "pending", "approved", "rejected", "rolled_back"
+                } or submission_status not in {
+                "approved", "pending_manual_review", "reviewed"
+                }):
+            fail("missing_review_status")
     return {
         "status": "submitted_readback_ok",
         "comment_id": comment_id, "mode": "submit",
         "external_id": external_id, "city_id": payload["city_id"],
         "evidence_id": reviewed["evidence_id"],
-        "change_request_id": reviewed.get("change_request_id"),
-        "change_status": reviewed.get("change_status"),
+        "change_request_id": change_id,
+        "change_status": review_status,
+        "submission_status": submission_status,
         "replayed": bool(submitted.get("replayed")),
     }
 
@@ -224,7 +241,7 @@ def receipt_message(result):
     for key, label in [
         ("external_id", "外部请求ID"), ("city_id", "城市ID"),
         ("evidence_id", "证据ID"), ("change_request_id", "变更申请ID"),
-        ("change_status", "变更状态"), ("replayed", "幂等重放")
+        ("change_status", "审核状态"), ("submission_status", "提交状态"), ("replayed", "幂等重放")
     ]:
         val = result.get(key)
         if val is not None and type(val) in (str, int, bool):
