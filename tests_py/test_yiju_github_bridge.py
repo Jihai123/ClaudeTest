@@ -113,13 +113,52 @@ class SubmissionTests(unittest.TestCase):
                 return {'external_id': payload['external_id'], 'city_id': 951,
                         'replayed': False}
             return {'external_id': payload['external_id'], 'city_id': 951,
-                    'evidence_id': 42, 'change_request_id': None, 'change_status': None}
+                    'evidence_id': 42, 'change_request_id': None,
+                    'review_status': None, 'submission_status': 'evidence_only'}
         result = M.execute(event('submit', payload), 'test-token', sender=sender)
         self.assertEqual(result['status'], 'submitted_readback_ok')
         self.assertEqual(result['evidence_id'], 42)
         self.assertEqual([call[0] for call in calls], ['POST', 'GET'])
         self.assertEqual(calls[1][1], M.BASE + '/submissions/' + payload['external_id'])
         self.assertNotIn('test-token', M.receipt_message(result))
+
+    def test_pending_proposal_reports_correct_backend_status(self):
+        payload = sample_payload()
+        payload['proposal'] = {
+            'field': 'location_intro',
+            'expected_old_value': None,
+            'new_value': '2025年本市医疗卫生机构共1391个，仍需核实社区就医距离。',
+            'conversion_note': '模拟材料用数字1391，不转换为评分',
+            'auto_apply': True
+        }
+        def sender(method, path, token, data=None):
+            if method == 'POST':
+                return {'external_id': payload['external_id'], 'city_id': 951,
+                        'evidence_id': 43, 'change_request_id': 7,
+                        'submission_status': 'pending_manual_review',
+                        'review_status': 'pending', 'replayed': False}
+            return {'external_id': payload['external_id'], 'city_id': 951,
+                    'evidence_id': 43, 'change_request_id': 7,
+                    'submission_status': 'pending_manual_review',
+                    'review_status': 'pending'}
+        result = M.execute(event('submit', payload), 'test-token', sender=sender)
+        self.assertEqual(result['change_status'], 'pending')
+        self.assertEqual(result['submission_status'], 'pending_manual_review')
+        msg = M.receipt_message(result)
+        self.assertIn('pending_manual_review', msg)
+        self.assertIn('pending', msg)
+        self.assertNotIn('approved', msg)
+
+    def test_unreadable_proposal_review_state_is_not_a_success(self):
+        payload = sample_payload()
+        def sender(method, path, token, data=None):
+            if method == 'POST':
+                return {'external_id': payload['external_id'], 'city_id': 951}
+            return {'external_id': payload['external_id'], 'city_id': 951,
+                    'evidence_id': 43, 'change_request_id': 7,
+                    'submission_status': 'pending_manual_review'}
+        with self.assertRaisesRegex(M.BridgeError, 'missing_review_status'):
+            M.execute(event('submit', payload), 'test-token', sender=sender)
 
     def test_mismatched_status_fails_not_as_success(self):
         payload = sample_payload()
