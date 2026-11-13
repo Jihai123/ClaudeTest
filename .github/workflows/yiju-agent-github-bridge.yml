@@ -1,0 +1,42 @@
+name: Yiju Agent API authenticated bridge
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: yiju-agent-bridge-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  submit-verified-evidence:
+    if: >-
+      github.event.issue.number == 138 &&
+      github.event.issue.state == 'open' &&
+      github.event.comment.user.login == 'Jihai123' &&
+      startsWith(github.event.comment.body, 'YIJU_AGENT_REQUEST_V1')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate input and use existing Yiju API
+        id: bridge
+        env:
+          YIJU_AGENT_API_TOKEN: ${{ secrets.YIJU_AGENT_API_TOKEN }}
+        run: |
+          python3 scripts/ops/yiju_github_bridge.py \
+            --event-file "$GITHUB_EVENT_PATH" \
+            --result-file "$RUNNER_TEMP/yiju_bridge_result.json"
+      - name: Return a sanitized, auditable receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RECEIPT="$(python3 scripts/ops/yiju_github_bridge.py \
+            --result-file "$RUNNER_TEMP/yiju_bridge_result.json" --receipt)"
+          gh api --silent --method POST repos/Jihai123/ClaudeTest/issues/138/comments \
+            --input "$RECEIPT"
