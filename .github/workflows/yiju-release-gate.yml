@@ -35,7 +35,7 @@ jobs:
       - name: City data and admin regressions
         run: npm run test:city-data
       - name: Verified living checklist page and SEO regression
-        run: node --test tests_js/yiju-d03-living-checklist.test.js
+        run: node --test tests_js/yiju-d03-living-checklist.test.js tests_js/yiju-d04-atlas.test.js
       - name: Full city quality audit read-only regression (synthetic, no production fetch)
         run: node --test tests_js/yiju-city-quality-audit.test.js
       - name: Real isolated SQLite regression
