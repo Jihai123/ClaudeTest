@@ -9,7 +9,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: yiju-agent-bridge-${{ github.event.issue.number }}
+  group: yiju-agent-bridge-${{ github.event.comment.id }}
   cancel-in-progress: false
 
 jobs:
