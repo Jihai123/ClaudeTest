@@ -12,7 +12,7 @@ test('living checklist is indexable, sourced and privacy-preserving',()=>{
  assert.match(html,/https:\/\/www\.hegang\.gov\.cn\/hegang\/tjgb\/202608\/92535\.shtml/);
  assert.match(html,/zhangye-city-facts-2025\.html/);
  for(const id of ['1238','897','951']) assert.match(html,new RegExp('city-detail\\.html\\?id='+id));
- assert.equal((html.match(/type="checkbox"/g)||[]).length,6);
+ assert.equal((html.match(/<input type="checkbox"/g)||[]).length,6);
  assert.doesNotMatch(html,/<form|localStorage|sessionStorage|sendBeacon|XMLHttpRequest|fetch\s*\(/i);
  assert.match(html,/aria-live="polite"/);
 });
