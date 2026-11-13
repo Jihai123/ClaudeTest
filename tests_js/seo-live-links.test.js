@@ -26,9 +26,10 @@ test('static fallback sitemap contains unique approved city URLs on the producti
   const ids=[...xml.matchAll(/<loc>https:\/\/yiju\.zhibeimao\.com\/city-detail\.html\?id=(\d+)<\/loc>/g)].map(x=>Number(x[1]));
   assert.equal(ids.length,561,'fallback snapshot should include 561 currently approved city records');
   assert.equal(new Set(ids).size,ids.length,'no duplicate ID URLs');
-  assert.equal((xml.match(/<url>/g)||[]).length,ids.length+4);
+  assert.equal((xml.match(/<url>/g)||[]).length,ids.length+5);
   assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/city-compare\.html<\/loc>/);
   assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/verified-city-facts\.html<\/loc>/);
+  assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/city-living-checklist\.html<\/loc>/);
   assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/<\/loc>/);
 });
 
