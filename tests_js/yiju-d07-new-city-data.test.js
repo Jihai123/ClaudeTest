@@ -84,10 +84,12 @@ test('public city decision page compares real 2025 fields and never treats legac
   new vm.Script(scripts[0][1], {filename:'comparison-inline.js'});
   const indexScript = read('public/city-evidence-explorer.js');
   assert.match(indexScript, /2025-city-living-comparison\.html/);
+  assert.match(indexScript, /hero-city-guide/);
   assert.match(indexScript, /ltc_insurance_beneficiaries_2025_count/);
   new vm.Script(indexScript, {filename:'city-evidence-explorer.js'});
 });
 
 test('new selection guide has a discoverable sitemap link', () => {
   assert.match(read('server/routes/sitemap.js'), /\/2025-city-living-comparison\.html/);
+  assert.match(read('public/sitemap.xml'), /2025-city-living-comparison\.html/);
 });
