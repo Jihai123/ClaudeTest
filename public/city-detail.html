@@ -728,8 +728,9 @@
             document.getElementById('cityName').textContent = cityData.name;
             document.getElementById('citySlogan').textContent = cityData.slogan || cityData.location_intro || cityData.evaluation || '宜居之城';
 
-            const score = cityData.layflat_score || cityData.overall_score || cityData.world_score || 0;
-            document.getElementById('cityScore').textContent = score.toFixed(1);
+            const score = cityData.layflat_score || cityData.overall_score || cityData.world_score;
+            document.getElementById('cityScore').textContent =
+                Number.isFinite(Number(score)) && Number(score) > 0 ? Number(score).toFixed(1) : '待核验';
 
             // 【新增】动态更新SEO标签
             updateSEOTags();
@@ -743,8 +744,11 @@
             if (cityData.district) metaItems.push(`🏘️ 区域: ${cityData.district}`);
             if (cityData.location) metaItems.push(`🗺️ 位置: ${cityData.location}`);
             if (cityData.city_tier) metaItems.push(`🏙️ 城市等级: ${cityData.city_tier}`);
-            if (cityData.house_price) metaItems.push(`🏠 房价: ¥${cityData.house_price}万/套`);
-            if (cityData.avg_rent) metaItems.push(`💰 租金: ¥${cityData.avg_rent}/月`);
+            // Historic house_price has no reliable unit (some records are yuan,
+            // some may be ten-thousand yuan). Never fabricate “万元/套”.
+            if (cityData.house_price) metaItems.push('🏠 房价：历史字段单位待核验，暂不展示');
+            if (Number(cityData.avg_rent) > 0) metaItems.push(`💰 租金参考：¥${cityData.avg_rent}/月（需按地段核实）`);
+            else metaItems.push('💰 租金：尚未核验');
             if (cityData.climate_desc) metaItems.push(`🌡️ 气候: ${cityData.climate_desc}`);
             if (cityData.layflat_level) metaItems.push(`😌 躺平等级: ${cityData.layflat_level}`);
             if (cityData.medical) metaItems.push(`🏥 医疗: ${cityData.medical}`);
@@ -752,7 +756,13 @@
             if (cityData.population) metaItems.push(`👥 人口: ${formatNumber(cityData.population)}`);
             if (cityData.avg_temp) metaItems.push(`🌡️ 平均气温: ${cityData.avg_temp}°C`);
 
-            meta.innerHTML = metaItems.map(item => `<div class="meta-item">${item}</div>`).join('');
+            meta.replaceChildren();
+            for (const text of metaItems) {
+                const item = document.createElement('div');
+                item.className = 'meta-item';
+                item.textContent = text;
+                meta.appendChild(item);
+            }
 
             // 添加城市评价和备注信息
             const cityHeader = document.querySelector('.city-header');
@@ -809,8 +819,7 @@
 
         // 渲染雷达图
         function renderRadarChart() {
-            const chart = echarts.init(document.getElementById('radarChart'));
-
+            const chartHost = document.getElementById('radarChart');
             const dimensions = [
                 { name: '生活成本', key: 'living_cost', max: 10 },
                 { name: '空气质量', key: 'air_quality', max: 10 },
@@ -820,7 +829,33 @@
                 { name: '适合养老', key: 'elderly_care', max: 10 }
             ];
 
-            const values = dimensions.map(d => cityData[d.key] || 5);
+            const available = dimensions.filter(d =>
+                cityData[d.key] !== null && cityData[d.key] !== undefined &&
+                Number.isFinite(Number(cityData[d.key])) && Number(cityData[d.key]) > 0
+            );
+            if (available.length < dimensions.length) {
+                // “5” used to be inserted for every missing field, creating
+                // convincing but fictitious six-axis scores. Show facts only.
+                chartHost.style.height = 'auto';
+                chartHost.style.minHeight = '150px';
+                chartHost.style.padding = '22px';
+                chartHost.style.textAlign = 'left';
+                chartHost.replaceChildren();
+                const heading = document.createElement('h3');
+                heading.textContent = '城市维度尚未全部核验';
+                const message = document.createElement('p');
+                message.style.margin = '10px 0';
+                message.textContent = '已采集 ' + available.length + '/6 项评分。缺失项不等于0分，暂不绘制容易误导的雷达图。';
+                chartHost.append(heading, message);
+                for (const d of available) {
+                    const line = document.createElement('p');
+                    line.textContent = d.name + '：' + Number(cityData[d.key]).toFixed(1) + ' / 10（原有评分，非2025年官方统计）';
+                    chartHost.appendChild(line);
+                }
+                return;
+            }
+            const chart = echarts.init(chartHost);
+            const values = dimensions.map(d => Number(cityData[d.key]));
 
             const option = {
                 title: {
@@ -880,12 +915,12 @@
             const climate = cityData.climate_desc || '';
 
             // 动态Title
-            const title = `${cityName}躺平指南 - 房租${rent} | 躺平指数${score}分 | 宜居城市指南`;
+            const title = `${cityName}城市资料 - 2025年来源数据与生活参考 | 宜居城市指南`;
             document.title = title;
             document.getElementById('pageTitle').textContent = title;
 
             // 动态Description
-            const description = `${cityName}(${province})真实房租${rent},躺平指数${score}分。${climate}。查看${cityName}生活成本、气候数据、用户真实评价,为你的躺平生活提供参考 - 宜居城市指南`;
+            const description = `${cityName}（${province}）城市资料、生活参考与2025年公开来源统计指标。${climate}。缺失数据标注为待核验，房租请按具体地段核实。`;
             const metaDesc = document.getElementById('pageDescription');
             if (metaDesc) metaDesc.setAttribute('content', description);
 

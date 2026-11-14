@@ -6,6 +6,7 @@
     <title>宜居城市指南 - 找到你的理想城市</title>
     <meta name="description" content="探索中国宜居城市排行榜，发现最适合躺平、养老、旅居的理想城市">
     <meta name="keywords" content="宜居城市,城市排行榜,躺平城市,养老城市,低房租城市">
+    <link rel="stylesheet" href="city-evidence-explorer.css?v=20261114">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>">
 
     <style>
@@ -1221,7 +1222,7 @@
     <section class="hero">
         <div class="hero-container">
             <h1 class="hero-title">找到你的理想城市</h1>
-            <p class="hero-subtitle">探索 300+ 城市数据 · 真实评分 · 智能推荐</p>
+            <p class="hero-subtitle">从有出处的城市数据开始，查收入、医疗与生活条件，不凭印象选城市</p>
 
             <div class="search-box">
                 <div class="search-input-wrapper">
@@ -1240,11 +1241,31 @@
                 <button class="quick-tag" data-filter="airQuality">🌿 空气好</button>
                 <button class="quick-tag" data-filter="coastal">🌊 沿海</button>
             </div>
+            <a href="#evidenceExplorer" class="evidence-hero-link">先看2025年有来源的城市资料 ↓</a>
         </div>
     </section>
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Real first-visit decision content: source-linked and never confused with old scores -->
+        <section class="evidence-explorer" id="evidenceExplorer" aria-labelledby="evidenceExplorerTitle">
+            <p class="evidence-eyebrow">城市决策 · 2025年度原始统计资料</p>
+            <h2 id="evidenceExplorerTitle" class="section-title">先看有依据的数据，再决定去哪座城市</h2>
+            <p class="evidence-intro">按你关心的问题查看不同城市的公开指标、统计口径和原始出处。缺少数据不代表城市差；GDP和收入也不是生活成本或本站宜居评分。点☆关注城市，下次打开仍能找到。</p>
+            <div class="evidence-controls">
+                <div class="evidence-tab-list" role="group" aria-label="选择城市关注维度">
+                    <button type="button" class="evidence-tab active" data-evidence-group="all" aria-pressed="true">📚 全部有源城市</button>
+                    <button type="button" class="evidence-tab" data-evidence-group="income" aria-pressed="false">💰 收入与消费</button>
+                    <button type="button" class="evidence-tab" data-evidence-group="care" aria-pressed="false">🏥 医疗与养老</button>
+                    <button type="button" class="evidence-tab" data-evidence-group="environment" aria-pressed="false">🌿 空气与交通</button>
+                </div>
+                <label class="evidence-saved-only"><input id="evidenceExplorerSavedOnly" type="checkbox"> 只看我的关注</label>
+            </div>
+            <p id="evidenceExplorerCounter" class="evidence-summary" aria-live="polite">正在加载城市原始资料...</p>
+            <div id="evidenceExplorerCards" class="evidence-cards"><p class="evidence-empty">正在读取2025年统计来源...</p></div>
+            <button type="button" id="evidenceExplorerMore" class="evidence-more" hidden>再看6座城市</button>
+        </section>
+
         <!-- Featured Carousel -->
         <section class="featured-section">
             <div class="section-header">
@@ -1309,6 +1330,8 @@
                     <span>🌍</span> 世界城市
                 </button>
             </div>
+
+            <p style="font-size:.8rem;color:#64748b;margin:.65rem 0 1.1rem;">城市卡片的「—」表示尚未核实该维度，不代表0分。搜索结果是匹配顺序，并非榜单名次。</p>
 
             <!-- Loading State -->
             <div class="loading" id="loading">
@@ -1595,6 +1618,16 @@
                     params.append('list_type', state.currentList);
                 }
 
+                // These controls used to update UI state but never reach the API.
+                // Send only explicitly selected filters; the API owns filtering and pagination.
+                const activeFilters = {};
+                for (const key of ['rent', 'region', 'tier']) {
+                    if (state.filters[key]) activeFilters[key] = state.filters[key];
+                }
+                if (Array.isArray(state.filters.features) && state.filters.features.length) {
+                    activeFilters.features = state.filters.features;
+                }
+                if (Object.keys(activeFilters).length) params.append('filters', JSON.stringify(activeFilters));
                 const data = await fetchAPI(`/api/cities?${params}`);
 
                 if (data.cities && data.cities.length > 0) {
@@ -1617,12 +1650,24 @@
             }
         }
 
+        // Missing legacy fields are unknown, not zero and not a negative city rating.
+        function visibleRating(value) {
+            const n = Number(value);
+            return value !== null && value !== undefined && n > 0 && Number.isFinite(n) ? n.toFixed(1) : '—';
+        }
+        function visibleRent(city) {
+            const n = Number(city.avg_rent);
+            return city.avg_rent != null && Number.isFinite(n) && n > 0
+                ? {value: '¥' + n.toLocaleString('zh-CN'), suffix: '/月'}
+                : {value: '租金待核实', suffix: ''};
+        }
+
         // ===== Render Functions =====
         function renderFeaturedCities() {
             const track = document.getElementById('carouselTrack');
             track.innerHTML = state.featuredCities.map((city, index) => {
-                const score = (city.layflat_score || city.overall_score || 0).toFixed(1);
-                const rent = city.avg_rent ? `¥${city.avg_rent}` : '暂无';
+                const score = visibleRating(city.layflat_score || city.overall_score);
+                const rent = visibleRent(city);
                 const imageUrl = getCityImageUrl(city);
                 const gradient = getGradientStyle(index);
 
@@ -1641,14 +1686,14 @@
                             <label class="compare-checkbox-label"></label>
                             <div class="featured-card-placeholder">${city.name[0]}</div>
                             <img src="${imageUrl}" alt="${city.name}" loading="eager" style="opacity:1">
-                            <div class="featured-card-badge">#${index + 1}</div>
+                            <div class="featured-card-badge">精选</div>
                             <div class="featured-card-score">⭐ ${score}</div>
                         </div>
                         <div class="featured-card-content">
                             <div class="featured-card-name">${city.name}</div>
                             <div class="featured-card-location">${city.province || ''}</div>
                             <div class="featured-card-info">
-                                <div class="featured-card-price">${rent}<span>/月</span></div>
+                                <div class="featured-card-price">${rent.value}<span>${rent.suffix}</span></div>
                                 <div class="featured-card-tags">
                                     ${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
                                 </div>
@@ -1703,9 +1748,9 @@
                 } else {
                     score = city.overall_score || 0;
                 }
-                score = score.toFixed(1);
+                score = visibleRating(score);
 
-                const rent = city.avg_rent ? `¥${city.avg_rent}` : '暂无';
+                const rent = visibleRent(city);
                 const imageUrl = getCityImageUrl(city);
                 const gradient = getGradientStyle(index);
 
@@ -1727,9 +1772,9 @@
                     '</a> · <a href="' + city.licensed_photo.license_url +
                     '" target="_blank" rel="noopener noreferrer">' + city.licensed_photo.license + '</a></div>' : '';
 
-                const air = (city.air_quality || 0).toFixed(1);
-                const medical = (city.medical_facilities || 0).toFixed(1);
-                const living = (city.living_cost || 0).toFixed(1);
+                const air = visibleRating(city.air_quality);
+                const medical = visibleRating(city.medical_facilities);
+                const living = visibleRating(city.living_cost);
                 const rankClass = rank <= 3 ? `top-${rank}` : '';
 
                 const card = document.createElement('div');
@@ -1741,7 +1786,7 @@
                         <label class="compare-checkbox-label"></label>
                         <div class="city-card-placeholder">${city.name[0]}</div>
                         <img src="${imageUrl}" alt="${city.name}" loading="lazy" style="opacity:1">
-                        <div class="city-card-rank ${rankClass}">${rank}</div>
+                        <div class="city-card-rank ${rankClass}" style="${state.filters.search || state.currentList === 'china_layflat' ? 'display:none' : ''}">${rank}</div>
                         <div class="city-card-score">⭐ ${score}</div>
                     </div>
                     <div class="city-card-body">
@@ -1751,7 +1796,7 @@
                                 <div class="city-card-location">${city.province || city.country || ''}</div>
                                 ${imageCredit}
                             </div>
-                            <div class="city-card-price">${rent}<span>/月</span></div>
+                            <div class="city-card-price">${rent.value}<span>${rent.suffix}</span></div>
                         </div>
                         <div class="city-card-tags">
                             ${tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
@@ -2102,5 +2147,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="city-evidence-explorer.js?v=20261114" defer></script>
 </body>
 </html>

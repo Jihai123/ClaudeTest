@@ -38,6 +38,8 @@ jobs:
         run: node --test tests_js/yiju-d03-living-checklist.test.js tests_js/yiju-d04-atlas.test.js
       - name: D05 sourced detail facts, photo license and field-review regressions
         run: node --test tests_js/yiju-d05-official-city-detail.test.js
+      - name: D06 first-visit practical browsing and honest city fields
+        run: node --test tests_js/yiju-first-visit.test.js
       - name: Full city quality audit read-only regression (synthetic, no production fetch)
         run: node --test tests_js/yiju-city-quality-audit.test.js
       - name: Real isolated SQLite regression
