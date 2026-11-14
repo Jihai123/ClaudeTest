@@ -4,6 +4,7 @@ const db = require('../models/database');
 const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateCity, validateDimensions, validateId } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
+const { getOfficialFacts, getSummary, getLicensedPhoto } = require('../utils/officialCityFacts');
 
 // 【新增】获取热门城市
 router.get('/hot', async (req, res) => {
@@ -386,6 +387,9 @@ router.get('/', optionalAuth, async (req, res) => {
         [city.id]
       );
       city.cover_image = coverImage || null;
+      // Supplementary sourced facts remain separate from scored/legacy city columns.
+      city.official_facts_summary = getSummary(city.id);
+      city.licensed_photo = coverImage ? null : getLicensedPhoto(city.id);
     }
 
     const countQuery = `SELECT COUNT(*) as total FROM cities c LEFT JOIN city_dimensions cd ON c.id = cd.city_id ${whereClause}`;
@@ -570,7 +574,9 @@ router.get('/:id', validateId, async (req, res) => {
       score_breakdown: scoreBreakdown,
       tags,
       images,
-      cover_image: coverImage
+      cover_image: coverImage,
+      official_facts: getOfficialFacts(city.id),
+      licensed_photo: images.length ? null : getLicensedPhoto(city.id)
     });
   } catch (error) {
     console.error('获取城市详情失败:', error);
