@@ -709,6 +709,8 @@
             font-weight: 700;
         }
 
+        .city-card-photo-credit { font-size:.67rem; color:#64748b; margin-top:4px; }
+        .city-card-photo-credit a { color:#3a6389; text-decoration:underline; }
         .city-card-location {
             font-size: 0.8125rem;
             color: var(--gray-500);
@@ -1485,6 +1487,10 @@
             if (imageIndex === 1 && city.cover_image && city.cover_image.image_url) {
                 return city.cover_image.image_url;
             }
+            // CC-licensed photography is not mixed with user-uploaded covers.
+            if (imageIndex === 1 && city.licensed_photo && city.licensed_photo.image_url) {
+                return city.licensed_photo.image_url;
+            }
             // 否则尝试按索引获取图片
             return `${R2_IMAGE_BASE}/${city.id}/${city.id}_${imageIndex}.jpeg`;
         }
@@ -1656,7 +1662,7 @@
             track.querySelectorAll('.featured-card').forEach(card => {
                 card.addEventListener('click', (e) => {
                     // 如果点击的是复选框或标签，不跳转
-                    if (e.target.classList.contains('compare-checkbox') ||
+                    if (e.target.closest('a') || e.target.classList.contains('compare-checkbox') ||
                         e.target.classList.contains('compare-checkbox-label')) {
                         return;
                     }
@@ -1712,6 +1718,15 @@
                     if (city.elderly_care >= 7) tags.push('适合养老');
                 }
 
+                if (city.official_facts_summary && city.official_facts_summary.count > 0) {
+                    tags.push('📚 ' + city.official_facts_summary.year + '年有源数据 ' + city.official_facts_summary.count + '项');
+                }
+                const imageCredit = city.licensed_photo && !city.cover_image ?
+                    '<div class="city-card-photo-credit"><a href="' + city.licensed_photo.source_url +
+                    '" target="_blank" rel="noopener noreferrer">摄影：' + city.licensed_photo.author +
+                    '</a> · <a href="' + city.licensed_photo.license_url +
+                    '" target="_blank" rel="noopener noreferrer">' + city.licensed_photo.license + '</a></div>' : '';
+
                 const air = (city.air_quality || 0).toFixed(1);
                 const medical = (city.medical_facilities || 0).toFixed(1);
                 const living = (city.living_cost || 0).toFixed(1);
@@ -1734,6 +1749,7 @@
                             <div>
                                 <div class="city-card-name">${city.name}</div>
                                 <div class="city-card-location">${city.province || city.country || ''}</div>
+                                ${imageCredit}
                             </div>
                             <div class="city-card-price">${rent}<span>/月</span></div>
                         </div>

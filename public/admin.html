@@ -197,6 +197,11 @@
             <div class="sub">待审核: <span id="statImagesPending">0</span></div>
           </div>
           <div class="stat-card">
+             <div class="label">城市字段待审核（非新城市审核）</div>
+             <div class="value" id="statFieldChangesPending">-</div>
+             <div class="sub"><button type="button" class="btn btn-primary" id="statFieldReviewLink">查看字段审批</button></div>
+           </div>
+           <div class="stat-card">
             <div class="label">用户总数</div>
             <div class="value" id="statUsers">-</div>
             <div class="sub">管理员: <span id="statAdmins">0</span></div>
@@ -485,7 +490,13 @@
       document.getElementById('logoutBtn').addEventListener('click', logout);
 
       // 标签页切换
-      document.getElementById('tabsContainer').addEventListener('click', function(e) {
+      document.getElementById('statFieldReviewLink').addEventListener('click', function () {
+         document.getElementById('cityDataStatus').value = 'pending';
+         document.getElementById('cityDataOnlySelected').checked = false;
+         switchTab('cityData');
+         document.getElementById('cityDataChanges').scrollIntoView({ behavior: 'smooth', block: 'center' });
+       });
+       document.getElementById('tabsContainer').addEventListener('click', function(e) {
         if (e.target.classList.contains('tab')) {
           switchTab(e.target.dataset.tab);
         }
@@ -658,6 +669,16 @@
         document.getElementById('statReviewsPending').textContent = stats.reviews ? stats.reviews.pending : 0;
         document.getElementById('statUsers').textContent = stats.users ? stats.users.total : 0;
         document.getElementById('statAdmins').textContent = stats.users ? stats.users.admins : 0;
+         // Real pending field-change applications are distinct from new-city review.
+         // If an API call fails, show '-' instead of misleading users with zero.
+         try {
+           const pending = await api('/admin/city-data/changes?status=pending');
+           document.getElementById('statFieldChangesPending').textContent =
+             Array.isArray(pending.changes) ? pending.changes.length : '-';
+         } catch (error) {
+           document.getElementById('statFieldChangesPending').textContent = '-';
+           console.error('字段待审数读取失败:', error);
+         }
 
         // 图片统计
         const imagesData = await api('/admin/images?limit=1');

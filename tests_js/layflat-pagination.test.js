@@ -53,6 +53,11 @@ function harness() {
     if (name==='../middleware/auth') return {optionalAuth:(req,res,next)=>next(),verifyToken:()=>{}};
     if (name==='../middleware/validator') return {validateCity:()=>{},validateDimensions:()=>{},validateId:()=>{}};
     if (name==='../utils/sanitize') return {sanitizeObject:x=>x};
+    if (name==='../utils/officialCityFacts') return {
+      getOfficialFacts:()=>null,
+      getSummary:()=>null,
+      getLicensedPhoto:()=>null
+    };
     throw Error(name);
   };
   const module={exports:{}};
