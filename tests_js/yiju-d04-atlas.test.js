@@ -54,7 +54,7 @@ test('index, checklist, public and dynamic sitemaps include this one page',()=>{
  assert.ok(read('public/city-living-checklist.html').includes('href="/2025-city-evidence-atlas.html"'));
  const sitemap=read('public/sitemap.xml');
  assert.equal(sitemap.split(url).length-1,1);
- assert.equal((sitemap.match(/<url>/g)||[]).length,567);
+ assert.equal((sitemap.match(/<url>/g)||[]).length,568);
  assert.equal((sitemap.match(/city-detail\.html\?id=/g)||[]).length,561);
  const dynamic=read('server/routes/sitemap.js');
  assert.ok(dynamic.includes("'/2025-city-evidence-atlas.html'"));
