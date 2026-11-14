@@ -510,6 +510,31 @@
             margin-bottom: 15px;
             opacity: 0.5;
         }
+
+        /* D05: source-linked, independently verified city facts. Legacy scores remain separate. */
+        .official-section-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .official-facts-count { font-size:.85rem; border:1px solid #c5ddef; background:#eef6ff; border-radius:99px; padding:4px 10px; color:#205483; font-weight:650; }
+        .official-intro { margin:10px 0 16px; color:#3d556d; }
+        .official-alias-note { padding:10px 14px; background:#edf5ff; border-left:3px solid #3a7fb0; border-radius:6px; color:#315269; font-size:.9rem; }
+        .official-facts-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:13px; }
+        .official-fact-card { border:1px solid #dce6ef; border-radius:13px; padding:17px; background:#f9fcff; min-width:0; }
+        .official-fact-category { color:#285f8f; background:#e7f2fb; border-radius:5px; font-size:.75rem; padding:3px 9px; }
+        .official-fact-label { color:#43566d; font-size:.88rem; margin:11px 0 5px; }
+        .official-fact-number { color:#1e4878; font-weight:800; font-size:1.65rem; line-height:1.32; }
+        .official-fact-unit { font-size:.77rem; font-weight:500; margin-left:6px; }
+        .official-fact-note { color:#526579; font-size:.81rem; margin:8px 0 9px; }
+        .official-fact-source { display:inline-block; font-size:.82rem; color:#185b96; text-decoration:underline; text-underline-offset:3px; overflow-wrap:anywhere; }
+        .official-field-tip { padding:13px 16px; background:#f2f7fc; border-left:3px solid #3a7298; margin:20px 0 12px; color:#384f61; }
+        .official-source-details { margin:15px 0; font-size:.87rem; }
+        .official-source-details summary { cursor:pointer; font-weight:700; color:#285377; padding:8px 0; }
+        .official-source-details li { margin:7px 0; overflow-wrap:anywhere; }
+        .official-source-details a { color:#246499; text-decoration:underline; }
+        .official-source-caveat,.official-integrity-note { font-size:.81rem; line-height:1.7; color:#5c6f7e; margin:12px 0 0; }
+        .licensed-photo { margin:0; max-width:850px; }
+        .licensed-photo img { display:block; width:100%; max-height:450px; object-fit:contain; background:#eff3f8; border-radius:12px; }
+        .licensed-photo figcaption { font-size:.8rem; color:#50667a; margin-top:8px; line-height:1.7; }
+        .licensed-photo a { color:#205c96; text-decoration:underline; }
+        @media(max-width:560px) { .official-facts-grid{grid-template-columns:1fr;} .official-fact-card{padding:14px;} }
     </style>
 </head>
 <body>
@@ -549,6 +574,7 @@
                     <a href="#" id="uploadLinkWithImages" class="btn btn-primary" style="display: none;">📷 上传你的城市印象</a>
                 </div>
                 <div id="imageGallery" class="image-gallery"></div>
+                <div id="licensedPhotoFallback" style="display:none"></div>
                 <div id="uploadPrompt" class="upload-prompt" style="display: none;">
                     <div class="empty-state-icon">📷</div>
                     <h3>暂无图片</h3>
@@ -556,6 +582,15 @@
                     <a href="#" id="uploadLink" class="btn btn-primary" style="margin-top: 20px;">上传图片</a>
                 </div>
             </section>
+
+             <!-- 可溯源资料不是原有评分，不绕过编辑审批 -->
+             <section class="section" id="officialFactsSection" style="display:none" aria-labelledby="officialFactsTitle">
+                 <div class="official-section-head">
+                     <h2 class="section-title" id="officialFactsTitle">📚 2025年城市统计资料</h2>
+                     <span class="official-facts-count" id="officialFactsCount"></span>
+                 </div>
+                 <div id="officialFactsBody"></div>
+             </section>
 
             <!-- 雷达图 -->
             <section class="section">
@@ -615,6 +650,7 @@
     <!-- 通知 -->
     <div id="notification" class="notification"></div>
 
+    <script src="city-detail-official.js?v=20261114"></script>
     <script>
         // 全局变量
         let cityId = null;
@@ -676,6 +712,8 @@
 
                 renderCityHeader();
                 renderImageGallery();
+                if (window.renderLicensedCityPhoto) window.renderLicensedCityPhoto(cityData);
+                if (window.renderOfficialCityFacts) window.renderOfficialCityFacts(cityData);
                 renderRadarChart();
                 loadReviews();
             } catch (error) {
