@@ -31,3 +31,6 @@
 .evidence-empty{padding:1rem;color:#68788a}
 .evidence-more[hidden]{display:none}
 @media(max-width:640px){.evidence-explorer{padding:1rem;margin-bottom:2rem}.evidence-explorer .section-title{font-size:1.25rem}.evidence-cards{grid-template-columns:1fr}.evidence-tab{font-size:.8rem;padding:.4rem .64rem}}
+
+.evidence-hero-link{display:inline-block;margin:.2rem auto 0;color:#ffffff;border:1px solid rgba(255,255,255,.68);border-radius:999px;padding:.5rem 1.1rem;font-weight:750;font-size:.87rem;background:rgba(255,255,255,.12)}
+.evidence-hero-link:hover{background:rgba(255,255,255,.26)}
