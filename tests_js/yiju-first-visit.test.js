@@ -22,12 +22,12 @@ function apiFixture() {
   const queries = [];
   const db = {
     async query(sql, args) {
-      if (sql.includes('FROM city_tags')) return [];
       if (sql.includes('FROM cities c')) {
         queries.push({ sql, args });
         if (sql.includes('GROUP BY c.id')) return fixtures.slice(0, Number(args.at(-2)));
         return fixtures.slice(0, Number(args.at(-1)));
       }
+      if (sql.includes('FROM city_tags')) return [];
       throw Error('Unexpected SQL ' + sql);
     },
     async get(sql) {
