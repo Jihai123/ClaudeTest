@@ -59,6 +59,7 @@ test('sitemap URL uses canonical Yiju host and W3C valid lastmod dates', async (
   assert.match(response.body, /zhangye-city-facts-2025\.html/);
   assert.match(response.body, /verified-city-facts\.html/);
   assert.match(response.body, /2025-city-living-comparison\.html/);
+  assert.match(fs.readFileSync(path.join(__dirname, '../public/sitemap.xml'), 'utf8'), /2025-city-living-comparison\.html/);
   assert.match(response.body, /city-compare\.html/);
   assert.doesNotMatch(response.body, /admin\.html|\/api\/|token=/);
 });

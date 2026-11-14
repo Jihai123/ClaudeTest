@@ -37,3 +37,7 @@
 
 .evidence-guide-link{display:inline-block;margin:0 0 1rem;background:#e2f4e8;border:1px solid #add7cb;color:#115e4a;padding:.7rem .95rem;border-radius:11px;text-decoration:none;font-weight:780;font-size:.88rem}
 .evidence-guide-link:hover{background:#cae9df;color:#0d4b40}
+
+.hero-city-guide{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#fff;border-radius:999px;padding:.7rem 1.15rem;color:#365264;font-size:.88rem;font-weight:800;margin-top:1rem;box-shadow:0 7px 20px rgba(8,32,39,.2)}
+.hero-city-guide:hover{background:#e9f8f4;color:#0d5750}
+@media(max-width:640px){.hero-city-guide{font-size:.79rem;padding:.6rem .85rem;line-height:1.5}}

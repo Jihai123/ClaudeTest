@@ -3,6 +3,15 @@
   'use strict';
   const root = document.getElementById('evidenceExplorer');
   if (!root) return;
+  // Prominent first-screen link; no edits to the legacy production index file.
+  const hero = document.querySelector('.hero-container');
+  if (hero && !hero.querySelector('.hero-city-guide')) {
+    const action = document.createElement('a');
+    action.className = 'hero-city-guide';
+    action.href = '2025-city-living-comparison.html';
+    action.textContent = '📖 想换城市生活？先对比4座城市的真实数据 →';
+    hero.appendChild(action);
+  }
   // Give users a practical, navigable decision task instead of another list.
   const intro = root.querySelector('.evidence-intro');
   if (intro) {
