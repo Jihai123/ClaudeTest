@@ -1286,6 +1286,374 @@
           "note": "2025年城市供热覆盖总面积，不代表具体房源已供热"
         }
       ]
+    },
+    {
+      "id": 927,
+      "name": "本溪市",
+      "province": "辽宁",
+      "list_type": "china_layflat",
+      "focus": "先核实居民收入与零售消费，医疗可达性还需核查",
+      "tip": "市级人均收入不是旅居者退休金；森林生态条件不能代替小区冬季供暖、坡度、医院就诊时间。原网站“房租¥280/月”属于未经溯源的存量线索，不能作为城市平均租金。",
+      "source_level": "government",
+      "sources": [
+        {
+          "key": "benxi_gov",
+          "title": "本溪市政府城市概况：2025年经济与收入",
+          "date": "2026-05-25",
+          "url": "https://benxi.gov.cn/sq/csgk"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1006,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "benxi_gov",
+          "note": "2025年本溪全市GDP；初步核算"
+        },
+        {
+          "key": "per_capita_gdp_2025_cny",
+          "label": "人均地区生产总值",
+          "value": 82562,
+          "unit": "元/人",
+          "category": "经济",
+          "source": "benxi_gov",
+          "note": "人均GDP不是居民收入或劳动工资"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 40347,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "benxi_gov",
+          "note": "全体居民口径，不能与仅城镇居民收入直接比较"
+        },
+        {
+          "key": "retail_sales_2025_billion_cny",
+          "label": "社会消费品零售总额",
+          "value": 169.3,
+          "unit": "亿元",
+          "category": "消费",
+          "source": "benxi_gov",
+          "note": "全市商业交易规模，不代表人均生活开销"
+        }
+      ],
+      "city_ids": [
+        927
+      ],
+      "source_note": "2025年本溪市政府公开统计汇总；房租、医保待遇、供暖与就医通达性尚须核验，不推算月度生活预算。"
+    },
+    {
+      "id": 971,
+      "name": "鹤壁市",
+      "province": "河南",
+      "list_type": "china_layflat",
+      "focus": "优先核对医疗资源与日常花销，区分市级总量与居住圈服务",
+      "tip": "医疗机构和床位总量不能等于所在片区医院可达性。想看是否适合养老，先确认拟住地冬季空气、三级医院路程、慢病随访与实测租金。",
+      "source_level": "official_bulletin_reprint",
+      "sources": [
+        {
+          "key": "hebi_bulletin",
+          "title": "鹤壁市统计局2025年统计公报（鹤壁发布转载）",
+          "date": "2026-05-22",
+          "url": "https://finance.sina.com.cn/wm/2026-05-22/doc-inhyvhtz7319078.shtml"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1144.12,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "hebi_bulletin",
+          "note": "全市初步核算GDP，不代表人均财务状况"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 155.4,
+          "unit": "万人",
+          "category": "人口",
+          "source": "hebi_bulletin",
+          "note": "常住人口，不是户籍人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 65.1,
+          "unit": "%",
+          "category": "人口",
+          "source": "hebi_bulletin",
+          "note": "对应全市常住人口城镇化率"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 43014,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "hebi_bulletin",
+          "note": "城镇居民人均年度收入，不能直接视为旅居者工资"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 28358,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "hebi_bulletin",
+          "note": "农村居民群体，不与城镇居民收入混为一谈"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均生活消费支出",
+          "value": 25602,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "hebi_bulletin",
+          "note": "城镇居民家庭调查口径，不能替代单人旅居预算"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "卫生机构数量",
+          "value": 1995,
+          "unit": "个",
+          "category": "医疗",
+          "source": "hebi_bulletin",
+          "note": "全市机构总量；不能代替医院等级及可达性"
+        },
+        {
+          "key": "healthcare_beds_2025_count",
+          "label": "卫生机构床位",
+          "value": 9629,
+          "unit": "张",
+          "category": "医疗",
+          "source": "hebi_bulletin",
+          "note": "全市床位总量，非可预约或可实际使用的空床"
+        },
+        {
+          "key": "community_service_facilities_2025_count",
+          "label": "城镇社区服务设施",
+          "value": 616,
+          "unit": "个",
+          "category": "养老",
+          "source": "hebi_bulletin",
+          "note": "设施总量；实际养老服务项目需逐个核实"
+        }
+      ],
+      "city_ids": [
+        971
+      ],
+      "source_note": "指标依据鹤壁市统计局2025年统计公报的公开转载，属于政府公报转载证据；未取得原始政府页面直链，使用前建议核对统计局原始公报。"
+    },
+    {
+      "id": 996,
+      "name": "启东市",
+      "province": "江苏",
+      "list_type": "china_layflat",
+      "focus": "用居民收入与消费同口径对照，别把海景房源租金当全市均价",
+      "tip": "启东靠海区域与市区生活服务差异明显，海滨房源的短租、淡季、供暖、潮湿问题需实地核实。居民消费支出是当地调查口径，不能直接代表搬来人的总预算。",
+      "source_level": "official_bulletin_reprint",
+      "sources": [
+        {
+          "key": "qidong_bulletin",
+          "title": "启东市统计局2025年统计公报公开转载",
+          "date": "2026-06-13",
+          "url": "https://tjgb.hongheiku.com/xjtjgb/xj2020/74011.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1556.89,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "qidong_bulletin",
+          "note": "启东县级市GDP，不是南通全市口径"
+        },
+        {
+          "key": "registered_population_2025_ten_thousand",
+          "label": "年末户籍人口",
+          "value": 104.38,
+          "unit": "万人",
+          "category": "人口",
+          "source": "qidong_bulletin",
+          "note": "户籍口径，不能直接与各市常住人口比较"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 65613,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "qidong_bulletin",
+          "note": "2025年城镇居民人均年度可支配收入"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 38966,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "qidong_bulletin",
+          "note": "2025年农村居民群体"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均生活消费支出",
+          "value": 46064,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "qidong_bulletin",
+          "note": "2025年城镇居民家庭抽样消费口径"
+        },
+        {
+          "key": "rural_consumption_2025_cny",
+          "label": "农村居民人均生活消费支出",
+          "value": 27487,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "qidong_bulletin",
+          "note": "2025年农村居民口径"
+        },
+        {
+          "key": "medical_insurance_insured_2025_ten_thousand",
+          "label": "基本医疗保险参保人数",
+          "value": 94.51,
+          "unit": "万人",
+          "category": "医疗",
+          "source": "qidong_bulletin",
+          "note": "参保人数不等于实际医疗服务质量"
+        },
+        {
+          "key": "ltc_insurance_beneficiaries_2025_count",
+          "label": "长期护理保险享受待遇人数",
+          "value": 9990,
+          "unit": "人",
+          "category": "养老",
+          "source": "qidong_bulletin",
+          "note": "2025年度享受长期护理保险待遇人数，不代表申请即获批"
+        }
+      ],
+      "city_ids": [
+        996
+      ],
+      "source_note": "统计公报可访问的为公开转载，保留原统计口径；启东房源价格、潮湿与医疗服务不能由全市GDP和居民平均收入推断。"
+    },
+    {
+      "id": 1074,
+      "name": "襄阳市",
+      "province": "湖北",
+      "list_type": "china_layflat",
+      "focus": "用城镇居民消费与收入衡量生活结构，再查看医院和所在城区",
+      "tip": "襄阳城区、下辖县市、工业区生活差异大；人均统计不能套到具体租房选择，房源单价和医院就诊应以当前可核验样本为准。",
+      "source_level": "official_bulletin_reprint",
+      "sources": [
+        {
+          "key": "xiangyang_reprint",
+          "title": "襄阳市统计局2025年统计公报公开整理",
+          "date": "2026-11-09",
+          "url": "https://www.tjnjdata.com/newsview/20260728153404"
+        },
+        {
+          "key": "xiangyang_official",
+          "title": "湖北省统计局2025年襄阳市统计公报原文（DOCX）",
+          "date": "2026-05-04",
+          "url": "https://tjj.hubei.gov.cn/tjsj/tjgb/ndtjgb/sztjgb/202606/P020260629418775557072.docx"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 6113.85,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "xiangyang_reprint",
+          "note": "2025年襄阳全市GDP初步核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 525.12,
+          "unit": "万人",
+          "category": "人口",
+          "source": "xiangyang_reprint",
+          "note": "全市常住人口，与户籍人口569.22万人不同"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 66.21,
+          "unit": "%",
+          "category": "人口",
+          "source": "xiangyang_reprint",
+          "note": "常住人口口径"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 50412,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "xiangyang_reprint",
+          "note": "城镇居民人均年度，不代表搬迁者收入"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 27078,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "xiangyang_reprint",
+          "note": "农村居民口径"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均生活消费支出",
+          "value": 30030,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "xiangyang_reprint",
+          "note": "居民抽样消费，并非单人租房可用预算"
+        },
+        {
+          "key": "rural_consumption_2025_cny",
+          "label": "农村居民人均生活消费支出",
+          "value": 20639,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "xiangyang_reprint",
+          "note": "农村居民口径"
+        },
+        {
+          "key": "new_urban_employment_2025_ten_thousand",
+          "label": "城镇新增就业人数",
+          "value": 10.77,
+          "unit": "万人",
+          "category": "就业",
+          "source": "xiangyang_reprint",
+          "note": "新增就业登记总量，不是空缺招聘岗位"
+        },
+        {
+          "key": "airport_passenger_trips_2025_ten_thousand",
+          "label": "襄阳机场旅客吞吐量",
+          "value": 189.98,
+          "unit": "万人次",
+          "category": "交通",
+          "source": "xiangyang_reprint",
+          "note": "机场全年吞吐人次，不代表具体航班可达性"
+        }
+      ],
+      "city_ids": [
+        1074
+      ],
+      "source_note": "省统计局原公报以DOCX公开，网页阅读使用统计公报公开整理版本并附原文入口；年度居民调查与迁居实测预算必须区分。"
     }
   ]
 }

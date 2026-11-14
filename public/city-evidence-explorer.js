@@ -3,6 +3,15 @@
   'use strict';
   const root = document.getElementById('evidenceExplorer');
   if (!root) return;
+  // Give users a practical, navigable decision task instead of another list.
+  const intro = root.querySelector('.evidence-intro');
+  if (intro) {
+    const guide = document.createElement('a');
+    guide.href = '2025-city-living-comparison.html';
+    guide.className = 'evidence-guide-link';
+    guide.textContent = '📖 鹤壁、本溪、启东、襄阳怎么选？看2025年收入、消费与医疗对照 →';
+    intro.insertAdjacentElement('afterend', guide);
+  }
   const cards = root.querySelector('#evidenceExplorerCards');
   const counter = root.querySelector('#evidenceExplorerCounter');
   const more = root.querySelector('#evidenceExplorerMore');
@@ -10,11 +19,15 @@
   const savedKey = 'yiju.evidence.saved.v1';
   const groups = {
     all: [],
-    income: ['urban_disposable_income_2025_cny', 'rural_disposable_income_2025_cny',
-      'urban_consumption_2025_cny', 'urban_housing_consumption_2025_cny', 'per_capita_gdp_2025_cny'],
+    income: ['urban_disposable_income_2025_cny', 'all_resident_disposable_income_2025_cny',
+      'rural_disposable_income_2025_cny', 'urban_consumption_2025_cny',
+      'rural_consumption_2025_cny', 'urban_housing_consumption_2025_cny',
+      'per_capita_gdp_2025_cny'],
     care: ['hospital_count_2025', 'hospitals_2025_count', 'tertiary_hospitals_2025_count',
       'tier_3a_hospitals_2025_count', 'health_institutions_2025_count',
-      'medical_health_institutions_count', 'eldercare_beds_2025_count',
+      'medical_health_institutions_count', 'healthcare_beds_2025_count',
+      'ltc_insurance_beneficiaries_2025_count', 'medical_insurance_insured_2025_ten_thousand',
+      'community_service_facilities_2025_count', 'eldercare_beds_2025_count',
       'eldercare_beds_2025_ten_thousand', 'eldercare_institutions_2025_count',
       'eldercare_institutions_2025_count', 'community_daycare_centers_2025_count'],
     environment: ['urban_good_air_days_2025_pct', 'good_air_days_excluding_dust_2025_pct',

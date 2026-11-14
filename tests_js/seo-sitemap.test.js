@@ -55,9 +55,10 @@ test('sitemap URL uses canonical Yiju host and W3C valid lastmod dates', async (
   assert.match(response.body, /https:\/\/yiju\.zhibeimao\.com\/city-detail\.html\?id=951/);
   assert.doesNotMatch(response.body, /tangping\.com/);
   assert.match(response.body, /<lastmod>2025-11-30<\/lastmod>/);
-  assert.equal((response.body.match(/<url>/g) || []).length, 11);
+  assert.equal((response.body.match(/<url>/g) || []).length, 12);
   assert.match(response.body, /zhangye-city-facts-2025\.html/);
   assert.match(response.body, /verified-city-facts\.html/);
+  assert.match(response.body, /2025-city-living-comparison\.html/);
   assert.match(response.body, /city-compare\.html/);
   assert.doesNotMatch(response.body, /admin\.html|\/api\/|token=/);
 });
@@ -87,5 +88,5 @@ test('explicit staging sitemap host can be configured without editing public rob
   const router = buildRouter({ env: { SITEMAP_BASE_URL: 'https://staging.example.org' }, cities: [] });
   const response = await router.get();
   assert.match(response.body, /https:\/\/staging\.example\.org\//);
-  assert.equal((response.body.match(/<url>/g) || []).length, 9);
+  assert.equal((response.body.match(/<url>/g) || []).length, 10);
 });
