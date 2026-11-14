@@ -37,6 +37,11 @@
     const facts = city && city.official_facts;
     if (!facts || !Array.isArray(facts.facts) || !facts.facts.length) return;
     const sources = new Map((facts.sources || []).map(s => [s.key, s]));
+    const header = document.getElementById('cityMeta');
+    if (header && !header.querySelector('.official-data-meta')) {
+      header.appendChild(make('div', 'meta-item official-data-meta',
+        '📚 2025年有源城市数据：' + facts.facts.length + '项'));
+    }
     document.getElementById('officialFactsCount').textContent =
       facts.facts.length + '项 · ' + facts.statistical_year + '年';
     const intro = make('p', 'official-intro');
