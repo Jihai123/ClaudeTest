@@ -950,6 +950,342 @@
           "note": "全年新增就业，不是招聘岗位数量"
         }
       ]
+    },
+    {
+      "id": 1247,
+      "city_ids": [
+        1247
+      ],
+      "name": "福州市",
+      "province": "福建",
+      "list_type": "china_general",
+      "source_level": "government",
+      "focus": "核查市级人口、居民收入、医疗及养老服务，而非以游客印象推断生活成本",
+      "tip": "2025年福州市统计涉及全市区域；“城区空气达标天数”仅指公报所用的城区监测口径，房租和医院便利应按具体住区核实。",
+      "sources": [
+        {
+          "key": "fz",
+          "title": "福州市统计局：2025年福州市国民经济和社会发展统计公报",
+          "date": "2026-04-14",
+          "url": "https://tjj.fuzhou.gov.cn/zwgk/tjzl/ndbg/202604/t20260414_5308173.htm"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 15112.32,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "fz",
+          "note": "2025年福州市全市初步核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "常住人口",
+          "value": 852.1,
+          "unit": "万人",
+          "category": "人口",
+          "source": "fz",
+          "note": "2025年末福州市全市人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 74.63,
+          "unit": "%",
+          "category": "人口",
+          "source": "fz",
+          "note": "城镇常住人口占比，不等于住房自有率"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 63435,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "fz",
+          "note": "非平均工资或到手薪资"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 32327,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "fz",
+          "note": "2025年农村常住居民年度平均"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均消费支出",
+          "value": 43278,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "fz",
+          "note": "全年居民消费，不等于当前租金"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "各级各类医疗卫生机构",
+          "value": 5554,
+          "unit": "个",
+          "category": "医疗",
+          "source": "fz",
+          "note": "包括医院和基层医疗机构"
+        },
+        {
+          "key": "hospitals_2025_count",
+          "label": "其中医院",
+          "value": 154,
+          "unit": "个",
+          "category": "医疗",
+          "source": "fz",
+          "note": "包括在卫生机构数5554个之内"
+        },
+        {
+          "key": "eldercare_beds_2025_count",
+          "label": "各类养老床位",
+          "value": 57262,
+          "unit": "张",
+          "category": "养老",
+          "source": "fz",
+          "note": "2025年末全市养老床位总量，不等于可用床位"
+        },
+        {
+          "key": "urban_good_air_days_2025_pct",
+          "label": "城区环境空气达标率",
+          "value": 97.5,
+          "unit": "%",
+          "category": "环境",
+          "source": "fz",
+          "note": "2025年福州城区监测口径，非全市每个小区"
+        }
+      ]
+    },
+    {
+      "id": 1232,
+      "city_ids": [
+        1232
+      ],
+      "name": "宁波市",
+      "province": "浙江",
+      "list_type": "china_general",
+      "source_level": "official_bulletin_reprint",
+      "focus": "产业城市生活需关注真实居民收入、医疗资源及养老机构，不把统计均值当个人预算",
+      "tip": "宁波日报刊载宁波市统计局2025年统计公报。医疗机构数量是全市规模；找房要在具体区县核对三级医院科室、房源和通勤。",
+      "sources": [
+        {
+          "key": "nb",
+          "title": "宁波日报刊载：宁波市统计局2025年统计公报",
+          "date": "2026-04-23",
+          "url": "https://epaper.cnnb.com.cn/nbrb/pc/content/202604/23/content_273204.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 18716,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "nb",
+          "note": "2025年宁波市全市初步核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 983.3,
+          "unit": "万人",
+          "category": "人口",
+          "source": "nb",
+          "note": "2025年1%人口抽样调查推算"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "城镇化率",
+          "value": 81.5,
+          "unit": "%",
+          "category": "人口",
+          "source": "nb",
+          "note": "年末常住人口城镇化率"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 86088,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "nb",
+          "note": "不是工资收入或月薪"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 53683,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "nb",
+          "note": "农村居民年度人均收入"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 5407,
+          "unit": "家",
+          "category": "医疗",
+          "source": "nb",
+          "note": "含基层机构和医院，非评分"
+        },
+        {
+          "key": "hospitals_2025_count",
+          "label": "其中医院（含妇保院）",
+          "value": 224,
+          "unit": "家",
+          "category": "医疗",
+          "source": "nb",
+          "note": "为医疗卫生机构子集"
+        },
+        {
+          "key": "grade_3a_hospitals_2025_count",
+          "label": "其中三甲医院（含妇保院）",
+          "value": 11,
+          "unit": "家",
+          "category": "医疗",
+          "source": "nb",
+          "note": "医院等级数量不等于就医可达性"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 235,
+          "unit": "个",
+          "category": "养老",
+          "source": "nb",
+          "note": "2025年末全市养老机构"
+        },
+        {
+          "key": "eldercare_beds_2025_ten_thousand",
+          "label": "养老机构床位",
+          "value": 4.4,
+          "unit": "万张",
+          "category": "养老",
+          "source": "nb",
+          "note": "2025年末全部机构床位，不等于空床"
+        }
+      ]
+    },
+    {
+      "id": 1236,
+      "city_ids": [
+        1236
+      ],
+      "name": "济南市",
+      "province": "山东",
+      "list_type": "china_general",
+      "source_level": "government",
+      "focus": "从医疗、公交/轨交、空气与居民成本全面考察具体片区",
+      "tip": "公报里的城市总体交通里程和PM2.5年平均值属于宏观背景，不是每个小区实测，也不能推导当前房租和评分。",
+      "sources": [
+        {
+          "key": "jn",
+          "title": "济南市统计局：2025年济南市国民经济和社会发展统计公报",
+          "date": "2026-03-30",
+          "url": "https://jntj.jinan.gov.cn/col/col18254/art/2026/art_7dc3135bb2209f961b3c65baa8ab3d2d.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 14210,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "jn",
+          "note": "2025全市初步核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 961.6,
+          "unit": "万人",
+          "category": "人口",
+          "source": "jn",
+          "note": "2025年末全市常住人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "城镇化率",
+          "value": 77.3,
+          "unit": "%",
+          "category": "人口",
+          "source": "jn",
+          "note": "全市常住人口中的城镇人口占比"
+        },
+        {
+          "key": "new_urban_employment_2025_ten_thousand",
+          "label": "城镇新增就业",
+          "value": 21,
+          "unit": "万人",
+          "category": "就业",
+          "source": "jn",
+          "note": "2025年新增就业人数，非在招岗位"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "PM2.5年平均浓度",
+          "value": 32,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "jn",
+          "note": "全市年度环境指标，不等于某一街道每日浓度"
+        },
+        {
+          "key": "rail_transit_length_2025_km",
+          "label": "轨道交通运营里程",
+          "value": 248.5,
+          "unit": "公里",
+          "category": "交通",
+          "source": "jn",
+          "note": "2025年末累计运营里程，非单条线距离"
+        },
+        {
+          "key": "rail_transit_routes_2025_count",
+          "label": "轨道交通运营线路",
+          "value": 8,
+          "unit": "条",
+          "category": "交通",
+          "source": "jn",
+          "note": "2025年末线路数量"
+        },
+        {
+          "key": "built_up_area_2025_km2",
+          "label": "城市建成区面积",
+          "value": 870.1,
+          "unit": "平方公里",
+          "category": "环境",
+          "source": "jn",
+          "note": "2025年末城市建成区，不等于行政辖区面积"
+        },
+        {
+          "key": "park_green_area_per_capita_2025_m2",
+          "label": "人均公园绿地面积",
+          "value": 14.9,
+          "unit": "平方米/人",
+          "category": "环境",
+          "source": "jn",
+          "note": "2025年济南城市绿化统计指标"
+        },
+        {
+          "key": "central_heating_area_2025_hundred_million_m2",
+          "label": "集中供热面积",
+          "value": 4,
+          "unit": "亿平方米",
+          "category": "生活",
+          "source": "jn",
+          "note": "2025年城市供热覆盖总面积，不代表具体房源已供热"
+        }
+      ]
     }
   ]
 }

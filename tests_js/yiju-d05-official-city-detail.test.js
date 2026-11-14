@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05 verified city data is 13 source-linked city regions and 71 2025 facts', () => {
+test('D05 verified city data is 16 source-linked city regions and 101 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 13);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 71);
+  assert.equal(dataset.cities.length, 16);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 101);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05 verified city data is 13 source-linked city regions and 71 2025 facts'
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 15, 'two explicitly mapped same-city cross-list aliases');
+  assert.equal(ids.size, 18, 'two explicitly mapped same-city cross-list aliases');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
@@ -48,6 +48,11 @@ test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () =
   assert.equal(getOfficialFacts(965).id, 965);
   assert.equal(getOfficialFacts(1458).id, 965);
   assert.equal(getOfficialFacts(1238).name, '西安市');
+  assert.equal(getOfficialFacts(1247).facts.length, 10, 'Fuzhou source-backed medical and incomes');
+  assert.equal(getOfficialFacts(1232).facts.length, 10, 'Ningbo sourced eldercare and medical');
+  assert.equal(getOfficialFacts(1232).source_level, 'official_bulletin_reprint');
+  assert.equal(getOfficialFacts(1236).facts.length, 10, 'Jinan sourced transit and environment');
+
   assert.equal(getOfficialFacts(951).name, '张掖市');
   assert.equal(getOfficialFacts(1490), null, 'unverified Zhangye alias cannot inherit facts');
   assert.equal(getOfficialFacts(999999), null);
