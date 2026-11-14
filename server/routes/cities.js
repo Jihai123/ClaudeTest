@@ -10,6 +10,7 @@ const { getOfficialFacts, getSummary, getLicensedPhoto } = require('../utils/off
 router.get('/hot', async (req, res) => {
   try {
     const { type = 'weekly', limit = 6 } = req.query;
+    const safeLimit = Math.max(1, Math.min(30, parseInt(limit, 10) || 6));
     let query, params;
 
     switch (type) {
@@ -25,7 +26,7 @@ router.get('/hot', async (req, res) => {
           ORDER BY c.views_count DESC, c.layflat_score DESC
           LIMIT ?
         `;
-        params = [parseInt(limit)];
+        params = [safeLimit];
         break;
 
       case 'featured':
@@ -43,7 +44,9 @@ router.get('/hot', async (req, res) => {
           ORDER BY c.layflat_score DESC, c.avg_rent ASC
           LIMIT ?
         `;
-        params = [parseInt(limit)];
+        // Fetch a broad candidate pool first: the previous top nine were
+        // concentrated in one province, a poor first-visit discovery experience.
+        params = [300];
         break;
 
       case 'new':
@@ -58,14 +61,37 @@ router.get('/hot', async (req, res) => {
           ORDER BY c.created_at DESC
           LIMIT ?
         `;
-        params = [parseInt(limit)];
+        params = [safeLimit];
         break;
 
       default:
         return res.status(400).json({ error: '无效的类型参数' });
     }
 
-    const cities = await db.query(query, params);
+    const candidates = await db.query(query, params);
+    let cities = candidates;
+    if (type === 'featured') {
+      // Editorial diversity is not a ranked score. Prefer at most two per
+      // province, then fill remaining slots when insufficient regions qualify.
+      const regionCounts = new Map();
+      const selected = [];
+      for (const city of candidates) {
+        const key = city.province || city.country || '未知';
+        const used = regionCounts.get(key) || 0;
+        if (used < 2 && selected.length < safeLimit) {
+          selected.push(city);
+          regionCounts.set(key, used + 1);
+        }
+      }
+      if (selected.length < safeLimit) {
+        const seen = new Set(selected.map(c => c.id));
+        for (const city of candidates) {
+          if (selected.length >= safeLimit) break;
+          if (!seen.has(city.id)) { selected.push(city); seen.add(city.id); }
+        }
+      }
+      cities = selected;
+    }
 
     // 获取城市标签
     for (let city of cities) {
@@ -74,6 +100,17 @@ router.get('/hot', async (req, res) => {
         [city.id]
       );
       city.tags = tags;
+      if (type === 'featured') {
+        const photo = await db.get(
+          `SELECT id, image_url, thumbnail_url, alt_text, is_cover
+           FROM city_images WHERE city_id = ? AND status = 'approved'
+           ORDER BY is_cover DESC, weight DESC, likes_count DESC, created_at DESC
+           LIMIT 1`, [city.id]
+        );
+        city.cover_image = photo || null;
+        city.official_facts_summary = getSummary(city.id);
+        city.licensed_photo = photo ? null : getLicensedPhoto(city.id);
+      }
     }
 
     res.json({ cities });
@@ -153,13 +190,21 @@ router.get('/', optionalAuth, async (req, res) => {
           )`;
         }
 
-        // 【新增】租金区间筛选
+        // Rent filter: allow only known ranges; never interpolate client values into SQL.
+        // NULL/0 means unverified and does not belong to any price bucket.
         if (filterObj.rent) {
+          const rentRanges = {
+            '0-500': [0, 500], '0-1000': [0, 1000],
+            '500-1000': [500, 1000], '1000-2000': [1000, 2000],
+            '2000-5000': [2000, 5000]
+          };
           if (filterObj.rent === '5000+') {
-            whereClause += ' AND c.avg_rent >= 5000';
-          } else {
-            const [min, max] = filterObj.rent.split('-').map(Number);
-            whereClause += ` AND c.avg_rent >= ${min} AND c.avg_rent <= ${max}`;
+            whereClause += ' AND c.avg_rent >= ?';
+            params.push(5000);
+          } else if (Object.prototype.hasOwnProperty.call(rentRanges, filterObj.rent)) {
+            const [minimum, maximum] = rentRanges[filterObj.rent];
+            whereClause += ' AND c.avg_rent > 0 AND c.avg_rent >= ? AND c.avg_rent <= ?';
+            params.push(minimum, maximum);
           }
         }
 
