@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05 verified city data is 16 source-linked city regions and 101 2025 facts', () => {
+test('D05/D07 source-linked facts cover 20 city regions and 131 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 16);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 101);
+  assert.equal(dataset.cities.length, 20);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 131);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05 verified city data is 16 source-linked city regions and 101 2025 facts
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 18, 'two explicitly mapped same-city cross-list aliases');
+  assert.equal(ids.size, 22, 'two explicitly mapped same-city cross-list aliases');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
