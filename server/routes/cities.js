@@ -75,7 +75,12 @@ router.get('/hot', async (req, res) => {
       // province, then fill remaining slots when insufficient regions qualify.
       const regionCounts = new Map();
       const selected = [];
+      // Editorial quarantine only: these records have unresolved entity or
+      // rent provenance in issue #147. Keep their IDs and public records intact;
+      // do not imply deletion, administrative correction or a changed score.
+      const editorialHoldIds = new Set([1023, 1087]);
       for (const city of candidates) {
+        if (editorialHoldIds.has(city.id)) continue;
         const key = city.province || city.country || '未知';
         const used = regionCounts.get(key) || 0;
         if (used < 2 && selected.length < safeLimit) {
@@ -87,7 +92,9 @@ router.get('/hot', async (req, res) => {
         const seen = new Set(selected.map(c => c.id));
         for (const city of candidates) {
           if (selected.length >= safeLimit) break;
-          if (!seen.has(city.id)) { selected.push(city); seen.add(city.id); }
+          if (!seen.has(city.id) && !editorialHoldIds.has(city.id)) {
+            selected.push(city); seen.add(city.id);
+          }
         }
       }
       cities = selected;
