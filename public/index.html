@@ -1758,7 +1758,7 @@
                 if (city.tags && city.tags.length > 0) {
                     city.tags.slice(0, 3).forEach(t => tags.push(t.tag_name));
                 } else {
-                    if (city.avg_rent && city.avg_rent < 1000) tags.push('低成本');
+                    // No low-cost claim from unverified historical rent.
                     if (city.air_quality >= 7) tags.push('空气好');
                     if (city.elderly_care >= 7) tags.push('适合养老');
                 }
