@@ -1657,9 +1657,9 @@
         }
         function visibleRent(city) {
             const n = Number(city.avg_rent);
-            return city.avg_rent != null && Number.isFinite(n) && n > 0
-                ? {value: '¥' + n.toLocaleString('zh-CN'), suffix: '/月'}
-                : {value: '租金待核实', suffix: ''};
+            // Historical rent values have no verified unit/sample/period provenance.
+            // Do not advertise them as a reliable citywide monthly price.
+            return {value: '租金待核实', suffix: ''};
         }
 
         // ===== Render Functions =====
@@ -1675,7 +1675,7 @@
                 if (city.tags && city.tags.length > 0) {
                     city.tags.slice(0, 2).forEach(t => tags.push(t.tag_name));
                 } else {
-                    if (city.avg_rent && city.avg_rent < 1000) tags.push('低成本');
+                    // Do not infer 'low cost' from unverified historical rent samples.
                     if (city.air_quality >= 7) tags.push('空气好');
                 }
 
