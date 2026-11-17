@@ -71,6 +71,19 @@ test('licensed photo is isolated to empty Xi’an city ID with full attribution'
   assert.equal(getLicensedPhoto(897), null, 'do not override existing approved photos');
 });
 
+test('Miyun 955 uses a Commons CC BY-SA real-photo fallback without overriding approved images', () => {
+  const photo = getLicensedPhoto(955);
+  assert.ok(photo);
+  assert.match(photo.image_url, /^https:\/\/thumb\.wikimedia\.org\/.*Miyun_Reservoir_2019\.jpg/);
+  assert.equal(photo.author, 'Shizhao');
+  assert.equal(photo.license, 'CC BY-SA 4.0');
+  assert.equal(photo.source_url, 'https://commons.wikimedia.org/wiki/File:Miyun_Reservoir_2019.jpg');
+  assert.equal(photo.license_url, 'https://creativecommons.org/licenses/by-sa/4.0/');
+  assert.equal(photo.changed, false);
+  assert.match(photo.caption, /密云水库/);
+  assert.equal(getLicensedPhoto(897), null, 'do not replace city gallery images');
+});
+
 test('public city API exposes supplementary facts without overwriting legacy columns', () => {
   const server = read('server/routes/cities.js');
   assert.match(server, /official_facts: getOfficialFacts\(city\.id\)/);
