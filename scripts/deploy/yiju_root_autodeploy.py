@@ -275,15 +275,14 @@ def retirement_policy(target=None):
 def approved_stage_paths(work, tracked, inventory):
     old_manifest = STATE / 'deployed-manifest.json'
     managed = set(private_json(old_manifest)) if old_manifest.exists() else set()
-    live_git = {p for p in git('ls-files', '-z').stdout.split('\0') if p}
     entries = inventory['entries']
     for name in tracked:
         safe_relative(name)
         dst = APP / name
-        if name in PROTECTED_DATA or not dst.exists() or name in managed or name in live_git:
+        if name in PROTECTED_DATA or not dst.exists() or name in managed:
             continue
         item = entries.get(name)
-        if not item or item.get('decision') != 'promote-tracked':
+        if not item or item.get('decision') not in ('promote-tracked', 'managed-code'):
             raise Abort('Unreviewed new tracked/untracked collision: ' + name)
         if sha256_file(dst) != item['sha256']:
             raise Abort('Reviewed untracked collision drift: ' + name)

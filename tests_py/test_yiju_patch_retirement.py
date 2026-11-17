@@ -142,6 +142,12 @@ class RetirementTests(unittest.TestCase):
             self.assertFalse(any('apply' in call.args[0] for call in run.call_args_list))
             __import__('shutil').rmtree(stage.parent)
 
+    def test_old_git_index_cannot_bypass_new_collision_review(self):
+        self.write(self.app/'new.js', 'unmanaged local content')
+        with patch.object(M, 'git', return_value=subprocess.CompletedProcess([],0,stdout='new.js\\0')):
+            with self.assertRaises(M.Abort):
+                M.approved_stage_paths(self.stage, {'new.js'}, self.inventory)
+
     def test_legacy_mode_still_checks_pinned_patch(self):
         (self.state/'reconciled-mode.json').unlink()
         self.assertIsNone(M.retirement_policy('d'*40))
