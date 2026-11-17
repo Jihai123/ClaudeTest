@@ -200,19 +200,161 @@ def release_gate(sha):
     return latest.get('status')=='completed' and latest.get('conclusion')=='success'
 
 
+
+# Only these historical import inputs are immutable runtime data.
+PROTECTED_DATA = frozenset((
+    'data/city-competitiveness-ranking.csv',
+    'server/crawlers/data_crawlers/filtered_data/city_data.json',
+))
+LEGACY_PATCH_NAME = 'production-tracked-rebased-e7f1fef.patch'
+LEGACY_PATCH_SHA = '3f77e4c62e79101b7ff586921a0c4aa67294be83c543a66953234e042bf9a0c4'
+
+
+def safe_relative(name):
+    p = Path(name)
+    if not name or p.is_absolute() or '..' in p.parts or str(p) != name:
+        raise Abort('Unsafe reconciliation path')
+    # Reject symlink parents too, before reads, writes or rollback extraction.
+    current = APP
+    for component in p.parts:
+        current = current / component
+        if current.is_symlink():
+            raise Abort('Symlink in reconciliation path: ' + name)
+    return p
+
+
+def private_json(path):
+    st = path.stat()
+    if path.is_symlink() or st.st_uid != os.geteuid() or st.st_mode & 0o077:
+        raise Abort('Reconciliation file must be private and owned by deploy user')
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def retirement_policy(target=None):
+    path = STATE / 'reconciled-mode.json'
+    if not path.exists():
+        return None
+    policy = private_json(path)
+    if policy.get('schema') != 1 or policy.get('review') != 'APPROVED':
+        raise Abort('Reconciliation has not passed separate review')
+    if policy.get('legacy_patch_sha256') != LEGACY_PATCH_SHA:
+        raise Abort('Reviewed legacy patch identity changed')
+    inventory_path = STATE / 'reconciliation-inventory.json'
+    if sha256_file(inventory_path) != policy.get('inventory_sha256'):
+        raise Abort('Reviewed production inventory changed')
+    inventory = private_json(inventory_path)
+    if set(inventory.get('protected_data', {})) != PROTECTED_DATA:
+        raise Abort('Both historical data files must be protected')
+    for name, digest in inventory['protected_data'].items():
+        safe_relative(name)
+        if sha256_file(APP / name) != digest:
+            raise Abort('Protected production data changed: ' + name)
+    if target is not None:
+        pr = api_json('https://api.github.com/repos/' + REPO + '/pulls/155')
+        merged = pr.get('merge_commit_sha')
+        if (not pr.get('merged') or pr.get('base', {}).get('ref') != BRANCH
+                or merged != policy.get('merge_sha')):
+            raise Abort('PR155 merge identity not confirmed')
+        if git('merge-base', '--is-ancestor', merged, target, check=False).returncode:
+            raise Abort('Target is not descended from reviewed PR155 merge')
+        # Keep an independent exact-SHA push gate even for direct run_deploy calls.
+        if not release_gate(target):
+            raise Abort('Reconciled target lacks exact-SHA push CI')
+        marker = STATE / 'reconciliation-state.json'
+        if marker.exists():
+            if private_json(marker).get('inventory_sha256') != policy['inventory_sha256']:
+                raise Abort('Deployed reconciliation identity changed')
+        else:
+            for name, item in inventory['entries'].items():
+                safe_relative(name)
+                if sha256_file(APP / name) != item['sha256']:
+                    raise Abort('Reviewed baseline drift: ' + name)
+    return policy, inventory
+
+
+def approved_stage_paths(work, tracked, inventory):
+    old_manifest = STATE / 'deployed-manifest.json'
+    managed = set(private_json(old_manifest)) if old_manifest.exists() else set()
+    entries = inventory['entries']
+    for name in tracked:
+        safe_relative(name)
+        dst = APP / name
+        if name in PROTECTED_DATA or not dst.exists() or name in managed:
+            continue
+        item = entries.get(name)
+        if not item or item.get('decision') not in ('promote-tracked', 'managed-code'):
+            raise Abort('Unreviewed new tracked/untracked collision: ' + name)
+        if sha256_file(dst) != item['sha256']:
+            raise Abort('Reviewed untracked collision drift: ' + name)
+    # Assets remaining outside the release must not be overwritten.
+    return {name: sha256_file(APP / name) for name, item in entries.items()
+            if item['decision'] == 'preserve-untracked'}
+
+
+def verify_preserved(expected):
+    for name, digest in expected.items():
+        safe_relative(name)
+        if sha256_file(APP / name) != digest:
+            raise Abort('Preserved production asset changed: ' + name)
+
+
+def snapshot_release_metadata(directory):
+    for name in ('deployed-manifest.json', 'reconciliation-state.json', 'status.json'):
+        src = STATE / name
+        if src.exists():
+            shutil.copy2(src, directory / name)
+    # Archive actual runner and mode identity with rollback, never publish them.
+    shutil.copy2(Path(__file__), directory / 'runner-before.py')
+    for name in ('reconciled-mode.json', 'reconciliation-inventory.json'):
+        if (STATE / name).exists():
+            shutil.copy2(STATE / name, directory / name)
+
+
+def restore_release_metadata(directory):
+    for name in ('deployed-manifest.json', 'reconciliation-state.json'):
+        snapshot = directory / name
+        if snapshot.exists():
+            shutil.copy2(snapshot, STATE / name)
+        elif (STATE / name).exists():
+            (STATE / name).unlink()
+
+
+def save_reconciliation_state(target):
+    policy = retirement_policy()
+    if policy:
+        tmp = STATE / 'reconciliation-state.tmp'
+        tmp.write_text(json.dumps({'sha': target,
+                                  'inventory_sha256': policy[0]['inventory_sha256']}))
+        tmp.chmod(0o600)
+        os.replace(tmp, STATE / 'reconciliation-state.json')
+
+
 def stage_release(sha):
     # Git 2.17-compatible separate worktree; live checkout stays dirty and untouched.
     work=Path(tempfile.mkdtemp(prefix='staging-',dir=STATE))/'src'
     git('worktree','add','--detach',str(work),sha)
-    patch=RESCUE/'production-tracked.patch'
-    if patch.stat().st_size:
-        p=run(['git','apply','--3way','--index',str(patch)],cwd=work,check=False)
-        if p.returncode:raise Abort('Local 13-file patch conflicted with upstream; production untouched')
-    # Detect newly tracked file paths colliding with the archived untracked files.
-    tracked={x for x in git('ls-files','-z',cwd=work).stdout.split('\0') if x}
-    with tarfile.open(RESCUE/'untracked-files.tar.gz','r:gz') as arc:
-        members={m.name.lstrip('./') for m in arc.getmembers() if m.isfile()}
-        if tracked.intersection(members):raise Abort('New Git files collide with existing untracked assets')
+    try:
+        retirement = retirement_policy(sha)
+        tracked = {x for x in git('ls-files', '-z', cwd=work).stdout.split('\0') if x}
+        if retirement:
+            approved_stage_paths(work, tracked, retirement[1])
+            print('RECONCILED_NO_LEGACY_PATCH', sha, flush=True)
+        else:
+            patch = STATE / LEGACY_PATCH_NAME
+            if sha256_file(patch) != LEGACY_PATCH_SHA:
+                raise Abort('Compatible patch checksum mismatch')
+            if patch.stat().st_size:
+                p = run(['git', 'apply', '--3way', '--index', str(patch)], cwd=work, check=False)
+                if p.returncode:
+                    raise Abort('Local 13-file patch conflicted with upstream; production untouched')
+            with tarfile.open(RESCUE/'untracked-files.tar.gz', 'r:gz') as arc:
+                members = {m.name.lstrip('./') for m in arc.getmembers() if m.isfile()}
+            if tracked.intersection(members):
+                raise Abort('New Git files collide with existing untracked assets')
+    except Exception:
+        git('worktree', 'remove', '--force', str(work), check=False)
+        shutil.rmtree(work.parent, ignore_errors=True)
+        raise
     return work,tracked
 
 
@@ -256,6 +398,8 @@ def backup_code(directory,tracked):
     missing=[]
     with tarfile.open(directory/'tracked-old.tar.gz','w:gz') as arc:
         for name in sorted(tracked):
+            if name in PROTECTED_DATA: continue
+            safe_relative(name)
             path=APP/name
             if path.is_symlink():raise Abort('Live tracked file symlink; manual review required: '+name)
             if path.is_file():arc.add(path,arcname=name,recursive=False)
@@ -288,6 +432,8 @@ def normalize_tracked_public_permissions(name):
 
 def copy_code(stage,tracked):
     for name in sorted(tracked):
+        safe_relative(name)
+        if name in PROTECTED_DATA: continue
         src=stage/name;dst=APP/name
         if src.is_symlink():raise Abort('Git-managed symlink requires review: '+name)
         if not src.is_file():raise Abort('Missing staged Git file: '+name)
@@ -311,11 +457,19 @@ def repair_deployed_public_permissions():
 
 def restore_code(directory,tracked):
     for name in json.loads((directory/'missing-before.json').read_text()):
+        safe_relative(name)
+        if name in PROTECTED_DATA: continue
         path=APP/name
         if path.is_file():path.unlink()
     with tarfile.open(directory/'tracked-old.tar.gz','r:gz') as arc:
-        if sys.version_info >= (3,12): arc.extractall(APP,filter='data')
-        else: arc.extractall(APP)
+        members = []
+        for member in arc.getmembers():
+            safe_relative(member.name)
+            if member.name in PROTECTED_DATA: continue
+            if not member.isfile(): raise Abort('Unsafe rollback archive member')
+            members.append(member)
+        if sys.version_info >= (3,12): arc.extractall(APP,members=members,filter='data')
+        else: arc.extractall(APP,members=members)
 
 
 def sitemap_urls(payload):
@@ -448,6 +602,7 @@ def save_local_manifest(tracked):
 def run_deploy(target, old, checks_done):
     if not checks_done: checks()
     verify_local_drift()
+    retirement_policy(target)
     ensure_free_space()
     stage = None
     try:
@@ -457,6 +612,23 @@ def run_deploy(target, old, checks_done):
         backup.mkdir(mode=0o700)
         backup_db(backup)
         backup_code(backup, tracked)
+        snapshot_release_metadata(backup)
+        policy = retirement_policy(target)
+        if policy:
+            marker = STATE / 'reconciliation-state.json'
+            old = (private_json(marker)['sha'] if marker.exists()
+                   else policy[1].get('previous_deployed_sha', ''))
+            if len(old) != 40 or any(c not in '0123456789abcdef' for c in old):
+                raise Abort('Previous deployed SHA provenance missing')
+        preserved = approved_stage_paths(stage, tracked, policy[1]) if policy else {}
+        preserved.update({name: sha256_file(APP / name) for name in PROTECTED_DATA})
+        # Private data backups are evidence/recovery material, never auto-restored.
+        for name in PROTECTED_DATA:
+            dest = backup / 'protected-data' / name
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(APP / name, dest)
+        (backup / 'preserved-sha256.json').write_text(json.dumps(preserved))
+        verify_preserved(preserved)
         # Keep the old modules and files recoverable, and prepare new ones before downtime.
         next_modules = APP / '.yiju-modules-next'
         if next_modules.exists(): raise Abort('Pending modules directory already exists')
@@ -466,6 +638,10 @@ def run_deploy(target, old, checks_done):
         modules_old = backup / 'node_modules'
         changed = False
         try:
+            # Compare again after staging/tests/backups, immediately before mutation.
+            verify_local_drift()
+            if policy: retirement_policy(target)
+            verify_preserved(preserved)
             run(['pm2', 'stop', SERVICE], timeout=50)
             changed = True
             if (APP / 'node_modules').is_dir():
@@ -486,7 +662,9 @@ def run_deploy(target, old, checks_done):
                 except Exception as exc:
                     failure = exc
             if failure is not None: raise failure
+            verify_preserved(preserved)
             save_local_manifest(tracked)
+            save_reconciliation_state(target)
             write_state({'status':'DEPLOYED', 'sha':target, 'previous':old,
                          'backup':str(backup), 'sitemap_urls':smoke['sitemapUrls'], 'cdn':smoke})
         except Exception as exc:
@@ -494,14 +672,17 @@ def run_deploy(target, old, checks_done):
                 try:
                     run(['pm2', 'stop', SERVICE], timeout=40, check=False)
                     restore_code(backup, tracked)
+                    restore_release_metadata(backup)
                     if (APP / 'node_modules').is_dir(): shutil.rmtree(APP / 'node_modules')
                     if modules_old.is_dir(): shutil.move(str(modules_old), str(APP / 'node_modules'))
                     run(['pm2', 'restart', SERVICE, '--interpreter', old_pm, '--update-env'], timeout=70)
+                    verify_preserved(preserved)
                 except Exception as rollback_exc:
                     write_state({'status':'FAILED_ROLLBACK', 'sha':target,
                                  'error':str(exc), 'rollback_error':str(rollback_exc)})
                     raise
-            write_state({'status':'ROLLED_BACK', 'sha':target, 'error':str(exc)})
+            write_state({'status':'ROLLED_BACK', 'sha':target, 'previous':old,
+                         'backup':str(backup), 'error':str(exc)})
             raise
         finally:
             if next_modules.exists(): shutil.rmtree(next_modules, ignore_errors=True)
@@ -524,6 +705,7 @@ def one_cycle():
     if latest.get('status')=='DEPLOYED' and latest.get('sha')==target:
         # Old fixed runners copied worktree mode 0600. Repair with the
         # verified deployed manifest instead of redeploying or clearing state.
+        retirement_policy(target)
         repair_deployed_public_permissions()
         print('UP_TO_DATE',target[:12], 'PUBLIC_MODES_VERIFIED');return
     if latest.get('status') in ('ROLLED_BACK','FAILED_ROLLBACK','BLOCKED_SHA') and latest.get('sha')==target:

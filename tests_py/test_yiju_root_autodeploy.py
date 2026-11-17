@@ -40,6 +40,7 @@ class ReleaseTests(unittest.TestCase):
             (app/'a.txt').write_text('a\nlocal customer edit\n')
             patchbytes=subprocess.check_output(['git','diff','--binary','HEAD'],cwd=app)
             (rescue/'production-tracked.patch').write_bytes(patchbytes)
+            (state/M.LEGACY_PATCH_NAME).write_bytes(patchbytes)
             with tarfile.open(rescue/'untracked-files.tar.gz','w:gz'):pass
             (app/'b.txt').write_text('new upstream code\n')
             git('add','b.txt',cwd=app);git('commit','-qm','upstream',cwd=app)
@@ -47,7 +48,7 @@ class ReleaseTests(unittest.TestCase):
             old_git=M.git
             def localgit(*args,cwd=app,check=True):
                 return M.run(['git','-c','core.hooksPath=/dev/null',*args],cwd=cwd,check=check)
-            with patch.object(M,'git',side_effect=localgit),patch.object(M,'RESCUE',rescue),patch.object(M,'STATE',state):
+            with patch.object(M,'git',side_effect=localgit),patch.object(M,'RESCUE',rescue),patch.object(M,'STATE',state),patch.object(M,'LEGACY_PATCH_SHA',__import__('hashlib').sha256(patchbytes).hexdigest()):
                 path,files=M.stage_release(sha)
                 self.assertEqual((path/'a.txt').read_text(),'a\nlocal customer edit\n')
                 self.assertEqual((path/'b.txt').read_text(),'new upstream code\n')
