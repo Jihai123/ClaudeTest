@@ -120,7 +120,7 @@ test('D10 Xiangyang health, eldercare and city-center air readings have transpar
  const c=getOfficialFacts(1074);
  assert.equal(c.source_level,'official_bulletin_reprint');
  assert.equal(c.facts.length,16);
- assert.match(c.source_note,/原件DOCX未完整取得/);
+ assert.match(dataset.cities.find(x=>x.id===1074).source_note,/原件DOCX未完整取得/);
  assert.ok(c.sources.some(x=>x.url==='https://tjgb.hongheiku.com/xjtjgb/xj2020/74464.html'));
  assert.ok(c.sources.some(x=>x.url.includes('tjj.hubei.gov.cn')));
  const rows=Object.fromEntries(c.facts.map(f=>[f.key,f]));
