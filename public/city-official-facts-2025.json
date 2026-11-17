@@ -1565,6 +1565,12 @@
           "title": "湖北省统计局2025年襄阳市统计公报原文（DOCX）",
           "date": "2026-05-04",
           "url": "https://tjj.hubei.gov.cn/tjsj/tjgb/ndtjgb/sztjgb/202606/P020260629418775557072.docx"
+        },
+        {
+          "key": "xiangyang_bulletin_fulltext_reprint",
+          "title": "襄阳市2025年国民经济和社会发展统计公报（红黑统计公报库全文转载）",
+          "date": "2026-06-22",
+          "url": "https://tjgb.hongheiku.com/xjtjgb/xj2020/74464.html"
         }
       ],
       "facts": [
@@ -1648,12 +1654,75 @@
           "category": "交通",
           "source": "xiangyang_reprint",
           "note": "机场全年吞吐人次，不代表具体航班可达性"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "卫生机构",
+          "value": 4405,
+          "unit": "个",
+          "category": "医疗",
+          "source": "xiangyang_bulletin_fulltext_reprint",
+          "note": "2025年全市卫生机构总数，包括医院及基层医疗机构；不等于医院数量或医疗评分"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 139,
+          "unit": "个",
+          "category": "医疗",
+          "source": "xiangyang_bulletin_fulltext_reprint",
+          "note": "包含在4405个卫生机构之内，不能重复相加"
+        },
+        {
+          "key": "healthcare_beds_2025_ten_thousand",
+          "label": "卫生机构床位",
+          "value": 4.49,
+          "unit": "万张",
+          "category": "医疗",
+          "source": "xiangyang_bulletin_fulltext_reprint",
+          "note": "全市年末卫生机构床位总量，非实时可住/可诊疗床位"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 216,
+          "unit": "家",
+          "category": "养老",
+          "source": "xiangyang_bulletin_fulltext_reprint",
+          "note": "年末全市养老机构总量，不能推断床位是否空余"
+        },
+        {
+          "key": "eldercare_beds_2025_ten_thousand",
+          "label": "养老服务机构床位",
+          "value": 5.01,
+          "unit": "万张",
+          "category": "养老",
+          "source": "xiangyang_bulletin_fulltext_reprint",
+          "note": "全市各类养老服务机构床位，不等于当前可申请床位"
+        },
+        {
+          "key": "air_quality_good_days_2025_count",
+          "label": "市区空气质量优良天数",
+          "value": 290,
+          "unit": "天",
+          "category": "环境",
+          "source": "xiangyang_bulletin_fulltext_reprint",
+          "note": "襄阳市市区统计口径，2025年全年，不能推断某小区实时空气质量"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "市区PM2.5年均浓度",
+          "value": 41.3,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "xiangyang_bulletin_fulltext_reprint",
+          "note": "2025年市区年均值，不是全年每天数值也不是当前实测"
         }
       ],
       "city_ids": [
         1074
       ],
-      "source_note": "省统计局原公报以DOCX公开，网页阅读使用统计公报公开整理版本并附原文入口；年度居民调查与迁居实测预算必须区分。"
+      "source_note": "省统计局原公报以DOCX公开，网页阅读使用统计公报公开整理版本并附原文入口；年度居民调查与迁居实测预算必须区分。 新增医疗、养老和市区空气质量七项仅核自公开的统计公报全文转载，并链接湖北省统计局DOCX原件入口；原件DOCX未完整取得，不冒充已实读政府原件。"
     },
     {
       "id": 955,
