@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H41YCVV2ZX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H41YCVV2ZX');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能推荐 - 宜居城市指南</title>
@@ -400,8 +409,8 @@
         // Get API base
         const API_BASE = (() => {
             const path = window.location.pathname;
-            if (path.includes('/yiju')) return window.location.origin + '/yiju';
-            if (path.includes('/livablecities')) return window.location.origin + '/livablecities';
+            if (/^\/yiju(?:\/|$)/.test(path)) return window.location.origin + '/yiju';
+            if (/^\/livablecities(?:\/|$)/.test(path)) return window.location.origin + '/livablecities';
             return window.location.origin;
         })();
 

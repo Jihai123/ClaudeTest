@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H41YCVV2ZX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H41YCVV2ZX');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>宜居城市指南 - 找到你的理想城市</title>
@@ -1468,8 +1477,8 @@
         // ===== Configuration =====
         const API_BASE = (() => {
             const path = window.location.pathname;
-            if (path.includes('/yiju')) return window.location.origin + '/yiju';
-            if (path.includes('/livablecities')) return window.location.origin + '/livablecities';
+            if (/^\/yiju(?:\/|$)/.test(path)) return window.location.origin + '/yiju';
+            if (/^\/livablecities(?:\/|$)/.test(path)) return window.location.origin + '/livablecities';
             return window.location.origin;
         })();
 
@@ -1505,45 +1514,21 @@
         }
 
         // ===== City Image Helper =====
-        function getCityImageUrl(city, imageIndex = 1) {
-            // 如果有封面图片且是第一次尝试，使用封面图片
-            if (imageIndex === 1 && city.cover_image && city.cover_image.image_url) {
-                return city.cover_image.image_url;
-            }
-            // CC-licensed photography is not mixed with user-uploaded covers.
-            if (imageIndex === 1 && city.licensed_photo && city.licensed_photo.image_url) {
-                return city.licensed_photo.image_url;
-            }
-            // 否则尝试按索引获取图片
-            return `${R2_IMAGE_BASE}/${city.id}/${city.id}_${imageIndex}.jpeg`;
+        function getCityImageUrl(city) {
+            if (city.cover_image && city.cover_image.image_url) return city.cover_image.image_url;
+            if (city.licensed_photo && city.licensed_photo.image_url) return city.licensed_photo.image_url;
+            return city.image_url || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
         }
 
-        // 图片加载失败时的重试机制
-        function setupImageFallback(img, cityId, currentIndex = 1) {
-            const maxRetries = 5; // 最多尝试5张图片
-
+        // Retain the existing card placeholder; never guess R2 filenames.
+        function setupImageFallback(img) {
             img.addEventListener('error', function() {
-                const nextIndex = currentIndex + 1;
-                if (nextIndex <= maxRetries) {
-                    // 尝试下一张图片
-                    const newUrl = `${R2_IMAGE_BASE}/${cityId}/${cityId}_${nextIndex}.jpeg`;
-                    console.log(`图片加载失败，尝试备用图片: ${newUrl}`);
-                    this.src = newUrl;
-                    // 更新当前索引，以便下次重试
-                    this.dataset.imageIndex = nextIndex;
-                } else {
-                    // 所有图片都失败，隐藏显示占位符
-                    console.log(`城市 ${cityId} 所有图片加载失败，显示占位符`);
-                    this.style.display = 'none';
-                }
-            });
-
-            img.addEventListener('load', function() {
-                this.style.opacity = '1';
-            });
-
-            // 记录当前图片索引
-            img.dataset.imageIndex = currentIndex;
+                this.style.display = 'none';
+                const credit = this.closest('.city-card')?.querySelector('.city-card-photo-credit');
+                if (credit) credit.style.display = 'none';
+            }, { once: true });
+            img.addEventListener('load', function() { this.style.opacity = '1'; });
+            if (img.complete && img.naturalWidth === 0) img.dispatchEvent(new Event('error'));
         }
 
         function getGradientStyle(index) {
@@ -1724,7 +1709,7 @@
                 const img = card.querySelector('img');
                 const cityId = card.dataset.cityId;
                 if (img && cityId) {
-                    setupImageFallback(img, cityId, 1);
+                    setupImageFallback(img);
                 }
 
                 // 绑定复选框事件
@@ -1831,7 +1816,7 @@
                 // 处理图片加载失败 - 使用备用图片机制
                 const img = card.querySelector('img');
                 if (img) {
-                    setupImageFallback(img, city.id, 1);
+                    setupImageFallback(img);
                 }
 
                 // 绑定复选框事件

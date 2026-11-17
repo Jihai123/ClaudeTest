@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H41YCVV2ZX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H41YCVV2ZX');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>城市对比 - 宜居城市指南</title>
@@ -363,7 +372,7 @@
             baseURL: window.API_BASE_URL || (() => {
                 const pathname = window.location.pathname;
                 const href = window.location.href;
-                if (pathname.includes('/livablecities') || href.includes('/livablecities')) {
+                if (/^\/livablecities(?:\/|$)/.test(pathname)) {
                     return window.location.origin + '/livablecities';
                 }
                 return window.location.origin;
