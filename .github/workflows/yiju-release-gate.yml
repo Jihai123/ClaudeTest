@@ -37,7 +37,7 @@ jobs:
       - name: City data and admin regressions
         run: npm run test:city-data
       - name: Verified living checklist page and SEO regression
-        run: node --test tests_js/yiju-d03-living-checklist.test.js tests_js/yiju-d04-atlas.test.js
+        run: node --test tests_js/yiju-d03-living-checklist.test.js tests_js/yiju-d04-atlas.test.js tests_js/yiju-d10-return-visit-checklist.test.js
       - name: D05 sourced detail facts, photo license and field-review regressions
         run: node --test tests_js/yiju-d05-official-city-detail.test.js
       - name: D06 first-visit practical browsing and honest city fields
