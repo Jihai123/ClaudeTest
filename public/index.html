@@ -1662,6 +1662,16 @@
             return {value: '租金待核实', suffix: ''};
         }
 
+        // Historical tag labels are not evidence of citywide rent levels.
+        // Until a rent source/period/sample is verified, suppress price claims.
+        function visibleCityTags(city, maxCount) {
+            return (Array.isArray(city.tags) ? city.tags : [])
+                .filter(tag => tag && tag.tag_key !== 'low_rent' &&
+                    !/(低房租|超低房租|低租金|低成本)/.test(String(tag.tag_name || '')))
+                .slice(0, maxCount)
+                .map(tag => tag.tag_name);
+        }
+
         // ===== Render Functions =====
         function renderFeaturedCities() {
             const track = document.getElementById('carouselTrack');
@@ -1671,13 +1681,8 @@
                 const imageUrl = getCityImageUrl(city);
                 const gradient = getGradientStyle(index);
 
-                const tags = [];
-                if (city.tags && city.tags.length > 0) {
-                    city.tags.slice(0, 2).forEach(t => tags.push(t.tag_name));
-                } else {
-                    // Do not infer 'low cost' from unverified historical rent samples.
-                    if (city.air_quality >= 7) tags.push('空气好');
-                }
+                const tags = visibleCityTags(city, 2);
+                if (!tags.length && city.air_quality >= 7) tags.push('空气好');
 
                 return `
                     <div class="featured-card" data-city-id="${city.id}">
@@ -1754,11 +1759,8 @@
                 const imageUrl = getCityImageUrl(city);
                 const gradient = getGradientStyle(index);
 
-                const tags = [];
-                if (city.tags && city.tags.length > 0) {
-                    city.tags.slice(0, 3).forEach(t => tags.push(t.tag_name));
-                } else {
-                    // No low-cost claim from unverified historical rent.
+                const tags = visibleCityTags(city, 3);
+                if (!tags.length) {
                     if (city.air_quality >= 7) tags.push('空气好');
                     if (city.elderly_care >= 7) tags.push('适合养老');
                 }
