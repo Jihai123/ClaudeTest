@@ -107,7 +107,7 @@ router.get('/hot', async (req, res) => {
         [city.id]
       );
       city.tags = tags;
-      if (type === 'featured') {
+      {
         const photo = await db.get(
           `SELECT id, image_url, thumbnail_url, alt_text, is_cover
            FROM city_images WHERE city_id = ? AND status = 'approved'
@@ -433,8 +433,9 @@ router.get('/', optionalAuth, async (req, res) => {
 
       // 获取城市封面图片
       const coverImage = await db.get(
-        `SELECT id, image_url, thumbnail_url, alt_text FROM city_images
-         WHERE city_id = ? AND is_cover = 1 AND status = 'approved'
+        `SELECT id, image_url, thumbnail_url, alt_text, is_cover FROM city_images
+         WHERE city_id = ? AND status = 'approved'
+         ORDER BY is_cover DESC, weight DESC, likes_count DESC, created_at DESC
          LIMIT 1`,
         [city.id]
       );

@@ -57,7 +57,8 @@ def load_config():
 # 加载配置
 CONFIG = load_config()
 DEFAULT_ENGINE = CONFIG['engine']
-DEFAULT_DRIVER = 'chrome_headless'  # 使用无头浏览器获取原图，api模式只能获取缩略图
+# Production API default; --driver still overrides configuration.
+DEFAULT_DRIVER = CONFIG.get('driver', 'api')
 DEFAULT_MAX_NUMBER = CONFIG['max_number']
 DEFAULT_DELAY = CONFIG['delay']
 DEFAULT_CONDA_ENV = CONFIG['conda_env']
