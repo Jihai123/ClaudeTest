@@ -102,7 +102,7 @@ test('D10 Miyun district 955 has 17 sourced facts with transparent reprint prove
   assert.deepEqual(c.city_ids, [955]);
   assert.equal(c.facts.length, 17);
   assert.equal(c.source_level, 'official_bulletin_reprint');
-  assert.ok(c.source_note.includes('原始DOC未完整下载复核'));
+  assert.ok(dataset.cities.find(x => x.id === 955).source_note.includes('原始DOC未完整下载复核'));
   const byKey = Object.fromEntries(c.facts.map(f => [f.key, f.value]));
   assert.equal(byKey.resident_population_2025_ten_thousand, 52.2);
   assert.equal(byKey.urban_disposable_income_2025_cny, 63624);
