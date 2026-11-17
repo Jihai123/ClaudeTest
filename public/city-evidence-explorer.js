@@ -3,6 +3,49 @@
   'use strict';
   const root = document.getElementById('evidenceExplorer');
   if (!root) return;
+  // D10: rotate the already loaded featured city cards without inventing new rankings.
+  // Keep unverified editorial holds out of the visitor-facing carousel even when
+  // the production /hot endpoint is temporarily behind the release gate.
+  const featuredTrack = document.getElementById('carouselTrack');
+  const featuredNav = document.querySelector('.featured-section .carousel-nav');
+  if (featuredTrack && featuredNav && !document.getElementById('rotateFeaturedCities')) {
+    const heldIds = new Set(['1023', '1087']);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id = 'rotateFeaturedCities';
+    button.className = 'carousel-btn';
+    button.textContent = '换一批城市';
+    button.setAttribute('aria-label', '换一批精选城市');
+    button.style.cssText = 'width:auto;min-width:92px;padding:0 12px;white-space:nowrap';
+    featuredNav.appendChild(button);
+    let page = 0;
+    let cards = [];
+    const apply = () => {
+      observer.disconnect();
+      for (const card of featuredTrack.querySelectorAll('.featured-card')) {
+        if (heldIds.has(card.dataset.cityId)) card.remove();
+      }
+      cards = [...featuredTrack.querySelectorAll('.featured-card')];
+      page = 0;
+      button.disabled = cards.length <= 3;
+      button.title = cards.length <= 3 ? '当前可用精选城市不足一批' : '轮换现有已展示的精选城市';
+      observer.observe(featuredTrack, { childList: true });
+    };
+    const observer = new MutationObserver(apply);
+    observer.observe(featuredTrack, { childList: true });
+    if (featuredTrack.children.length) apply();
+    button.addEventListener('click', () => {
+      if (cards.length <= 3) return;
+      page = (page + 1) % Math.ceil(cards.length / 3);
+      const start = page * 3;
+      const ordered = cards.slice(start).concat(cards.slice(0, start));
+      observer.disconnect();
+      for (const card of ordered) featuredTrack.appendChild(card);
+      featuredTrack.scrollLeft = 0;
+      observer.observe(featuredTrack, { childList: true });
+      button.setAttribute('aria-label', '换一批精选城市，当前第' + (page + 1) + '批');
+    });
+  }
   // Prominent first-screen link; no edits to the legacy production index file.
   const hero = document.querySelector('.hero-container');
   if (hero && !hero.querySelector('.hero-city-guide')) {
