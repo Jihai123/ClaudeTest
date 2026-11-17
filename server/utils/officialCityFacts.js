@@ -26,6 +26,18 @@ const licensedPhotos = new Map([
     license: 'CC BY-SA 4.0',
     caption: '西安城墙（2026年3月23日）',
     changed: false
+  })],
+  // Wikimedia Commons "Miyun Reservoir 2019.jpg" by Shizhao, 2019-05-29.
+  // CC BY-SA 4.0, verified on the public file page; source & attribution required.
+  // Shown only when no administrator-approved city image exists.
+  [955, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Miyun_Reservoir_2019.jpg/960px-Miyun_Reservoir_2019.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:Miyun_Reservoir_2019.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Shizhao',
+    license: 'CC BY-SA 4.0',
+    caption: '密云水库（2019年5月29日）',
+    changed: false
   })]
 ]);
 
