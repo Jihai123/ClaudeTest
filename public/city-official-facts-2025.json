@@ -1,7 +1,7 @@
 {
   "schema_version": "yiju.city_official_facts.v2",
   "statistical_year": 2025,
-  "updated_at": "2026-11-14",
+  "updated_at": "2026-11-17",
   "policy": "本资料为独立来源事实集，按站内城市ID精确绑定；不覆盖原城市数据库、评分、排行、房租、房价及图片审核。不同统计口径不直接横向比较。",
   "cities": [
     {
@@ -1654,6 +1654,188 @@
         1074
       ],
       "source_note": "省统计局原公报以DOCX公开，网页阅读使用统计公报公开整理版本并附原文入口；年度居民调查与迁居实测预算必须区分。"
+    },
+    {
+      "id": 955,
+      "name": "密云区",
+      "province": "北京",
+      "list_type": "china_layflat",
+      "focus": "核对2025年密云区的居民收入、养老床位、交通与医疗供给；区级口径不等于北京市均值",
+      "tip": "看水库周边与密云城区时，应分开核实房源位置、公共交通班次、就医时间、租金样本与冬季取暖费用。区统计公报数据不证明某套房源的实际居住成本。",
+      "source_level": "official_bulletin_reprint",
+      "sources": [
+        {
+          "key": "miyun_bulletin_2025_reprint",
+          "title": "密云区统计局2025年国民经济和社会发展统计公报公开转载全文（已实读）",
+          "date": "2026-04-19",
+          "url": "https://tjgb.hongheiku.com/xjtjgb/xj2020/68947.html"
+        },
+        {
+          "key": "miyun_official_landing",
+          "title": "北京市密云区人民政府2025年统计公报入口（含原始DOC；原件正文未核验）",
+          "date": "2026-04-17",
+          "url": "https://www.bjmy.gov.cn/zwgk/tj/tjgb/202604/t20260417_538556.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 475,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "2025年全区初步核算，非北京市总量"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 52.2,
+          "unit": "万人",
+          "category": "人口",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "密云区行政区域常住人口；不是户籍人口"
+        },
+        {
+          "key": "registered_population_2025_ten_thousand",
+          "label": "年末户籍人口",
+          "value": 43.7,
+          "unit": "万人",
+          "category": "人口",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "户籍统计口径，不能与常住人口混同"
+        },
+        {
+          "key": "urban_population_2025_ten_thousand",
+          "label": "城镇常住人口",
+          "value": 35.2,
+          "unit": "万人",
+          "category": "人口",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "常住人口城乡分组；不是城区租房人口"
+        },
+        {
+          "key": "age_65_plus_population_2025_ten_thousand",
+          "label": "65岁及以上常住人口",
+          "value": 9.4,
+          "unit": "万人",
+          "category": "养老",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "年龄分组的全区常住人口，不代表机构床位供给"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全区居民人均可支配收入",
+          "value": 51671,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "年度居民人均调查口径，非搬入者工资"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 63624,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "城镇常住居民年度人均，不能作个人就业收入预测"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 38398,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "农村常住居民年度人均，与城镇口径有别"
+        },
+        {
+          "key": "all_resident_consumption_2025_cny",
+          "label": "全区居民人均消费支出",
+          "value": 30477,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "调查年度居民人均，不是旅居月预算"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均消费支出",
+          "value": 37223,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "城镇家庭年度居民抽样支出，不含对个体租金判断"
+        },
+        {
+          "key": "rural_consumption_2025_cny",
+          "label": "农村居民人均消费支出",
+          "value": 22987,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "农村年度居民人均，不代表实际租房花费"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "年末卫生机构数",
+          "value": 570,
+          "unit": "个",
+          "category": "医疗",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "全区卫生机构合计，不是医院数，也不是易居医疗评分"
+        },
+        {
+          "key": "hospital_beds_per_1000_2025_count",
+          "label": "每千常住人口医院床位",
+          "value": 4.16,
+          "unit": "张/千人",
+          "category": "医疗",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "医院床位密度，不代表单家医院服务可及性"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "年末养老服务机构",
+          "value": 140,
+          "unit": "个",
+          "category": "养老",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "全区养老服务机构总数，供需与服务质量另需实地核实"
+        },
+        {
+          "key": "eldercare_beds_2025_count",
+          "label": "养老服务机构床位",
+          "value": 6627,
+          "unit": "张",
+          "category": "养老",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "机构汇总床位数，不代表实时空余床位"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "PM2.5年均浓度",
+          "value": 23,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "全区年度统计，不能推断单个小区即时空气质量"
+        },
+        {
+          "key": "bus_routes_2025_count",
+          "label": "年末客运线路",
+          "value": 95,
+          "unit": "条",
+          "category": "交通",
+          "source": "miyun_bulletin_2025_reprint",
+          "note": "全区客运线路总数，具体到站、班次须核查"
+        }
+      ],
+      "city_ids": [
+        955
+      ],
+      "source_note": "数值逐项核自公报公开转载全文，密云区政府官网原件落地页已发现，但原始DOC未完整下载复核；故保留official_bulletin_reprint层级，不把转载冒充政府原件已实读。统计为密云区全区2025年度口径，不改现有SQLite租金、排名、评分和图片。"
     }
   ]
 }
