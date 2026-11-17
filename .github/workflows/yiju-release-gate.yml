@@ -44,6 +44,12 @@ jobs:
         run: node --test tests_js/yiju-d07-new-city-data.test.js
       - name: D08 editorial provenance and rent claims guard
         run: node --test tests_js/yiju-d08-featured-trust.test.js
+      - name: D10 featured rotation and visible rent-tag trust regressions
+        run: node --test tests_js/yiju-d10-featured-rotation.test.js tests_js/yiju-d10-trust-tags.test.js
+      - name: Read-only external production API snapshot (diagnostic, never a release approval)
+        if: ${{ matrix['node-version'] == '22' }}
+        continue-on-error: true
+        run: node scripts/ops/yiju_public_api_probe.mjs
       - name: Full city quality audit read-only regression (synthetic, no production fetch)
         run: node --test tests_js/yiju-city-quality-audit.test.js
       - name: Real isolated SQLite regression
