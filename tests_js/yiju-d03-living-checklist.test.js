@@ -13,7 +13,10 @@ test('living checklist is indexable, sourced and privacy-preserving',()=>{
  assert.match(html,/zhangye-city-facts-2025\.html/);
  for(const id of ['1238','897','951']) assert.match(html,new RegExp('city-detail\\.html\\?id='+id));
  assert.equal((html.match(/<input type="checkbox"/g)||[]).length,6);
- assert.doesNotMatch(html,/<form|localStorage|sessionStorage|sendBeacon|XMLHttpRequest|fetch\s*\(/i);
+ assert.doesNotMatch(html,/<form|sessionStorage|sendBeacon|XMLHttpRequest|fetch\s*\(/i);
+ assert.match(html,/localStorage\.setItem\(key\(\)/);
+ assert.match(html,/2026年跨城居住/);
+ assert.match(html,/https:\/\/www\.nhsa\.gov\.cn\/art\/2026\/5\/27\/art_104_20751\.html/);
  assert.match(html,/aria-live="polite"/);
 });
 test('new content is linked from home and verified facts and listed exactly once in sitemap',()=>{
