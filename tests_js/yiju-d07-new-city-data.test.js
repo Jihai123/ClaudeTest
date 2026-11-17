@@ -12,9 +12,9 @@ test('D07 retains its four EXACT city mappings after D10 adds Miyun', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
   assert.equal(dataset.cities.length, 21);
-  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 148);
+  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 155);
   const expected = new Map([[927,['本溪市',4]],[971,['鹤壁市',9]],
-                            [996,['启东市',8]],[1074,['襄阳市',9]]]);
+                            [996,['启东市',8]],[1074,['襄阳市',16]]]);
   for (const [id, [name, count]] of expected) {
     const entry = getOfficialFacts(id);
     assert.ok(entry, 'missing city ' + id);
@@ -113,4 +113,25 @@ test('D10 Miyun district 955 has 17 sourced facts with transparent reprint prove
   assert.match(c.sources[1].url, /^https:\/\/www\.bjmy\.gov\.cn\//);
   assert.ok(c.facts.every(f => f.source === 'miyun_bulletin_2025_reprint'));
   assert.ok(!c.facts.some(f => f.key === 'medical_facilities' || f.key === 'avg_rent'));
+});
+
+
+test('D10 Xiangyang health, eldercare and city-center air readings have transparent reprint origin',()=>{
+ const c=getOfficialFacts(1074);
+ assert.equal(c.source_level,'official_bulletin_reprint');
+ assert.equal(c.facts.length,16);
+ assert.match(c.source_note,/原件DOCX未完整取得/);
+ assert.ok(c.sources.some(x=>x.url==='https://tjgb.hongheiku.com/xjtjgb/xj2020/74464.html'));
+ assert.ok(c.sources.some(x=>x.url.includes('tjj.hubei.gov.cn')));
+ const rows=Object.fromEntries(c.facts.map(f=>[f.key,f]));
+ assert.equal(rows.health_institutions_2025_count.value,4405);
+ assert.equal(rows.hospital_count_2025.value,139);
+ assert.equal(rows.healthcare_beds_2025_ten_thousand.value,4.49);
+ assert.equal(rows.eldercare_institutions_2025_count.value,216);
+ assert.equal(rows.eldercare_beds_2025_ten_thousand.value,5.01);
+ assert.equal(rows.air_quality_good_days_2025_count.value,290);
+ assert.equal(rows.pm25_annual_mean_2025_ug_m3.value,41.3);
+ assert.ok(rows.pm25_annual_mean_2025_ug_m3.note.includes('市区'));
+ assert.ok(c.facts.every(f=>!['avg_rent','medical_facilities','price','ranking'].includes(f.key)));
+ assert.deepEqual(c.city_ids,[1074]);
 });
