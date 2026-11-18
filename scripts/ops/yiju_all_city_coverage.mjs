@@ -20,6 +20,24 @@ export function summarize(cities,pagination=[]){
       String(city.country||'').trim()].join('|');
     knownNames.set(k,(knownNames.get(k)||0)+1);
   }
+  // Exact approved URL repeats across *different* named places require manual photo review.
+  // Keep same-place cross-ranking repeats out of this warning; never automatically reject a photo.
+  const coverByUrl = new Map();
+  for (const c of cities) {
+    const url=c.cover_image?.image_url||c.cover_image?.thumbnail_url;
+    if (!url) continue;
+    const group=coverByUrl.get(url)||[];
+    group.push({id:c.id,name:c.name,province:c.province});
+    coverByUrl.set(url,group);
+  }
+  const sharedCoverById=new Map(),sharedCoverGroups=[];
+  for (const group of coverByUrl.values()){
+    const distinct=new Set(group.map(c=>[String(c.name||'').trim(),String(c.province||'').trim()].join('|')));
+    if(group.length<2||distinct.size<2)continue;
+    const ids=group.map(c=>c.id);
+    sharedCoverGroups.push({city_ids:ids,place_names:group.map(c=>c.name)});
+    for(const c of group)sharedCoverById.set(c.id,ids.filter(id=>id!==c.id));
+  }
   const rows=cities.map(c=>{
     const approved=Boolean(c.cover_image?.image_url||c.cover_image?.thumbnail_url);
     // Use ONLY the production API response, never the PR checkout's local maps.
@@ -40,6 +58,8 @@ export function summarize(cities,pagination=[]){
       list_type:c.list_type,
       official_fact_count:facts?.count||0,
       approved_image:approved,licensed_fallback:!!fallback,
+      approved_cover_missing_alt:approved&&!String(c.cover_image?.alt_text||'').trim(),
+      shared_approved_cover_city_ids:sharedCoverById.get(c.id)||[],
       fallback_source_url:fallback?fallback.source_url:null,
       needs_cover:!approved&&!fallback,missing_fields:missing,
       uncertain_rent:flaggedRent,identity_review:identityReview,
@@ -58,6 +78,9 @@ export function summarize(cities,pagination=[]){
     without_approved_cover:count(r=>!r.approved_image),
     available_licensed_fallbacks:count(r=>!r.approved_image&&r.licensed_fallback),
     without_any_usable_cover:count(r=>r.needs_cover),
+    approved_cover_missing_alt:count(r=>r.approved_cover_missing_alt),
+    reused_cover_across_different_places_groups:sharedCoverGroups.length,
+    cities_with_reused_cover_across_different_places:count(r=>r.shared_approved_cover_city_ids.length>0),
     without_sourced_facts:count(r=>r.official_fact_count===0),
     measurement:'all source/cover counts are derived from live API fields, not repository code',
     missing:report.missing,
@@ -71,7 +94,7 @@ export function summarize(cities,pagination=[]){
       (x.identity_review?4:0)+(x.uncertain_rent?3:0)+x.missing_fields.length;
     return weight(b)-weight(a)||a.id-b.id;
   });
-  return {summary,rows,priorities:priorities.slice(0,60)};
+  return {summary,rows,priorities:priorities.slice(0,60),photo_reuse_review:sharedCoverGroups};
 }
 async function main(){
  const baseUrl=process.env.YIJU_BASE_URL||'https://yiju.zhibeimao.com';
