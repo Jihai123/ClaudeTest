@@ -475,19 +475,14 @@
         function renderComparison(cities) {
             const compareContent = document.getElementById('compareContent');
 
-            // 找出最优值
-            const rents = cities.filter(c => c.avg_rent).map(c => c.avg_rent);
-            const bestRent = rents.length > 0 ? Math.min(...rents) : null;
-
+            // Historical rent values lack verified provenance; do not rank by lowest price.
             const scores = cities.map(c => c.layflat_score || c.overall_score || c.world_score || 0);
             const bestScore = Math.max(...scores);
 
             const html = `
                 <div class="compare-grid">
                     ${cities.map((city, index) => {
-                        const rent = city.avg_rent || 0;
                         const score = city.layflat_score || city.overall_score || city.world_score || 0;
-                        const isBestRent = rent && rent === bestRent;
                         const isBestScore = score === bestScore && score > 0;
 
                         return `
@@ -498,10 +493,8 @@
 
                                 <div class="compare-metric">
                                     <div class="metric-label">月租金</div>
-                                    <div class="metric-value ${isBestRent ? 'best' : ''}">
-                                        ¥${rent || '暂无'}/月
-                                        ${isBestRent ? '<span class="best-badge">最低</span>' : ''}
-                                    </div>
+                                    <div class="metric-value">待核实</div>
+                                    <small>历史租金未确认样本和统计口径，暂不比较高低</small>
                                 </div>
 
                                 <div class="compare-metric">
@@ -541,7 +534,6 @@
             const chart = echarts.init(document.getElementById('radarChart'));
 
             const indicators = [
-                { name: '房租成本', max: 10 },
                 { name: '气候环境', max: 10 },
                 { name: '生活节奏', max: 10 },
                 { name: '医疗设施', max: 10 },
@@ -551,7 +543,6 @@
 
             const series = cities.map((city, index) => {
                 const dimensions = city.dimensions || {};
-                const rentScore = calculateRentScore(city.avg_rent);
                 const climateScore = dimensions.climate || 5;
                 const slowPaceScore = dimensions.slow_pace || city.slow_pace_score || 5;
                 const medicalScore = dimensions.medical || 5;
@@ -562,7 +553,6 @@
                     name: city.name,
                     type: 'radar',
                     data: [[
-                        rentScore,
                         climateScore,
                         slowPaceScore,
                         medicalScore,
@@ -596,16 +586,6 @@
             window.addEventListener('resize', () => {
                 chart.resize();
             });
-        }
-
-        // 计算房租评分 (房租越低分数越高)
-        function calculateRentScore(rent) {
-            if (!rent) return 5;
-            if (rent <= 500) return 10;
-            if (rent <= 1000) return 8;
-            if (rent <= 2000) return 6;
-            if (rent <= 3000) return 4;
-            return 2;
         }
 
         // 格式化人口
