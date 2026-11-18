@@ -84,6 +84,33 @@ test('Miyun 955 uses a Commons CC BY-SA real-photo fallback without overriding a
   assert.equal(getLicensedPhoto(897), null, 'do not replace city gallery images');
 });
 
+test('sitewide photo candidates: 3 exact city IDs, real Commons place and license',()=>{
+ const expected=[
+  [1449,'Liuxingy',/安康水电站/,/安康市汉江瀛湖/],
+  [971,'Amazingloong',/鹤壁东站/,/鹤壁东站/],
+  [1063,'EditQ',/安徽黄山市街景/,/黄山市街景/]
+ ];
+ for(const [id,author,file,place] of expected){
+  const p=getLicensedPhoto(id);
+  assert.ok(p,'missing licensed fallback for city '+id);
+  assert.match(decodeURIComponent(p.source_url),file);
+  assert.match(p.caption,place);
+  assert.equal(p.author,author);
+  assert.equal(p.license,'CC BY-SA 4.0');
+  assert.equal(p.license_url,'https://creativecommons.org/licenses/by-sa/4.0/');
+  assert.match(p.image_url,/^https:\/\/(?:thumb|upload)\.wikimedia\.org\//);
+  assert.equal(p.changed,false);
+ }
+ assert.equal(getLicensedPhoto(897),null,'other city photos remain untouched');
+ const page=read('public/city-detail.html');
+ assert.match(page,/cityData\.images && cityData\.images\.length > 0/);
+ assert.match(page,/cityData\.licensed_photo/);
+ assert.match(page,/getElementById\('licensedPhotoFallback'\)/);
+ assert.match(page,/caption\.append\(source, document\.createTextNode\(' · '\), license\)/);
+ assert.match(page,/img\.addEventListener\('error'/);
+ assert.doesNotMatch(read('server/utils/officialCityFacts.js'),/\bUPDATE\s+(?:city_images|cities)\b/i);
+});
+
 test('public city API exposes supplementary facts without overwriting legacy columns', () => {
   const server = read('server/routes/cities.js');
   assert.match(server, /official_facts: getOfficialFacts\(city\.id\)/);
