@@ -132,7 +132,20 @@ footer{font-size:.9rem;color:#59667a}
   }catch(_){state.textContent='无法本地保存，勾选仅在当前页面有效。'}
   output.hidden=true;update();
  }
- try{cityInput.value=localStorage.getItem(activeKey)||'';}catch(_){}
+ // Only a bounded, plain city name may enter through a shareable link.
+ // URL parameters never write to server and do not erase saved progress.
+ let cityFromLink='';
+ try{
+  if(typeof location!=='undefined' && typeof URLSearchParams!=='undefined'){
+   const requested=new URLSearchParams(location.search).get('city');
+   if(requested && requested.trim().length<=24 &&
+      /^[\u4e00-\u9fa5A-Za-z0-9·（）()-]+$/.test(requested.trim())){
+    cityFromLink=requested.trim();
+   }
+  }
+ }catch(_){}
+ if(cityFromLink){cityInput.value=cityFromLink;}
+ else try{cityInput.value=localStorage.getItem(activeKey)||'';}catch(_){}
  restore();
  checks.forEach(c=>c.addEventListener('change',save));
  cityInput.addEventListener('change',()=>{

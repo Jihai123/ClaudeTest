@@ -6,7 +6,7 @@ const path=require('node:path');
 const vm=require('node:vm');
 
 const html=fs.readFileSync(path.join(__dirname,'../public/city-living-checklist.html'),'utf8');
-function makePage(store=new Map(),{clipboard=true,storageBlocked=false}={}){
+function makePage(store=new Map(),{clipboard=true,storageBlocked=false,search=''}={}){
  const items=new Map();
  function element(id){
   const e={id,checked:false,textContent:'',value:'',hidden:true,
@@ -37,7 +37,7 @@ function makePage(store=new Map(),{clipboard=true,storageBlocked=false}={}){
  assert.ok(first>=0&&last>first);
  const source=html.slice(first+8,last);
  new vm.Script(source,{filename:'city-living-checklist.html'}).runInNewContext(
-  {document,localStorage,navigator,encodeURIComponent,Set,Date}
+  {document,localStorage,navigator,encodeURIComponent,Set,Date,location:{search},URLSearchParams}
  );
  return {items,inputs,writes,store};
 }
@@ -85,4 +85,24 @@ test('private storage or clipboard denial keeps checklist available',async()=>{
  await ui.items.get('copyPending').fire('click');
  assert.equal(ui.items.get('pendingOutput').selected,true);
  assert.match(ui.items.get('savedState').textContent,/手动复制/);
+});
+
+
+test('sourced fact card links to a per-city checklist without mixing saved progress',()=>{
+ const explorer=fs.readFileSync(path.join(__dirname,'../public/city-evidence-explorer.js'),'utf8');
+ assert.match(explorer,/city-living-checklist\.html\?city=/);
+ assert.match(explorer,/encodeURIComponent\(city\.name\)/);
+ new vm.Script(explorer);
+ const saved=new Map([
+  ['yiju.checklist.active-city.v2','西安'],
+  ['yiju.checklist.items.v2:%E5%AE%89%E5%BA%B7%E5%B8%82',JSON.stringify({checked:['c2']})]
+ ]);
+ const link='?city='+encodeURIComponent('安康市');
+ const page=makePage(saved,{search:link});
+ assert.equal(page.items.get('targetCity').value,'安康市');
+ assert.equal(page.inputs[1].checked,true);
+ assert.equal(page.items.get('count').textContent,'已核查 1 / 6 项');
+ assert.equal(page.inputs[0].checked,false);
+ const stale=makePage(saved,{search:'?city=%3Cscript%3Ebad%3C%2Fscript%3E'});
+ assert.equal(stale.items.get('targetCity').value,'西安');
 });
