@@ -1,7 +1,7 @@
 {
   "schema_version": "yiju.city_official_facts.v2",
   "statistical_year": 2025,
-  "updated_at": "2026-11-17",
+  "updated_at": "2026-11-18",
   "policy": "本资料为独立来源事实集，按站内城市ID精确绑定；不覆盖原城市数据库、评分、排行、房租、房价及图片审核。不同统计口径不直接横向比较。",
   "cities": [
     {
@@ -1905,6 +1905,164 @@
         955
       ],
       "source_note": "数值逐项核自公报公开转载全文，密云区政府官网原件落地页已发现，但原始DOC未完整下载复核；故保留official_bulletin_reprint层级，不把转载冒充政府原件已实读。统计为密云区全区2025年度口径，不改现有SQLite租金、排名、评分和图片。"
+    },
+    {
+      "id": 1449,
+      "name": "安康市",
+      "province": "陕西省",
+      "list_type": "china_general",
+      "focus": "以市统计局2025年人口、居民收入、医疗与气候数据核对真实生活条件",
+      "tip": "公报统计为安康全市，中心城区空气优良天数仅城区口径；选具体社区前须核对医院到达时间、租金与交通，未核实的实时房租不参与判断。",
+      "source_level": "government",
+      "sources": [
+        {
+          "key": "ankang_stat_bulletin_2025",
+          "title": "安康市统计局、国家统计局安康调查队：2025年安康市国民经济和社会发展统计公报",
+          "date": "2026-05-26",
+          "url": "https://tjj.ankang.gov.cn/Content-2919483.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1190.03,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "初步核算的2025年全市GDP，非家庭收入"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 242.64,
+          "unit": "万人",
+          "category": "人口",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "全市常住人口，不等于户籍人口297.68万人"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "年末常住人口城镇化率",
+          "value": 56.23,
+          "unit": "%",
+          "category": "人口",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "全市常住人口城镇化比例，非城区房价分布"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "居民人均可支配收入",
+          "value": 25730,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "全体居民人均年度值，不是旅居者收入"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 37174,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "城镇居民年均值，不能当工资或房租"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 16399,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "农村居民年度人均口径，不与城镇直接混算"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "卫生健康机构",
+          "value": 2742,
+          "unit": "个",
+          "category": "医疗",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "包含医院、卫生院、村卫生室等，不等于医院数或医疗评分"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 55,
+          "unit": "所",
+          "category": "医疗",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "医院含民营医疗机构，已包含在2742个卫生健康机构中"
+        },
+        {
+          "key": "healthcare_beds_2025_count",
+          "label": "卫生健康机构床位",
+          "value": 19166,
+          "unit": "张",
+          "category": "医疗",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "医疗床位总量，非养老床位或实时空床"
+        },
+        {
+          "key": "air_quality_good_days_2025_count",
+          "label": "安康中心城区空气优良天数",
+          "value": 352,
+          "unit": "天",
+          "category": "环境",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "仅安康中心城区2025年统计，不代表全市各县实时空气"
+        },
+        {
+          "key": "forest_coverage_rate_2025_pct",
+          "label": "森林覆盖率",
+          "value": 72,
+          "unit": "%",
+          "category": "环境",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "安康全市森林覆盖率，不能推断某个小区绿化率"
+        },
+        {
+          "key": "public_eldercare_homes_2025_count",
+          "label": "公办敬老院",
+          "value": 129,
+          "unit": "所",
+          "category": "养老",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "公办敬老院口径，并非全市所有养老机构总数"
+        },
+        {
+          "key": "public_eldercare_beds_2025_count",
+          "label": "公办敬老院床位",
+          "value": 18484,
+          "unit": "张",
+          "category": "养老",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "对应公办敬老院床位，非实时空床和个人可申请数量"
+        },
+        {
+          "key": "new_urban_jobs_2025_count",
+          "label": "城镇新增就业人数",
+          "value": 22050,
+          "unit": "人",
+          "category": "就业",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "2025年新增就业人数，不是当前空缺职位数"
+        },
+        {
+          "key": "airport_passenger_trips_2025_ten_thousand",
+          "label": "安康机场旅客吞吐量",
+          "value": 47.94,
+          "unit": "万人次",
+          "category": "交通",
+          "source": "ankang_stat_bulletin_2025",
+          "note": "2025年机场全年吞吐量，不等于航班班次或日常出行便利程度"
+        }
+      ],
+      "city_ids": [
+        1449
+      ],
+      "source_note": "2026-11-18直接阅读安康市统计局2025年统计公报全文，精确匹配站内综合榜城市ID1449（站内名称“安康”，官方名称“安康市”）。所有2025统计值不覆盖SQLite租金、房价、评分、排行或图片审批；居民收入非迁居预算，中心城区空气统计非市域口径，公办敬老院床位非实时可申请床位。"
     }
   ]
 }
