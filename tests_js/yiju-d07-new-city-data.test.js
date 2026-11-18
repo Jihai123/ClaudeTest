@@ -11,8 +11,8 @@ const { getOfficialFacts, getSummary } = require('../server/utils/officialCityFa
 test('D07 retains its four EXACT city mappings after D10 adds Miyun', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 21);
-  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 155);
+  assert.equal(dataset.cities.length, 22);
+  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 170);
   const expected = new Map([[927,['本溪市',4]],[971,['鹤壁市',9]],
                             [996,['启东市',8]],[1074,['襄阳市',16]]]);
   for (const [id, [name, count]] of expected) {
@@ -62,7 +62,7 @@ test('all facts carry provenance, honest admin-region mapping, unique keys and s
       ids.add(cityId);
     }
   }
-  assert.equal(ids.size, 23, 'original dual-list aliases plus Miyun district');
+  assert.equal(ids.size, 24, 'original aliases plus Miyun district and Ankang');
 });
 
 test('public city decision page compares real 2025 fields and never treats legacy rents as verified', () => {
@@ -134,4 +134,36 @@ test('D10 Xiangyang health, eldercare and city-center air readings have transpar
  assert.ok(rows.pm25_annual_mean_2025_ug_m3.note.includes('市区'));
  assert.ok(c.facts.every(f=>!['avg_rent','medical_facilities','price','ranking'].includes(f.key)));
  assert.deepEqual(c.city_ids,[1074]);
+});
+
+
+test('D11 Ankang city 1449 has official primary-source 2025 figures without scores or rentals',()=>{
+ const c=getOfficialFacts(1449), raw=dataset.cities.find(x=>x.id===1449);
+ assert.ok(c&&raw);
+ assert.equal(raw.name,'安康市');
+ assert.equal(raw.province,'陕西省');
+ assert.equal(raw.list_type,'china_general');
+ assert.deepEqual(raw.city_ids,[1449]);
+ assert.equal(raw.source_level,'government');
+ assert.equal(raw.facts.length,15);
+ assert.equal(getSummary(1449).count,15);
+ assert.equal(raw.sources.length,1);
+ assert.equal(raw.sources[0].url,'https://tjj.ankang.gov.cn/Content-2919483.html');
+ assert.equal(raw.sources[0].date,'2026-05-26');
+ assert.match(raw.source_note,/站内名称“安康”/);
+ const facts=Object.fromEntries(raw.facts.map(f=>[f.key,f]));
+ const expected={
+  gdp_2025_billion_cny:1190.03,resident_population_2025_ten_thousand:242.64,
+  urbanization_rate_2025_pct:56.23,all_resident_disposable_income_2025_cny:25730,
+  urban_disposable_income_2025_cny:37174,rural_disposable_income_2025_cny:16399,
+  health_institutions_2025_count:2742,hospital_count_2025:55,
+  healthcare_beds_2025_count:19166,air_quality_good_days_2025_count:352,
+  forest_coverage_rate_2025_pct:72,public_eldercare_homes_2025_count:129,
+  public_eldercare_beds_2025_count:18484,new_urban_jobs_2025_count:22050,
+  airport_passenger_trips_2025_ten_thousand:47.94
+ };
+ for(const [k,v] of Object.entries(expected))assert.equal(facts[k]?.value,v,k);
+ assert.ok(raw.facts.every(f=>f.source===raw.sources[0].key&&f.unit&&f.note));
+ assert.ok(!raw.facts.some(f=>['avg_rent','medical_facilities','house_price','rank'].includes(f.key)));
+ assert.match(facts.air_quality_good_days_2025_count.note,/中心城区/);
 });

@@ -8,7 +8,9 @@ const checks = [
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
   ['robots', '/robots.txt'],
-  ['sitemap', '/sitemap.xml']
+  ['sitemap', '/sitemap.xml'],
+  ['candidate-ankang', '/api/cities?search=' + encodeURIComponent('安康') + '&limit=20'],
+  ['checklist-html', '/city-living-checklist.html']
 ];
 async function inspect([label, path]) {
   const url = BASE + path;
@@ -37,8 +39,22 @@ async function inspect([label, path]) {
       }
       return { label, http: response.status, cityCount: json.cities?.length ?? null,
         factCount: (json.cities || []).reduce((n,c) => n + (c.facts?.length || 0), 0),
-        miyunExists: Boolean((json.cities || []).find(c => c.id === 955)) };
+        miyunExists: Boolean((json.cities || []).find(c => c.id === 955)),
+        ankangFactCount: (json.cities || []).find(c => c.id === 1449)?.facts?.length ?? null };
     }
+    if (label === 'candidate-ankang') {
+      const json = JSON.parse(body);
+      const rows = (json.cities || []).map(c => ({
+        id: c.id, name: c.name, province: c.province, list_type: c.list_type,
+        sourcedFacts: c.official_facts_summary?.count ?? null
+      }));
+      return { label, http: response.status,
+        total: json.pagination?.total ?? null, matches: rows };
+    }
+    if (label === 'checklist-html') return { label, http: response.status,
+      hasLocalPersistence: body.includes('yiju.checklist.items.v2:'),
+      hasPolicySource: body.includes('nhsa.gov.cn/art/2026/5/27/art_104_20751.html'),
+      bytes: body.length };
     if (label === 'homepage-js') return { label, http: response.status,
       hasRotation: body.includes('rotateFeaturedCities'), bytes: body.length };
     if (label === 'robots') return { label, http: response.status,

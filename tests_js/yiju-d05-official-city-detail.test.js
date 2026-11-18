@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 21 city regions and 155 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 22 city regions and 170 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 21);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 155);
+  assert.equal(dataset.cities.length, 22);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 170);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05/D07/D10 baseline plus Xiangyang expansion: 21 city regions and 155 sou
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 23, 'D10 adds one exact verified district ID; two older aliases remain');
+  assert.equal(ids.size, 24, 'D11 adds one source-backed Ankang mapping; older aliases unchanged');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
