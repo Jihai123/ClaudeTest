@@ -32,7 +32,7 @@ test('inventory makes distinct 2025 source, legacy fields, and licensed pictures
  assert.equal(report.cities.find(x=>x.id===7).rent_status,'unverified_existing_value');
  assert.equal(report.cities.find(x=>x.id===5).photo_status,'approved_cover');
  assert.equal(report.by_type.world.cities,1);
- assert.equal(report.next_priority[0].id,6);
+ assert.equal(report.next_priority[0].id,7); // no sourced facts + no licensed image outranks reviewed extreme rent
 });
 test('duplicate source city IDs or ranking city IDs are rejected',async()=>{
  const {buildInventory}=await load();
