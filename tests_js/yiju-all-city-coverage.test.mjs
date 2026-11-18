@@ -125,5 +125,6 @@ test('HEAD checks do not fetch image bytes; errors are inconclusive, not fake mi
  assert.ok(requests.every(x=>x.opts.method==='HEAD'&&x.opts.redirect==='manual'));
  assert.equal(result[0].link_status,'head_ok');
  assert.equal(result[1].link_status,'external_host_review');
+ assert.equal(result[1].host,'evil.example.org');
  assert.equal(result[2].link_status,'redirect_needs_check');
 });
