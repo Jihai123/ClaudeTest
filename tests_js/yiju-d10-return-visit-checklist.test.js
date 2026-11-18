@@ -106,3 +106,16 @@ test('sourced fact card links to a per-city checklist without mixing saved progr
  const stale=makePage(saved,{search:'?city=%3Cscript%3Ebad%3C%2Fscript%3E'});
  assert.equal(stale.items.get('targetCity').value,'西安');
 });
+
+
+test('D11 homepage uses a fresh cache key for the sourced-city deep-link script',()=>{
+ const page=fs.readFileSync(path.join(__dirname,'../public/index.html'),'utf8');
+ const source=fs.readFileSync(path.join(__dirname,'../public/city-evidence-explorer.js'),'utf8');
+ const probe=fs.readFileSync(path.join(__dirname,'../scripts/ops/yiju_public_api_probe.mjs'),'utf8');
+ assert.match(page,/<script src="city-evidence-explorer\.js\?v=20261118-d11" defer><\/script>/);
+ assert.match(source,/city-living-checklist\.html\?city=/);
+ assert.match(probe,/homepage-js-fresh/);
+ assert.match(probe,/hasChecklistDeepLink/);
+ assert.match(probe,/hasFreshScriptVersion/);
+ assert.match(probe,/hasCityLinkPrefill/);
+});
