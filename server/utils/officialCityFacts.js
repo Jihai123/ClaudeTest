@@ -67,6 +67,26 @@ const licensedPhotos = new Map([
     license: 'CC BY-SA 4.0',
     caption: '安徽省黄山市街景（2022年10月22日摄）',
     changed: false
+  })],
+  // Zhoushan Xincheng panorama, Commons own work by Maeshima hiroki (2021-08-09).
+  [1308, Object.freeze({
+    image_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/A_panorama_of_Zhoushan%27s_new_city_center.jpg/960px-A_panorama_of_Zhoushan%27s_new_city_center.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:A_panorama_of_Zhoushan%27s_new_city_center.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Maeshima hiroki',
+    license: 'CC BY-SA 4.0',
+    caption: '舟山市新城城区全景（2021年8月9日）',
+    changed: false
+  })],
+  // Shangrao Xinzhou District, Commons own work by Qa003qa003 (2017-10-28).
+  [1365, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Xinzhou_District%2C_Shangrao_20171028_113223.jpg/960px-Xinzhou_District%2C_Shangrao_20171028_113223.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:Xinzhou_District%2C_Shangrao_20171028_113223.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Qa003qa003',
+    license: 'CC BY-SA 4.0',
+    caption: '上饶市信州区城区景观（2017年10月28日）',
+    changed: false
   })]
 ]);
 
