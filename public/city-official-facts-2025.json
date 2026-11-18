@@ -2388,6 +2388,119 @@
         1365
       ],
       "source_note": "2026-11-18实读统计公报公开全文转载，尚未完整读取政府官网原件，因此来源级别official_bulletin_reprint。独立附加2025统计事实，不覆盖评分、房租、图像审核或数据库记录。不同统计口径不可跨城市直接当作购买力/宜居评分。"
+    },
+    {
+      "id": 915,
+      "name": "白山市",
+      "province": "吉林省",
+      "list_type": "china_layflat",
+      "city_ids": [
+        915
+      ],
+      "source_level": "government",
+      "focus": "据吉林省统计局2025年白山公报核对常住人口、收入、医疗保障和床位",
+      "tip": "白山市为地级市，市域统计不等于浑江区或某社区；单项医疗保障参保量不是异地结算资格，缺失租金保持待核。",
+      "sources": [
+        {
+          "key": "baishan_2025_primary",
+          "title": "白山市2025年国民经济和社会发展统计公报（吉林省统计局全文）",
+          "date": "2026-09-07",
+          "url": "https://tjj.jl.gov.cn/tjsj/tjgb/ndgb/202609/t20260907_3668512.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 590.17,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "baishan_2025_primary",
+          "note": "2025年全市初步核算，非家庭收入"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 87.53,
+          "unit": "万人",
+          "category": "人口",
+          "source": "baishan_2025_primary",
+          "note": "白山市全市常住人口"
+        },
+        {
+          "key": "urban_resident_population_2025_ten_thousand",
+          "label": "城镇常住人口",
+          "value": 71.81,
+          "unit": "万人",
+          "category": "人口",
+          "source": "baishan_2025_primary",
+          "note": "年末全市城镇常住人口，不是市中心城区人口"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 33304,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "baishan_2025_primary",
+          "note": "2025年城镇常住居民年度人均调查口径"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 18078,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "baishan_2025_primary",
+          "note": "2025年农村常住居民年度人均调查口径"
+        },
+        {
+          "key": "healthcare_beds_2025_count",
+          "label": "医疗卫生机构床位",
+          "value": 9568,
+          "unit": "张",
+          "category": "医疗",
+          "source": "baishan_2025_primary",
+          "note": "全市医疗卫生机构床位总量，非当前可用床位"
+        },
+        {
+          "key": "new_urban_jobs_2025_count",
+          "label": "城镇新增就业人数",
+          "value": 9426,
+          "unit": "人",
+          "category": "就业",
+          "source": "baishan_2025_primary",
+          "note": "全年新增就业人数，不是现有职位空缺"
+        },
+        {
+          "key": "medical_insurance_covered_2025_ten_thousand",
+          "label": "基本医疗保险参保人数",
+          "value": 87.45,
+          "unit": "万人",
+          "category": "医疗",
+          "source": "baishan_2025_primary",
+          "note": "年末参保总人数，非居民医保单一口径"
+        },
+        {
+          "key": "employee_medical_insurance_2025_ten_thousand",
+          "label": "其中职工医保参保人数",
+          "value": 32.75,
+          "unit": "万人",
+          "category": "医疗",
+          "source": "baishan_2025_primary",
+          "note": "已包含于基本医疗保险总参保人数中"
+        },
+        {
+          "key": "residents_medical_insurance_2025_ten_thousand",
+          "label": "其中城乡居民医保参保人数",
+          "value": 54.7,
+          "unit": "万人",
+          "category": "医疗",
+          "source": "baishan_2025_primary",
+          "note": "已包含于基本医疗保险总参保人数中，非个人异地结算资格"
+        }
+      ],
+      "source_note": "2026-11-18直接阅读吉林省统计局官网2025年白山市统计公报；行政ID915仅对应白山市，市级口径不外推某区县，保持旧SQLite、租金、评分和图片不变。"
     }
   ]
 }

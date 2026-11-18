@@ -137,6 +137,66 @@ const licensedPhotos = new Map([
     license: 'CC BY-SA 4.0',
     caption: '广西玉林市城区天际线（2006年7月12日）',
     changed: false
+  })],
+  // Feicheng Civic Square by Yhy9630 (2017-08-25), Wikimedia Commons.
+  [988, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/%E8%82%A5%E5%9F%8E%E5%B8%82%E5%B8%82%E6%B0%91%E5%B9%BF%E5%9C%BA.jpg/960px-%E8%82%A5%E5%9F%8E%E5%B8%82%E5%B8%82%E6%B0%91%E5%B9%BF%E5%9C%BA.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:%E8%82%A5%E5%9F%8E%E5%B8%82%E5%B8%82%E6%B0%91%E5%B9%BF%E5%9C%BA.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Yhy9630',
+    license: 'CC BY-SA 4.0',
+    caption: '山东省肥城市市民广场（2017年8月25日）',
+    changed: false
+  })],
+  // Suihua People's Square by Amarespeco (2017-07-16).
+  [1426, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/%E7%BB%A5%E5%8C%96%E5%B8%82%E4%BA%BA%E6%B0%91%E5%B9%BF%E5%9C%BA.jpg/960px-%E7%BB%A5%E5%8C%96%E5%B8%82%E4%BA%BA%E6%B0%91%E5%B9%BF%E5%9C%BA.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:%E7%BB%A5%E5%8C%96%E5%B8%82%E4%BA%BA%E6%B0%91%E5%B9%BF%E5%9C%BA.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Amarespeco',
+    license: 'CC BY-SA 4.0',
+    caption: '黑龙江绥化市人民广场与市政府大楼（2017年7月16日）',
+    changed: false
+  })],
+  // Zhongwei Gaomiao by Windmemories (2026-08-09).
+  [1495, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/20260809_Zhongwei_Gaomiao_01.jpg/960px-20260809_Zhongwei_Gaomiao_01.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:20260809_Zhongwei_Gaomiao_01.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Windmemories',
+    license: 'CC BY-SA 4.0',
+    caption: '宁夏中卫市高庙保安寺（2026年8月9日）',
+    changed: false
+  })],
+  // Yuanjiang County urban skyline by 瑞丽江的河水 (2024-10-05).
+  [1600, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/%E5%85%83%E6%B1%9F%E5%8E%BF%E5%A4%A9%E9%99%85%E7%BA%BF_-_%E8%88%AA%E6%8B%8D_-_%E5%85%A8%E6%99%AF_-_2024-10-05_01.jpg/960px-%E5%85%83%E6%B1%9F%E5%8E%BF%E5%A4%A9%E9%99%85%E7%BA%BF_-_%E8%88%AA%E6%8B%8D_-_%E5%85%A8%E6%99%AF_-_2024-10-05_01.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:%E5%85%83%E6%B1%9F%E5%8E%BF%E5%A4%A9%E9%99%85%E7%BA%BF_-_%E8%88%AA%E6%8B%8D_-_%E5%85%A8%E6%99%AF_-_2024-10-05_01.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: '瑞丽江的河水',
+    license: 'CC BY-SA 4.0',
+    caption: '云南玉溪元江县城天际线航拍（2024年10月5日）',
+    changed: false
+  })],
+  // CRH5G train at Mudanjiang Railway Station by Prcshaw (2021-06-25).
+  [903, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/CRH5G_at_Mudanjiang_Railway_Station.jpg/960px-CRH5G_at_Mudanjiang_Railway_Station.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:CRH5G_at_Mudanjiang_Railway_Station.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Prcshaw',
+    license: 'CC BY-SA 4.0',
+    caption: '牡丹江火车站的CRH5G列车（2021年6月25日）',
+    changed: false
+  })],
+  // Baishan Railway Station by PanShiBo (2013-10-05), CC BY-SA 3.0.
+  [915, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Baishan_Railway_Station.JPG/960px-Baishan_Railway_Station.JPG',
+    source_url: 'https://commons.wikimedia.org/wiki/File:Baishan_Railway_Station.JPG',
+    license_url: 'https://creativecommons.org/licenses/by-sa/3.0/',
+    author: 'PanShiBo',
+    license: 'CC BY-SA 3.0',
+    caption: '吉林省白山市火车站（2013年10月5日）',
+    changed: false
   })]
 ]);
 

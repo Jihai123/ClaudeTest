@@ -823,7 +823,8 @@
             } else if (cityData.licensed_photo &&
                 /^https:\/\/(?:thumb|upload)\.wikimedia\.org\//.test(cityData.licensed_photo.image_url) &&
                 /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/.test(cityData.licensed_photo.source_url) &&
-                cityData.licensed_photo.license === 'CC BY-SA 4.0' &&
+                /^CC BY-SA (?:3\.0|4\.0)$/.test(cityData.licensed_photo.license) &&
+                cityData.licensed_photo.license_url === 'https://creativecommons.org/licenses/by-sa/' + cityData.licensed_photo.license.slice(-3) + '/' &&
                 cityData.licensed_photo.author && cityData.licensed_photo.caption) {
                 // Use a license-attributed real photo only when no reviewed image exists.
                 const p = cityData.licensed_photo;
