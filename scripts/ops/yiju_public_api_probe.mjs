@@ -12,7 +12,10 @@ const checks = [
   ['robots', '/robots.txt'],
   ['sitemap', '/sitemap.xml'],
   ['candidate-ankang', '/api/cities?search=' + encodeURIComponent('安康') + '&limit=20'],
-  ['checklist-html', '/city-living-checklist.html']
+  ['checklist-html', '/city-living-checklist.html'],
+  ['detail-html', '/city-detail.html'],
+  ['compare-html', '/city-compare.html'],
+  ['recommend-html', '/recommend.html']
 ];
 async function inspect([label, path]) {
   const url = BASE + path;
@@ -39,7 +42,10 @@ async function inspect([label, path]) {
         return { label, http: response.status, id: city.id,
           officialFactCount: city.official_facts?.facts?.length ?? null };
       }
-      return { label, http: response.status, cityCount: json.cities?.length ?? null,
+      const ids=[943,1061,1079,939,917,972,1216,1212,1214,1210];
+      const enriched=(json.cities||[]).filter(c=>ids.includes(c.id)&&c.facts?.length===5);
+      return { label, http: response.status, enrichedD11Cities:enriched.length,
+        enrichedD11Facts:enriched.reduce((n,c)=>n+c.facts.length,0), cityCount: json.cities?.length ?? null,
         factCount: (json.cities || []).reduce((n,c) => n + (c.facts?.length || 0), 0),
         miyunExists: Boolean((json.cities || []).find(c => c.id === 955)),
         ankangFactCount: (json.cities || []).find(c => c.id === 1449)?.facts?.length ?? null };
@@ -58,6 +64,18 @@ async function inspect([label, path]) {
       hasCityLinkPrefill: body.includes('new URLSearchParams(location.search)'),
       hasPolicySource: body.includes('nhsa.gov.cn/art/2026/5/27/art_104_20751.html'),
       bytes: body.length };
+    if (label === 'detail-html') return {label,http:response.status,
+      hasUnverifiedRentSuppression:body.includes('租金：暂无可核实的当地房源样本'),
+      hasStructuredNoPrice:body.includes('"priceRange": null'),bytes:body.length};
+    if (label === 'compare-html') return {label,http:response.status,
+      hasUnverifiedRentSuppression:body.includes('历史租金未确认样本和统计口径'),
+      stillHasCheapestRentClaim:body.includes('isBestRent'),bytes:body.length};
+    if (label === 'recommend-html') {
+      const clause=(body.match(/case 'low':([\s\S]*?)break;/)||[])[1]||'';
+      return {label,http:response.status,
+        lowBudgetNoLegacyRentSort:clause.includes("sort', 'overall_score'")&&!clause.includes("sort', 'avg_rent'"),
+        bytes:body.length};
+    }
     if (label === 'homepage-js' || label === 'homepage-js-fresh') return { label, http: response.status,
       hasRotation: body.includes('rotateFeaturedCities'),
       hasChecklistDeepLink: body.includes('city-living-checklist.html?city='),
