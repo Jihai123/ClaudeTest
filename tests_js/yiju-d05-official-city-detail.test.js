@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 22 city regions and 170 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 24 city regions and 201 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 22);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 170);
+  assert.equal(dataset.cities.length, 24);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 201);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05/D07/D10 baseline plus Xiangyang expansion: 22 city regions and 170 sou
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 24, 'D11 adds one source-backed Ankang mapping; older aliases unchanged');
+  assert.equal(ids.size, 26, 'adds Ankang, Zhoushan and Shangrao exact mappings; prior aliases unchanged');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
@@ -84,11 +84,13 @@ test('Miyun 955 uses a Commons CC BY-SA real-photo fallback without overriding a
   assert.equal(getLicensedPhoto(897), null, 'do not replace city gallery images');
 });
 
-test('sitewide photo candidates: 3 exact city IDs, real Commons place and license',()=>{
+test('sitewide photo candidates: 5 exact city IDs, real Commons place and license',()=>{
  const expected=[
   [1449,'Liuxingy',/安康水电站/,/安康市汉江瀛湖/],
   [971,'Amazingloong',/鹤壁东站/,/鹤壁东站/],
-  [1063,'EditQ',/安徽黄山市街景/,/黄山市街景/]
+  [1063,'EditQ',/安徽黄山市街景/,/黄山市街景/],
+  [1308,'Maeshima hiroki',/A_panorama_of_Zhoushan/,/舟山市新城/],
+  [1365,'Qa003qa003',/Xinzhou_District/,/上饶市信州区/]
  ];
  for(const [id,author,file,place] of expected){
   const p=getLicensedPhoto(id);
