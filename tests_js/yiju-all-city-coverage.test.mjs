@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {summarize} from '../scripts/ops/yiju_all_city_coverage.mjs';
+import {summarize,selectPhotoSamples,resolveSafePhotoUrl,checkPhotoLinks} from '../scripts/ops/yiju_all_city_coverage.mjs';
 
 const entry=(id,opts={})=>({
  id,name:'测试城市'+id,province:'省份',country:'中国',
@@ -83,4 +83,47 @@ test('the same named place on different ranking IDs is not automatically a wrong
  ]);
  assert.equal(r.summary.reused_cover_across_different_places_groups,0);
  assert.equal(r.summary.cities_with_reused_cover_across_different_places,0);
+});
+
+
+test('sample 20 covers prioritizing missing alt and licensed fallback while distributing rankings',()=>{
+ const cities=[];
+ for(let i=0;i<28;i++){
+  cities.push(entry(100+i,{list_type:i<10?'china_general':i<20?'china_layflat':'world',
+   cover_image:{image_url:'/uploads/photo'+i+'.jpg',alt_text:i<2?'':'实景描述'}}));
+ }
+ for(let i=0;i<5;i++)cities.push(entry(200+i,{list_type:'china_layflat',cover_image:null,
+   licensed_photo:{image_url:'https://thumb.wikimedia.org/wikipedia/commons/thumb/test'+i+'.jpg',
+    source_url:'https://commons.wikimedia.org/wiki/File:Test'+i+'.jpg',author:'Author',
+    license:'CC BY-SA 4.0',caption:'某城市地点'}}));
+ const out=selectPhotoSamples(cities);
+ assert.equal(out.length,20);
+ assert.equal(new Set(out.map(x=>x.id)).size,20);
+ assert.deepEqual(out.filter(x=>x.alt_missing).map(x=>x.id),[100,101]);
+ assert.equal(out.filter(x=>x.kind==='licensed_fallback').length,3);
+ assert.ok(out.some(x=>x.list_type==='world'));
+});
+test('only HTTPS own-site or Wikimedia URLs are probed, never private/IP or userinfo',()=>{
+ assert.equal(resolveSafePhotoUrl('/uploads/a.jpg'),'https://yiju.zhibeimao.com/uploads/a.jpg');
+ assert.equal(resolveSafePhotoUrl('http://127.0.0.1/latest'),null);
+ assert.equal(resolveSafePhotoUrl('https://user:pass@yiju.zhibeimao.com/a.jpg'),null);
+ assert.equal(resolveSafePhotoUrl('https://evil.example.org/a.jpg'),null);
+ assert.equal(resolveSafePhotoUrl('https://thumb.wikimedia.org/a.jpg'),'https://thumb.wikimedia.org/a.jpg');
+});
+test('HEAD checks do not fetch image bytes; errors are inconclusive, not fake missing photos',async()=>{
+ const requests=[];
+ const samples=[
+  {id:10,name:'甲',kind:'approved',list_type:'china_general',raw_url:'/uploads/a.jpg',alt_missing:false},
+  {id:11,name:'乙',kind:'approved',list_type:'china_general',raw_url:'https://evil.example.org/a.jpg',alt_missing:true},
+  {id:12,name:'丙',kind:'approved',list_type:'world',raw_url:'/uploads/redirect.jpg',alt_missing:false}
+ ];
+ const result=await checkPhotoLinks(samples,{fetchFn:async(url,opts)=>{
+  requests.push({url,opts});
+  return {status:url.includes('redirect')?302:200};
+ }});
+ assert.equal(requests.length,2);
+ assert.ok(requests.every(x=>x.opts.method==='HEAD'&&x.opts.redirect==='manual'));
+ assert.equal(result[0].link_status,'head_ok');
+ assert.equal(result[1].link_status,'external_host_review');
+ assert.equal(result[2].link_status,'redirect_needs_check');
 });
