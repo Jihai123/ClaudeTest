@@ -109,6 +109,8 @@ test('only HTTPS own-site or Wikimedia URLs are probed, never private/IP or user
  assert.equal(resolveSafePhotoUrl('https://user:pass@yiju.zhibeimao.com/a.jpg'),null);
  assert.equal(resolveSafePhotoUrl('https://evil.example.org/a.jpg'),null);
  assert.equal(resolveSafePhotoUrl('https://thumb.wikimedia.org/a.jpg'),'https://thumb.wikimedia.org/a.jpg');
+ assert.equal(resolveSafePhotoUrl('https://cityimg.zhibeimao.com/city/test.jpg'),'https://cityimg.zhibeimao.com/city/test.jpg');
+ assert.equal(resolveSafePhotoUrl('https://bad.cityimg.zhibeimao.com/test.jpg'),null);
 });
 test('HEAD checks do not fetch image bytes; errors are inconclusive, not fake missing photos',async()=>{
  const requests=[];

@@ -119,7 +119,7 @@ export function selectPhotoSamples(cities){
  add(cities.filter(c=>c.cover_image?.image_url||c.licensed_photo?.image_url),20-chosen.length);
  return chosen;
 }
-const SAFE_PHOTO_HOSTS=new Set(['yiju.zhibeimao.com','thumb.wikimedia.org','upload.wikimedia.org']);
+const SAFE_PHOTO_HOSTS=new Set(['yiju.zhibeimao.com','cityimg.zhibeimao.com','thumb.wikimedia.org','upload.wikimedia.org']);
 export function resolveSafePhotoUrl(raw,base='https://yiju.zhibeimao.com'){
  try{
   const url=new URL(raw,base);
