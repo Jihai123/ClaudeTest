@@ -57,3 +57,30 @@ test('non-Wikimedia or unlicensed raw photo cannot be counted as covered',()=>{
  assert.equal(r.summary.available_licensed_fallbacks,0);
  assert.equal(r.rows[0].needs_cover,true);
 });
+
+
+test('reused approved cover between distinct cities is flagged, not removed',()=>{
+ const url='https://img.example.org/shared.jpg';
+ const rows=[
+  entry(100,{name:'甲市',province:'甲省',cover_image:{image_url:url,alt_text:'甲市街景'}}),
+  entry(101,{name:'乙市',province:'乙省',cover_image:{image_url:url,alt_text:''}}),
+  entry(102,{name:'乙市',province:'乙省',cover_image:{image_url:'https://img.example.org/unique.jpg',alt_text:'乙市'}})
+ ];
+ const r=summarize(rows);
+ assert.equal(r.summary.reused_cover_across_different_places_groups,1);
+ assert.equal(r.summary.cities_with_reused_cover_across_different_places,2);
+ assert.equal(r.summary.approved_cover_missing_alt,1);
+ assert.deepEqual(r.rows.find(c=>c.id===100).shared_approved_cover_city_ids,[101]);
+ assert.deepEqual(r.rows.find(c=>c.id===101).shared_approved_cover_city_ids,[100]);
+ assert.equal(r.rows.find(c=>c.id===100).approved_image,true,'do not auto-revoke approval');
+ assert.equal(r.photo_reuse_review.length,1);
+});
+test('the same named place on different ranking IDs is not automatically a wrong-photo flag',()=>{
+ const url='https://img.example.org/same.jpg';
+ const r=summarize([
+  entry(111,{name:'上海',province:'上海市',cover_image:{image_url:url,alt_text:'上海'}}),
+  entry(112,{name:'上海',province:'上海市',cover_image:{image_url:url,alt_text:'上海'}})
+ ]);
+ assert.equal(r.summary.reused_cover_across_different_places_groups,0);
+ assert.equal(r.summary.cities_with_reused_cover_across_different_places,0);
+});
