@@ -38,6 +38,35 @@ const licensedPhotos = new Map([
     license: 'CC BY-SA 4.0',
     caption: '密云水库（2019年5月29日）',
     changed: false
+  })],
+  // Officially mapped city IDs; file-page author/license/location verified on Commons.
+  // Safe fallback only if there is no approved image in city_images.
+  [1449, Object.freeze({
+    image_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/%E5%AE%89%E5%BA%B7%E6%B0%B4%E7%94%B5%E7%AB%99_03.jpg/960px-%E5%AE%89%E5%BA%B7%E6%B0%B4%E7%94%B5%E7%AB%99_03.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:%E5%AE%89%E5%BA%B7%E6%B0%B4%E7%94%B5%E7%AB%99_03.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Liuxingy',
+    license: 'CC BY-SA 4.0',
+    caption: '安康市汉江瀛湖的安康水电站（2024年7月5日）',
+    changed: false
+  })],
+  [971, Object.freeze({
+    image_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/%E9%B9%A4%E5%A3%81%E4%B8%9C%E7%AB%992015-10-12.png/960px-%E9%B9%A4%E5%A3%81%E4%B8%9C%E7%AB%992015-10-12.png',
+    source_url: 'https://commons.wikimedia.org/wiki/File:%E9%B9%A4%E5%A3%81%E4%B8%9C%E7%AB%992015-10-12.png',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Amazingloong',
+    license: 'CC BY-SA 4.0',
+    caption: '鹤壁东站（2015年10月12日）',
+    changed: false
+  })],
+  [1063, Object.freeze({
+    image_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/%E5%AE%89%E5%BE%BD%E9%BB%84%E5%B1%B1%E5%B8%82%E8%A1%97%E6%99%AF.jpg/960px-%E5%AE%89%E5%BE%BD%E9%BB%84%E5%B1%B1%E5%B8%82%E8%A1%97%E6%99%AF.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:%E5%AE%89%E5%BE%BD%E9%BB%84%E5%B1%B1%E5%B8%82%E8%A1%97%E6%99%AF.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'EditQ',
+    license: 'CC BY-SA 4.0',
+    caption: '安徽省黄山市街景（2022年10月22日摄）',
+    changed: false
   })]
 ]);
 
