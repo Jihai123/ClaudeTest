@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 24 city regions and 201 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 25 city regions and 211 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 24);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 201);
+  assert.equal(dataset.cities.length, 25);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 211);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05/D07/D10 baseline plus Xiangyang expansion: 24 city regions and 201 sou
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 26, 'adds Ankang, Zhoushan and Shangrao exact mappings; prior aliases unchanged');
+  assert.equal(ids.size, 27, 'adds source-mapped Baishan and prior cities; aliases unchanged');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
@@ -84,7 +84,7 @@ test('Miyun 955 uses a Commons CC BY-SA real-photo fallback without overriding a
   assert.equal(getLicensedPhoto(897), null, 'do not replace city gallery images');
 });
 
-test('sitewide photo candidates: 10 exact city IDs, real Commons place and license',()=>{
+test('sitewide photo candidates: 16 exact city IDs, real Commons place and license',()=>{
  const expected=[
   [1449,'Liuxingy',/安康水电站/,/安康市汉江瀛湖/],
   [971,'Amazingloong',/鹤壁东站/,/鹤壁东站/],
@@ -95,7 +95,13 @@ test('sitewide photo candidates: 10 exact city IDs, real Commons place and licen
   [1520,'Lucas366',/Hamburg_City/,/汉堡市/],
   [1456,'颜邯',/Zhongshan_Street/,/佳木斯市中山街/],
   [918,'Tomskyhaha',/Scenery_in_Tieling_New_City/,/铁岭市凡河新区/],
-  [1383,'Zeilmeter',/Yulin_Skyline/,/广西玉林市/]
+  [1383,'Zeilmeter',/Yulin_Skyline/,/广西玉林市/],
+  [988,'Yhy9630',/肥城市市民广场/,/肥城市市民广场/],
+  [1426,'Amarespeco',/绥化市人民广场/,/绥化市人民广场/],
+  [1495,'Windmemories',/20260809_Zhongwei_Gaomiao/,/中卫市高庙/],
+  [1600,'瑞丽江的河水',/元江县天际线/,/元江县城天际线/],
+  [903,'Prcshaw',/CRH5G_at_Mudanjiang/,/牡丹江火车站/],
+  [915,'PanShiBo',/Baishan_Railway_Station/,/白山市火车站/]
  ];
  for(const [id,author,file,place] of expected){
   const p=getLicensedPhoto(id);
@@ -103,8 +109,9 @@ test('sitewide photo candidates: 10 exact city IDs, real Commons place and licen
   assert.match(decodeURIComponent(p.source_url),file);
   assert.match(p.caption,place);
   assert.equal(p.author,author);
-  assert.equal(p.license,'CC BY-SA 4.0');
-  assert.equal(p.license_url,'https://creativecommons.org/licenses/by-sa/4.0/');
+  const expectedLicense=id===915?'3.0':'4.0';
+  assert.equal(p.license,'CC BY-SA '+expectedLicense);
+  assert.equal(p.license_url,'https://creativecommons.org/licenses/by-sa/'+expectedLicense+'/');
   assert.match(p.image_url,/^https:\/\/(?:thumb|upload)\.wikimedia\.org\//);
   assert.equal(p.changed,false);
  }
