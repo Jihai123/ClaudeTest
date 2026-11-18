@@ -164,5 +164,5 @@ test('year, city boundary and income interpretation must stay explicit',()=>{
  const shenzhen=getOfficialFacts(1210);
  assert.match(shenzhen.facts.find(x=>x.key==='urban_employee_medical_insurance_2025_ten_thousand').note,/不是/);
  const hami=getOfficialFacts(943);
- assert.match(hami.facts.find(x=>x.key==='hospitals_clinics_beds_2025_count').note,/不是养老/);
+ assert.match(hami.facts.find(x=>x.key==='hospitals_clinics_beds_2025_count').note,/不等于养老/);
 });
