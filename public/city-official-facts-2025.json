@@ -2501,6 +2501,277 @@
         }
       ],
       "source_note": "2026-11-18直接阅读吉林省统计局官网2025年白山市统计公报；行政ID915仅对应白山市，市级口径不外推某区县，保持旧SQLite、租金、评分和图片不变。"
+    },
+    {
+      "id": 910,
+      "name": "四平市",
+      "province": "吉林",
+      "list_type": "china_layflat",
+      "focus": "核对2025年居民收入、医疗、养老及气候条件，再比较具体社区房源。",
+      "tip": "四平公报的全市常住人口、卫生机构数、养老机构床位不等于市区或指定社区的即时供给，房租与房价尚需独立来源。",
+      "source_level": "government",
+      "sources": [
+        {
+          "key": "siping_2025_official",
+          "title": "四平市2025年国民经济和社会发展统计公报",
+          "date": "2026-09-08",
+          "url": "https://tjj.jl.gov.cn/tjsj/tjgb/ndgb/202609/t20260908_3668990.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 601.6,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "siping_2025_official",
+          "note": "2025全市初步核算的现价总值"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 160.98,
+          "unit": "万人",
+          "category": "人口",
+          "source": "siping_2025_official",
+          "note": "四平全市人口，市区人口另计，不将全市值当中心城区"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 37047,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "siping_2025_official",
+          "note": "2025全地区城镇居民，不等于就业工资或家庭预算"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 21766,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "siping_2025_official",
+          "note": "2025全地区农村居民口径"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "卫生机构",
+          "value": 1736,
+          "unit": "个",
+          "category": "医疗",
+          "source": "siping_2025_official",
+          "note": "包含医院、诊所、卫生室等，不等于医院数量"
+        },
+        {
+          "key": "healthcare_beds_2025_count",
+          "label": "卫生机构实有床位",
+          "value": 13665,
+          "unit": "张",
+          "category": "医疗",
+          "source": "siping_2025_official",
+          "note": "统计期年末机构实有床位，不代表可即时入住或挂号"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 120,
+          "unit": "个",
+          "category": "养老",
+          "source": "siping_2025_official",
+          "note": "2025全市养老机构数，不等于所有机构都能接受外地申请"
+        },
+        {
+          "key": "eldercare_beds_2025_count",
+          "label": "养老机构床位",
+          "value": 9864,
+          "unit": "张",
+          "category": "养老",
+          "source": "siping_2025_official",
+          "note": "总床位数，非实时空床"
+        },
+        {
+          "key": "air_quality_good_days_2025_pct",
+          "label": "城市环境空气质量优良天数比例",
+          "value": 91.78,
+          "unit": "%",
+          "category": "环境",
+          "source": "siping_2025_official",
+          "note": "全市城市空气统计值，非各县区、各街道实时状况"
+        },
+        {
+          "key": "avg_temperature_2025_c",
+          "label": "全地区全年平均气温",
+          "value": 7.8,
+          "unit": "℃",
+          "category": "气候",
+          "source": "siping_2025_official",
+          "note": "2025四平全地区年均温，不等于冬季极端低温"
+        },
+        {
+          "key": "annual_precipitation_2025_mm",
+          "label": "全地区全年降水量",
+          "value": 533.9,
+          "unit": "毫米",
+          "category": "气候",
+          "source": "siping_2025_official",
+          "note": "四平全地区全年平均降水量"
+        },
+        {
+          "key": "health_technicians_2025_count",
+          "label": "卫生技术人员",
+          "value": 17332,
+          "unit": "人",
+          "category": "医疗",
+          "source": "siping_2025_official",
+          "note": "全市卫生技术人员存量，非实际可预约医师人数"
+        }
+      ],
+      "city_ids": [
+        910
+      ],
+      "source_note": "2026-11-18直接实读吉林省统计局发布的四平2025年统计公报，精确对应现有躺平榜city_id=910；仅独立2025事实展示，不修改SQLite原租金、评分或排名。气温为全地区，空气优良比例为全市城市环境口径。"
+    },
+    {
+      "id": 926,
+      "name": "盘锦市",
+      "province": "辽宁",
+      "list_type": "china_layflat",
+      "focus": "用官方2025年收入、医疗、养老、空气和交通数据核实居住条件。",
+      "tip": "全市统计值和房源级均价不可混用；盘锦2025公报披露的是年末户籍人口而非同口径年末常住人口，不自动混填。",
+      "source_level": "government",
+      "sources": [
+        {
+          "key": "panjin_2025_official",
+          "title": "盘锦市2025年国民经济和社会发展统计公报",
+          "date": "2026-04-14",
+          "url": "https://panjin.gov.cn/html/1934/2026-04-14/content-150766.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1417.6,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "panjin_2025_official",
+          "note": "2025全市地区生产总值，初步核算"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 46105,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "panjin_2025_official",
+          "note": "2025全年全体居民，不等于工资"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 52641,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "panjin_2025_official",
+          "note": "2025全市城镇居民年度人均口径"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 27907,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "panjin_2025_official",
+          "note": "2025全市农村居民年度人均口径"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 1252,
+          "unit": "个",
+          "category": "医疗",
+          "source": "panjin_2025_official",
+          "note": "包括医院、卫生院、诊所等，不是医院数"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 70,
+          "unit": "个",
+          "category": "医疗",
+          "source": "panjin_2025_official",
+          "note": "已包含在1252个卫生机构中，不可加总"
+        },
+        {
+          "key": "healthcare_beds_2025_ten_thousand",
+          "label": "医疗卫生机构床位",
+          "value": 1.1,
+          "unit": "万张",
+          "category": "医疗",
+          "source": "panjin_2025_official",
+          "note": "官方以1.1万张取整披露，不能转述为精确11000张或实时可用"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "住宿类养老机构",
+          "value": 85,
+          "unit": "个",
+          "category": "养老",
+          "source": "panjin_2025_official",
+          "note": "公报所述提供住宿的民政服务机构中养老机构85个，非全市所有养老服务点"
+        },
+        {
+          "key": "residential_social_services_beds_2025_count",
+          "label": "住宿类民政服务机构床位",
+          "value": 5240,
+          "unit": "张",
+          "category": "养老",
+          "source": "panjin_2025_official",
+          "note": "包含各类提供住宿的民政机构，不能当作85家养老机构专属床位"
+        },
+        {
+          "key": "air_quality_good_days_2025_pct",
+          "label": "空气质量优良天数比例",
+          "value": 88.2,
+          "unit": "%",
+          "category": "环境",
+          "source": "panjin_2025_official",
+          "note": "2025全年统计比例，不是今天空气质量"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "PM2.5年平均浓度",
+          "value": 29,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "panjin_2025_official",
+          "note": "2025全市空气监测年平均值，非各社区实时值"
+        },
+        {
+          "key": "public_transport_passenger_2025_ten_thousand",
+          "label": "全年旅客运输量",
+          "value": 2020,
+          "unit": "万人",
+          "category": "交通",
+          "source": "panjin_2025_official",
+          "note": "公报公路及水运交通运输口径，不能直接作公交日常通勤次数"
+        },
+        {
+          "key": "registered_population_2025_ten_thousand",
+          "label": "年末户籍人口",
+          "value": 127.2,
+          "unit": "万人",
+          "category": "人口",
+          "source": "panjin_2025_official",
+          "note": "年末户籍人口，不能与其他城市常住人口直接比较"
+        }
+      ],
+      "city_ids": [
+        926
+      ],
+      "source_note": "2026-11-18直接实读盘锦市人民政府发布的《二〇二五年盘锦市国民经济和社会发展统计公报》，精确对应现有躺平榜city_id=926；所有数据为公报统计值，不修改原租金、房价、评分、排名、图片或生产SQLite。"
     }
   ]
 }
