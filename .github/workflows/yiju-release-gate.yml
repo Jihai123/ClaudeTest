@@ -54,6 +54,20 @@ jobs:
         run: node scripts/ops/yiju_public_api_probe.mjs
       - name: Full city quality audit read-only regression (synthetic, no production fetch)
         run: node --test tests_js/yiju-city-quality-audit.test.js
+      - name: All-city enrichment inventory unit regression
+        run: node --test tests_js/yiju-all-city-enrichment-audit.test.js
+      - name: Read-only full public city and photo completeness inventory
+        if: ${{ matrix['node-version'] == '22' }}
+        continue-on-error: true
+        run: node scripts/ops/yiju_full_city_enrichment_audit.mjs yiju-city-enrichment-coverage.json
+      - name: Archive full per-city gap list
+        if: ${{ matrix['node-version'] == '22' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: yiju-city-enrichment-coverage
+          path: yiju-city-enrichment-coverage.json
+          if-no-files-found: ignore
+          retention-days: 14
       - name: All-city coverage inventory logic regression (synthetic)
         run: node --test tests_js/yiju-all-city-coverage.test.mjs
       - name: Read-only ALL production cities inventory (diagnostic)
