@@ -45,7 +45,7 @@ test('D11 two government bulletins map exactly to existing ranking IDs; 25 facts
 });
 test('citywide / city center and registered / permanent resident population cannot be mixed',()=>{
  const siping=getOfficialFacts(910),panjin=getOfficialFacts(926);
- assert.match(siping.source_level,'government');
+ assert.equal(siping.source_level,'government');
  assert.match(panjin.facts.find(x=>x.key==='registered_population_2025_ten_thousand').note,/户籍/);
  assert.ok(!panjin.facts.some(x=>x.key==='resident_population_2025_ten_thousand'));
  assert.match(panjin.facts.find(x=>x.key==='healthcare_beds_2025_ten_thousand').note,/取整/);
