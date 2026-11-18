@@ -96,6 +96,63 @@ export function summarize(cities,pagination=[]){
   });
   return {summary,rows,priorities:priorities.slice(0,60),photo_reuse_review:sharedCoverGroups};
 }
+
+export function selectPhotoSamples(cities){
+ const chosen=[],seen=new Set();
+ const add=(subset,n)=>{
+  for(const c of subset.sort((a,b)=>a.id-b.id)){
+   if(chosen.length>=20||n<=0||seen.has(c.id))continue;
+   const photo=c.cover_image||c.licensed_photo;
+   if(!photo?.image_url)continue;
+   chosen.push({id:c.id,name:c.name,list_type:c.list_type,
+     kind:c.cover_image?'approved':'licensed_fallback',
+     alt_missing:!!c.cover_image&&!String(c.cover_image.alt_text||'').trim(),
+     raw_url:photo.image_url});
+   seen.add(c.id);n--;
+  }
+ };
+ add(cities.filter(c=>c.cover_image?.image_url&&!String(c.cover_image.alt_text||'').trim()),2);
+ add(cities.filter(c=>!c.cover_image&&c.licensed_photo?.image_url),3);
+ for(const [type,n] of [['china_general',6],['china_layflat',6],['world',3]]){
+  add(cities.filter(c=>c.list_type===type&&c.cover_image?.image_url),n);
+ }
+ add(cities.filter(c=>c.cover_image?.image_url||c.licensed_photo?.image_url),20-chosen.length);
+ return chosen;
+}
+const SAFE_PHOTO_HOSTS=new Set(['yiju.zhibeimao.com','thumb.wikimedia.org','upload.wikimedia.org']);
+export function resolveSafePhotoUrl(raw,base='https://yiju.zhibeimao.com'){
+ try{
+  const url=new URL(raw,base);
+  if(url.protocol!=='https:'||!SAFE_PHOTO_HOSTS.has(url.hostname)||url.username||url.password)
+   return null;
+  return url.toString();
+ }catch(_){return null;}
+}
+export async function checkPhotoLinks(items,{fetchFn=globalThis.fetch,baseUrl='https://yiju.zhibeimao.com'}={}){
+ const results=[];
+ for(let start=0;start<items.length;start+=4){
+  const group=await Promise.all(items.slice(start,start+4).map(async item=>{
+   const safe=resolveSafePhotoUrl(item.raw_url,baseUrl);
+   const out={id:item.id,name:item.name,kind:item.kind,list_type:item.list_type,
+      alt_missing:item.alt_missing,host:null,http:null,link_status:'not_checked'};
+   if(!safe){out.link_status='external_host_review';return out;}
+   out.host=new URL(safe).hostname;
+   try{
+    // HEAD only: never download image content or follow untrusted redirects.
+    const response=await fetchFn(safe,{method:'HEAD',redirect:'manual',
+      signal:AbortSignal.timeout(7000)});
+    out.http=response.status;
+    out.link_status=response.status>=200&&response.status<300?'head_ok':
+      (response.status>=300&&response.status<400?'redirect_needs_check':
+       'head_unconfirmed');
+   }catch(error){out.link_status='network_unconfirmed';out.error=String(error?.cause?.code||error?.name||'fetch_error');}
+   return out;
+  }));
+  results.push(...group);
+ }
+ return results;
+}
+
 async function main(){
  const baseUrl=process.env.YIJU_BASE_URL||'https://yiju.zhibeimao.com';
  const fetched=await loadAll({
@@ -103,10 +160,25 @@ async function main(){
   fetchFn:(url,opts)=>fetch(url,{...opts,signal:AbortSignal.timeout(12000)})
  });
  const report=summarize(fetched.cities,fetched.pagination);
+ const photoItems=selectPhotoSamples(fetched.cities);
+ const photoChecks=await checkPhotoLinks(photoItems,{baseUrl});
+ const missingAlt=fetched.cities.filter(c=>c.cover_image?.image_url&&
+   !String(c.cover_image.alt_text||'').trim()).map(c=>({
+    id:c.id,name:c.name,province:c.province||null,list_type:c.list_type
+   }));
+ report.photo_link_probe={
+  checked_at:new Date().toISOString(),
+  sampled:photoChecks.length,
+  head_ok:photoChecks.filter(x=>x.link_status==='head_ok').length,
+  unresolved:photoChecks.filter(x=>x.link_status!=='head_ok').length,
+  status_note:'HEAD verifies reachability only. It does not validate photographed location, actual browser rendering, or copyright. No source image bytes fetched.',
+  items:photoChecks,missing_alt_cities:missingAlt
+ };
  fs.mkdirSync(path.dirname(OUT),{recursive:true});
  fs.writeFileSync(OUT,JSON.stringify(report,null,2)+'\n');
  console.log('YIJU_ALL_CITY_COVERAGE '+JSON.stringify(report.summary));
  console.log('YIJU_ALL_CITY_TOP30 '+JSON.stringify(report.priorities.slice(0,30)));
+ console.log('YIJU_PHOTO_LINK_AUDIT '+JSON.stringify(report.photo_link_probe));
  console.log('YIJU_ALL_CITY_ARTIFACT '+OUT+' (public city metadata only)');
 }
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
