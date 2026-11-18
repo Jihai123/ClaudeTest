@@ -159,6 +159,9 @@
         link.rel = 'noopener noreferrer';
         foot.append(link);
       }
+      const checklist = node('a', 'evidence-source-link', '带着此城做6项实地核查');
+      checklist.href = 'city-living-checklist.html?city=' + encodeURIComponent(city.name);
+      foot.append(checklist);
       const view = node('a', 'evidence-detail-link', '查看城市资料与注意事项');
       view.href = 'city-detail.html?id=' + city.city_ids[0];
       item.append(head, label, value, note, foot, view);
