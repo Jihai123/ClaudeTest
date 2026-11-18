@@ -7,6 +7,8 @@ const checks = [
   ['miyun', '/api/cities/955'],
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
+  ['homepage-js-fresh', '/city-evidence-explorer.js?v=20261118-d11'],
+  ['homepage-html', '/'],
   ['robots', '/robots.txt'],
   ['sitemap', '/sitemap.xml'],
   ['candidate-ankang', '/api/cities?search=' + encodeURIComponent('安康') + '&limit=20'],
@@ -53,10 +55,16 @@ async function inspect([label, path]) {
     }
     if (label === 'checklist-html') return { label, http: response.status,
       hasLocalPersistence: body.includes('yiju.checklist.items.v2:'),
+      hasCityLinkPrefill: body.includes('new URLSearchParams(location.search)'),
       hasPolicySource: body.includes('nhsa.gov.cn/art/2026/5/27/art_104_20751.html'),
       bytes: body.length };
-    if (label === 'homepage-js') return { label, http: response.status,
-      hasRotation: body.includes('rotateFeaturedCities'), bytes: body.length };
+    if (label === 'homepage-js' || label === 'homepage-js-fresh') return { label, http: response.status,
+      hasRotation: body.includes('rotateFeaturedCities'),
+      hasChecklistDeepLink: body.includes('city-living-checklist.html?city='),
+      bytes: body.length };
+    if (label === 'homepage-html') return { label, http: response.status,
+      hasFreshScriptVersion: body.includes('city-evidence-explorer.js?v=20261118-d11'),
+      bytes: body.length };
     if (label === 'robots') return { label, http: response.status,
       hasBaiduspider: body.includes('Baiduspider'), bytes: body.length };
     return { label, http: response.status,
