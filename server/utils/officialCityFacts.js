@@ -87,6 +87,46 @@ const licensedPhotos = new Map([
     license: 'CC BY-SA 4.0',
     caption: '上饶市信州区城区景观（2017年10月28日）',
     changed: false
+  })],
+  // Changzhi Museum, Shanxi, Commons "Changzhi Museum 20260116.jpg", 1969社论.
+  [1410, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Changzhi_Museum_20260116.jpg/960px-Changzhi_Museum_20260116.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:Changzhi_Museum_20260116.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: '1969社论',
+    license: 'CC BY-SA 4.0',
+    caption: '长治市博物馆新馆（2026年1月16日）',
+    changed: false
+  })],
+  // Hamburg (Germany), Commons "Hamburg City.jpg" by Lucas366, 2011.
+  [1520, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Hamburg_City.jpg/960px-Hamburg_City.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:Hamburg_City.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Lucas366',
+    license: 'CC BY-SA 4.0',
+    caption: '德国汉堡市城市景观（2011年1月15日）',
+    changed: false
+  })],
+  // Zhongshan Street, Jiamusi, Commons by 颜邯, February 2018.
+  [1456, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/%E4%BD%B3%E6%9C%A8%E6%96%AF%E5%B8%82%E4%B8%AD%E5%B1%B1%E8%A1%97%EF%BC%8C%E5%8E%9F%E6%AD%A5%E8%A1%8C%E8%A1%97%E6%AE%B5_Zhongshan_Street%2C_Jiamusi%2C_Feb_2018.jpg/960px-%E4%BD%B3%E6%9C%A8%E6%96%AF%E5%B8%82%E4%B8%AD%E5%B1%B1%E8%A1%97%EF%BC%8C%E5%8E%9F%E6%AD%A5%E8%A1%8C%E8%A1%97%E6%AE%B5_Zhongshan_Street%2C_Jiamusi%2C_Feb_2018.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:%E4%BD%B3%E6%9C%A8%E6%96%AF%E5%B8%82%E4%B8%AD%E5%B1%B1%E8%A1%97%EF%BC%8C%E5%8E%9F%E6%AD%A5%E8%A1%8C%E8%A1%97%E6%AE%B5_Zhongshan_Street%2C_Jiamusi%2C_Feb_2018.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: '颜邯',
+    license: 'CC BY-SA 4.0',
+    caption: '佳木斯市中山街与西林路路口（2018年2月）',
+    changed: false
+  })],
+  // Fanhe New City, Tieling, Commons by Tomskyhaha (2012-10-04).
+  [918, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Scenery_in_Tieling_New_City_04.jpg/960px-Scenery_in_Tieling_New_City_04.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:Scenery_in_Tieling_New_City_04.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Tomskyhaha',
+    license: 'CC BY-SA 4.0',
+    caption: '辽宁省铁岭市凡河新区景观（2012年10月4日）',
+    changed: false
   })]
 ]);
 
