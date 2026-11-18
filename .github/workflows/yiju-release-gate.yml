@@ -54,6 +54,20 @@ jobs:
         run: node scripts/ops/yiju_public_api_probe.mjs
       - name: Full city quality audit read-only regression (synthetic, no production fetch)
         run: node --test tests_js/yiju-city-quality-audit.test.js
+      - name: All-city coverage inventory logic regression (synthetic)
+        run: node --test tests_js/yiju-all-city-coverage.test.mjs
+      - name: Read-only ALL production cities inventory (diagnostic)
+        if: ${{ matrix['node-version'] == '22' }}
+        continue-on-error: true
+        run: node scripts/ops/yiju_all_city_coverage.mjs
+      - name: Keep all-city public inventory artifact for human source/photo verification
+        if: ${{ matrix['node-version'] == '22' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: yiju-all-city-coverage
+          path: artifacts/yiju-all-city-coverage.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Real isolated SQLite regression
         run: npm run test:city-data:sqlite
       - name: SEO, pagination and canonical regressions
