@@ -39,12 +39,14 @@ async function inspect([label, path]) {
       }
       return { label, http: response.status, cityCount: json.cities?.length ?? null,
         factCount: (json.cities || []).reduce((n,c) => n + (c.facts?.length || 0), 0),
-        miyunExists: Boolean((json.cities || []).find(c => c.id === 955)) };
+        miyunExists: Boolean((json.cities || []).find(c => c.id === 955)),
+        ankangFactCount: (json.cities || []).find(c => c.id === 1449)?.facts?.length ?? null };
     }
     if (label === 'candidate-ankang') {
       const json = JSON.parse(body);
       const rows = (json.cities || []).map(c => ({
-        id: c.id, name: c.name, province: c.province, list_type: c.list_type
+        id: c.id, name: c.name, province: c.province, list_type: c.list_type,
+        sourcedFacts: c.official_facts_summary?.count ?? null
       }));
       return { label, http: response.status,
         total: json.pagination?.total ?? null, matches: rows };
