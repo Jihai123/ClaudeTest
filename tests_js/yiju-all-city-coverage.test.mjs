@@ -9,13 +9,14 @@ const entry=(id,opts={})=>({
  ...opts
 });
 test('all-ranking coverage keeps every ID and separates usable photos from approval',()=>{
- const input=[entry(11,{cover_image:{image_url:'https://example.com/approved.jpg'}}),
-  entry(12),entry(13),entry(14,{avg_rent:50})];
- const lookup={
-  getSummary:id=>id===11||id===12?{count:8,year:2025}:null,
-  getLicensedPhoto:id=>id===12||id===13?{image_url:'https://commons.example'}:null
- };
- const r=summarize(input,[],lookup);
+ const photo={image_url:'https://thumb.wikimedia.org/test.jpg',
+  source_url:'https://commons.wikimedia.org/wiki/File:Test.jpg',author:'Author',
+  license:'CC BY-SA 4.0',caption:'Precise location',license_url:'https://creativecommons.org/licenses/by-sa/4.0/'};
+ const input=[
+  entry(11,{cover_image:{image_url:'https://example.com/approved.jpg'},official_facts_summary:{count:8}}),
+  entry(12,{licensed_photo:photo,official_facts_summary:{count:8}}),
+  entry(13,{licensed_photo:photo}),entry(14,{avg_rent:50})];
+ const r=summarize(input);
  assert.equal(r.summary.scanned,4);
  assert.equal(r.summary.unique_ids,4);
  assert.equal(r.summary.official_facts_covered,2);
@@ -31,10 +32,28 @@ test('all-ranking coverage keeps every ID and separates usable photos from appro
 });
 test('same place names, source gap and zero score must not be auto-repaired',()=>{
  const rows=[entry(21,{name:'同名',province:'同省'}),entry(22,{name:'同名',province:'同省'})];
- const r=summarize(rows,[],{getSummary:()=>null,getLicensedPhoto:()=>null});
+ const r=summarize(rows);
  assert.equal(r.summary.identity_review_records,2);
  assert.deepEqual(r.summary.duplicate_ids,[]);
  assert.ok(r.rows.every(x=>x.work_status==='source_or_image_review_required'));
  assert.ok(r.rows.every(x=>x.missing_fields.includes('population')));
  assert.equal(rows[0].population,null);
+});
+
+
+test('a PR-only verified photo and sourced facts never inflate actual production counts',()=>{
+ const fake=[entry(901,{licensed_photo:null,official_facts_summary:null})];
+ const r=summarize(fake);
+ assert.equal(r.summary.official_facts_covered,0);
+ assert.equal(r.summary.available_licensed_fallbacks,0);
+ assert.equal(r.summary.without_any_usable_cover,1);
+ assert.match(r.summary.measurement,/live API fields/);
+});
+test('non-Wikimedia or unlicensed raw photo cannot be counted as covered',()=>{
+ const fake=[entry(902,{licensed_photo:{image_url:'https://example.com/stock.jpg',
+  source_url:'https://commons.wikimedia.org/wiki/File:NotThis.jpg',
+  author:'unverified',license:'unknown',caption:'somewhere'}})];
+ const r=summarize(fake);
+ assert.equal(r.summary.available_licensed_fallbacks,0);
+ assert.equal(r.rows[0].needs_cover,true);
 });
