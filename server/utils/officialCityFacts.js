@@ -127,6 +127,16 @@ const licensedPhotos = new Map([
     license: 'CC BY-SA 4.0',
     caption: '辽宁省铁岭市凡河新区景观（2012年10月4日）',
     changed: false
+  })],
+  // Yulin (Guangxi) skyline, Commons original work by Zeilmeter (2006-07-12).
+  [1383, Object.freeze({
+    image_url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Yulin_Skyline.jpg/960px-Yulin_Skyline.jpg',
+    source_url: 'https://commons.wikimedia.org/wiki/File:Yulin_Skyline.jpg',
+    license_url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    author: 'Zeilmeter',
+    license: 'CC BY-SA 4.0',
+    caption: '广西玉林市城区天际线（2006年7月12日）',
+    changed: false
   })]
 ]);
 
