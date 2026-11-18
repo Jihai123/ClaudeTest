@@ -802,6 +802,10 @@
             const gallery = document.getElementById('imageGallery');
             const uploadPrompt = document.getElementById('uploadPrompt');
             const uploadLinkWithImages = document.getElementById('uploadLinkWithImages');
+            const photoHost = document.getElementById('licensedPhotoFallback');
+            photoHost.replaceChildren();
+            photoHost.style.display = 'none';
+            uploadPrompt.style.display = 'none';
 
             // 设置上传链接
             const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
@@ -816,8 +820,45 @@
                 // 有图片时，显示顶部的上传按钮
                 uploadLinkWithImages.style.display = 'inline-block';
                 uploadLinkWithImages.href = uploadUrl;
+            } else if (cityData.licensed_photo &&
+                /^https:\/\/(?:thumb|upload)\.wikimedia\.org\//.test(cityData.licensed_photo.image_url) &&
+                /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/.test(cityData.licensed_photo.source_url) &&
+                cityData.licensed_photo.license === 'CC BY-SA 4.0' &&
+                cityData.licensed_photo.author && cityData.licensed_photo.caption) {
+                // Use a license-attributed real photo only when no reviewed image exists.
+                const p = cityData.licensed_photo;
+                const figure = document.createElement('figure');
+                figure.className = 'licensed-photo';
+                const img = document.createElement('img');
+                img.src = p.image_url;
+                img.alt = p.caption;
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.addEventListener('error', () => {
+                    photoHost.replaceChildren();
+                    photoHost.style.display = 'none';
+                    uploadPrompt.style.display = 'block';
+                });
+                const caption = document.createElement('figcaption');
+                caption.textContent = p.caption + ' · 摄影：' + p.author + ' · ' + p.license + ' · ';
+                const source = document.createElement('a');
+                source.href = p.source_url;
+                source.target = '_blank';
+                source.rel = 'noopener noreferrer';
+                source.textContent = '作品来源';
+                const license = document.createElement('a');
+                license.href = p.license_url;
+                license.target = '_blank';
+                license.rel = 'noopener noreferrer';
+                license.textContent = '授权条款';
+                caption.append(source, document.createTextNode(' · '), license);
+                figure.append(img, caption);
+                photoHost.append(figure);
+                photoHost.style.display = 'block';
+                uploadLinkWithImages.style.display = 'inline-block';
+                uploadLinkWithImages.href = uploadUrl;
             } else {
-                // 没有图片时，显示上传提示
+                // No approved or licensed photo: explicitly request user submissions.
                 uploadPrompt.style.display = 'block';
                 const uploadLink = document.getElementById('uploadLink');
                 if (uploadLink) {
