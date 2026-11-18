@@ -9,11 +9,10 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const {loadAll, audit} = require('../audit/yiju_city_quality_audit.js');
-const {getSummary, getLicensedPhoto} = require('../../server/utils/officialCityFacts.js');
 const OUT = 'artifacts/yiju-all-city-coverage.json';
 const MISSING = ['population','gdp','area','notes','location_intro','avg_rent'];
 
-export function summarize(cities,pagination=[],lookups={getSummary,getLicensedPhoto}){
+export function summarize(cities,pagination=[]){
   if(!Array.isArray(cities)) throw Error('cities required');
   const knownNames = new Map();
   for(const city of cities){
@@ -23,8 +22,12 @@ export function summarize(cities,pagination=[],lookups={getSummary,getLicensedPh
   }
   const rows=cities.map(c=>{
     const approved=Boolean(c.cover_image?.image_url||c.cover_image?.thumbnail_url);
-    const fallback=!approved?lookups.getLicensedPhoto(c.id):null;
-    const facts=lookups.getSummary(c.id);
+    // Use ONLY the production API response, never the PR checkout's local maps.
+    const rawPhoto=!approved?c.licensed_photo:null;
+    const fallback=rawPhoto && /^https:\/\/(?:thumb|upload)\.wikimedia\.org\//.test(rawPhoto.image_url||'') &&
+      /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/.test(rawPhoto.source_url||'') &&
+      /^CC BY-SA (?:3\.0|4\.0)$/.test(rawPhoto.license||'') && rawPhoto.author && rawPhoto.caption ? rawPhoto : null;
+    const facts=c.official_facts_summary || null;
     const missing=MISSING.filter(k=>c[k]===undefined||c[k]===null||c[k]==='');
     const k=[String(c.name||'').trim(),String(c.province||'').trim(),
       String(c.country||'').trim()].join('|');
@@ -37,6 +40,7 @@ export function summarize(cities,pagination=[],lookups={getSummary,getLicensedPh
       list_type:c.list_type,
       official_fact_count:facts?.count||0,
       approved_image:approved,licensed_fallback:!!fallback,
+      fallback_source_url:fallback?fallback.source_url:null,
       needs_cover:!approved&&!fallback,missing_fields:missing,
       uncertain_rent:flaggedRent,identity_review:identityReview,
       work_status:'source_or_image_review_required'
@@ -55,6 +59,7 @@ export function summarize(cities,pagination=[],lookups={getSummary,getLicensedPh
     available_licensed_fallbacks:count(r=>!r.approved_image&&r.licensed_fallback),
     without_any_usable_cover:count(r=>r.needs_cover),
     without_sourced_facts:count(r=>r.official_fact_count===0),
+    measurement:'all source/cover counts are derived from live API fields, not repository code',
     missing:report.missing,
     suspicious_rent_records:count(r=>r.uncertain_rent),
     identity_review_records:count(r=>r.identity_review),
