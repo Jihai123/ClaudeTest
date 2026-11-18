@@ -34,6 +34,6 @@ test('hidden legacy rent protection does not touch database, official facts or a
  const compare=read('city-compare.html');
  const detail=read('city-detail.html');
  assert.match(compare,/查看详情/);
- assert.match(detail,/cityData\.official_facts/);
+ assert.match(detail,/officialFacts/);
  assert.doesNotMatch(detail,/fetch\([^\n]*POST[^\n]*avg_rent/);
 });
