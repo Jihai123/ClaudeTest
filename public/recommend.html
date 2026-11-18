@@ -476,9 +476,11 @@
             // 1. Budget
             switch (answers.budget) {
                 case 'low':
+                    // Avoid ordering by unverifiable legacy rent. Budget is a preference,
+                    // not a validated city-wide price ranking.
                     params.append('list_type', 'china_layflat');
-                    params.append('sort', 'avg_rent');
-                    params.append('order', 'ASC');
+                    params.append('sort', 'overall_score');
+                    params.append('order', 'DESC');
                     break;
                 case 'medium':
                     params.append('sort', 'living_cost');
