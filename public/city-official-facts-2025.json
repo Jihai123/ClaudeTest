@@ -2772,6 +2772,686 @@
         926
       ],
       "source_note": "2026-11-18直接实读盘锦市人民政府发布的《二〇二五年盘锦市国民经济和社会发展统计公报》，精确对应现有躺平榜city_id=926；所有数据为公报统计值，不修改原租金、房价、评分、排名、图片或生产SQLite。"
+    },
+    {
+      "id": 943,
+      "name": "哈密市",
+      "province": "新疆",
+      "list_type": "china_layflat",
+      "focus": "核对城乡收入和全市医疗床位，再实地确认居住地与就医距离。",
+      "tip": "哈密收入统计分城乡；医院及卫生院床位不等于养老空床。旅游旺季住宿报价不能代替长期租金。",
+      "source_level": "government",
+      "city_ids": [
+        943
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_943",
+          "title": "哈密市2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-05-09",
+          "url": "https://www.hami.gov.cn/hami/c120173/202605/9bc459f53d3d4abda752ae0e967cf68a.shtml"
+        }
+      ],
+      "facts": [
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 40050,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_943",
+          "note": "2025年哈密全市居民平均值，不是工资或单个家庭的收入"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 48647,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_943",
+          "note": "2025年按常住地划分的哈密城镇居民"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 27533,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_943",
+          "note": "2025年哈密农村居民年度人均值"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 389,
+          "unit": "个",
+          "category": "医疗",
+          "source": "d11_nov18_943",
+          "note": "2025年哈密全市医疗卫生机构，不等同医院数"
+        },
+        {
+          "key": "hospitals_clinics_beds_2025_count",
+          "label": "医院和卫生院实有床位",
+          "value": 2755,
+          "unit": "张",
+          "category": "医疗",
+          "source": "d11_nov18_943",
+          "note": "包含医院与卫生院年末实有床位，不等于养老机构床位或即时空床"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=943；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 1061,
+      "name": "淮南市",
+      "province": "安徽",
+      "list_type": "china_layflat",
+      "focus": "比对2025年常住人口、城乡收入与住宿类民政服务设施。",
+      "tip": "住宿类民政服务机构并不等于全部是养老院；统计人均收入也不能直接替代当地可租房源价格。",
+      "source_level": "government",
+      "city_ids": [
+        1061
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_1061",
+          "title": "淮南市2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-07-10",
+          "url": "https://tjj.huainan.gov.cn/zxfbyjd/551865247.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1750.1,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_1061",
+          "note": "2025年淮南全市初步核算GDP"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 300,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_1061",
+          "note": "淮南2025年末常住人口而非户籍人口"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 49377,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1061",
+          "note": "2025年淮南全市城镇居民年度人均"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 21385,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1061",
+          "note": "2025年淮南全市农村居民年度人均"
+        },
+        {
+          "key": "residential_social_services_2025_count",
+          "label": "住宿类民政服务机构",
+          "value": 162,
+          "unit": "个",
+          "category": "养老",
+          "source": "d11_nov18_1061",
+          "note": "公报统计的提供住宿的各类民政服务机构，不可全部理解为养老机构"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=1061；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 1079,
+      "name": "常德市",
+      "province": "湖南",
+      "list_type": "china_layflat",
+      "focus": "结合全市人口、城乡居民收入和医疗卫生机构数，按县区评估生活便利。",
+      "tip": "2025年指标为常德全市口径，医院、乡镇卫生院及村卫生室均计入机构总数；租房仍须逐社区核对。",
+      "source_level": "government",
+      "city_ids": [
+        1079
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_1079",
+          "title": "常德市2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-05-15",
+          "url": "https://tjj.hunan.gov.cn/hntj/tjfx/tjgb/szgb/cds_1/202605/t20260518_33979393.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 4770.9,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_1079",
+          "note": "2025年常德全市初步核算GDP"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 510.7,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_1079",
+          "note": "常德全市2025年末常住人口"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 45683,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1079",
+          "note": "2025年常德城镇居民年度人均"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 25495,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1079",
+          "note": "2025年常德农村居民年度人均"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 4637,
+          "unit": "个",
+          "category": "医疗",
+          "source": "d11_nov18_1079",
+          "note": "全市各类机构总量，包括医院、基层卫生室和诊所，并非医院数"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=1079；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 939,
+      "name": "通辽市",
+      "province": "内蒙古",
+      "list_type": "china_layflat",
+      "focus": "优先查看人口结构、城镇化及就业数据，核实具体城区医疗和交通。",
+      "tip": "人口和老龄结构是通辽全市统计口径；就业新增人数不是当前招聘职位，城市房租不可由此推算。",
+      "source_level": "government",
+      "city_ids": [
+        939
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_939",
+          "title": "通辽市2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-04-21",
+          "url": "https://tjj.tongliao.gov.cn/xwzx/sjfbyjd/202604/t20260421_1044488.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1737.7,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_939",
+          "note": "2025年全市地区生产总值统一核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 275.2,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_939",
+          "note": "2025年全市年末常住人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 53.72,
+          "unit": "%",
+          "category": "人口",
+          "source": "d11_nov18_939",
+          "note": "全市城镇人口占常住人口比例"
+        },
+        {
+          "key": "elderly_65plus_population_2025_ten_thousand",
+          "label": "65岁及以上常住人口",
+          "value": 43.87,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_939",
+          "note": "2025年全市65岁以上常住人口，不是养老床位需求数"
+        },
+        {
+          "key": "new_urban_jobs_2025_count",
+          "label": "全年城镇新增就业人数",
+          "value": 15614,
+          "unit": "人",
+          "category": "就业",
+          "source": "d11_nov18_939",
+          "note": "2025年当年新增就业累计，不是实时空缺职位数"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=939；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 917,
+      "name": "白城市",
+      "province": "吉林",
+      "list_type": "china_layflat",
+      "focus": "查看人口变化、城乡收入和全市养老机构规模，提前确认冬季生活条件。",
+      "tip": "白城全市统计包含县区，养老机构数量不能代表目前空床或申请资格；不据旧租金作低价承诺。",
+      "source_level": "government",
+      "city_ids": [
+        917
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_917",
+          "title": "白城市2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-09-07",
+          "url": "https://tjj.jl.gov.cn/tjsj/tjgb/ndgb/202609/t20260907_3668501.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 626.52,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_917",
+          "note": "2025年白城全市GDP初步核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 141.86,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_917",
+          "note": "白城2025年末常住人口"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇常住居民人均可支配收入",
+          "value": 33679,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_917",
+          "note": "全市城镇常住居民年度人均"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村常住居民人均可支配收入",
+          "value": 17659,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_917",
+          "note": "全市农村常住居民年度人均"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 110,
+          "unit": "家",
+          "category": "养老",
+          "source": "d11_nov18_917",
+          "note": "2025年白城公办及民办养老机构总数，非即时可申请数量"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=917；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 972,
+      "name": "三门峡市",
+      "province": "河南",
+      "list_type": "china_layflat",
+      "focus": "核实市域人口、城乡居民收入与常住人口结构，筛选具体县区再实地走访。",
+      "tip": "全市城乡收入是居民样本平均值，不能代替目标街区的生活预算和可租房源价格。",
+      "source_level": "government",
+      "city_ids": [
+        972
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_972",
+          "title": "三门峡市2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-06-22",
+          "url": "https://www.smx.gov.cn/10486/2026/6/2269438.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 1702.61,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_972",
+          "note": "2025年全市初步核算地区生产总值"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 199.5,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_972",
+          "note": "全市常住人口，不等于中心城区人口"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 32469,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_972",
+          "note": "全市居民全年人均可支配收入"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 40487,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_972",
+          "note": "按常住地划分的2025年城镇居民人均值"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 23534,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_972",
+          "note": "按常住地划分的2025年农村居民人均值"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=972；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 1216,
+      "name": "北京",
+      "province": "北京市",
+      "list_type": "world",
+      "focus": "借助北京全市人口、医疗卫生机构和环境监测的2025年公开数据比较公共服务规模。",
+      "tip": "北京在本站世界榜是原有榜单归属，不代表本资料采用全球可比评分；医疗机构数及市域PM2.5不能直接推断各社区医疗或空气状况。",
+      "source_level": "government",
+      "city_ids": [
+        1216
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_1216",
+          "title": "北京2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-03-25",
+          "url": "https://tjj.beijing.gov.cn/zxfbu/202603/t20260324_4564401.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 52073.4,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_1216",
+          "note": "2025年北京市GDP初步核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 2180,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_1216",
+          "note": "全市2025年末常住人口抽样推算"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 11994,
+          "unit": "个",
+          "category": "医疗",
+          "source": "d11_nov18_1216",
+          "note": "医院和各类基层医疗卫生机构总量"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 782,
+          "unit": "个",
+          "category": "医疗",
+          "source": "d11_nov18_1216",
+          "note": "医院已包含在11994个医疗卫生机构内，不可重复相加"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "PM2.5年均浓度",
+          "value": 27,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "d11_nov18_1216",
+          "note": "北京市2025全年空气质量年均值，不代表具体街区实时值"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=1216；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 1212,
+      "name": "上海",
+      "province": "上海市",
+      "list_type": "china_general",
+      "focus": "依据2025年常住人口、居民收入和PM2.5年度数据了解城市总体量级。",
+      "tip": "全市年均收入和空气浓度不能替代特定区域的租金、通勤或即时环境实测。",
+      "source_level": "government",
+      "city_ids": [
+        1212
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_1212",
+          "title": "上海2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-03-30",
+          "url": "https://tjj.sh.gov.cn/tjgb/20260330/e0772941e8e041eaaad2df850b44ef98.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 56708.71,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_1212",
+          "note": "上海2025年地区生产总值初步核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 2485.41,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_1212",
+          "note": "2025年上海市年末常住人口"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 91987,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1212",
+          "note": "上海市全年居民抽样调查人均值，不是工资"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇常住居民人均可支配收入",
+          "value": 96842,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1212",
+          "note": "上海市城镇常住居民年度人均"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "PM2.5年均浓度",
+          "value": 26.3,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "d11_nov18_1212",
+          "note": "2025年上海市环境空气统计年均值"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=1212；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 1214,
+      "name": "广州",
+      "province": "广东省",
+      "list_type": "china_general",
+      "focus": "核对2025年常住人口与城乡居民收入，关注目标社区的交通和就医距离。",
+      "tip": "广州城镇化率与收入均是市域年度统计，实际生活成本按所选城区、户型和通勤范围自行核查。",
+      "source_level": "government",
+      "city_ids": [
+        1214
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_1214",
+          "title": "广州2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-05-10",
+          "url": "https://tjj.gz.gov.cn/stats_newtjyw/tjsj/tjgb/qstjgb/content/post_10800227.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 1910.1,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_1214",
+          "note": "2025年广州市全市年末常住人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 87.56,
+          "unit": "%",
+          "category": "人口",
+          "source": "d11_nov18_1214",
+          "note": "全市常住人口城镇化比例"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 80591,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1214",
+          "note": "广州全市居民全年人均值"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 86069,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1214",
+          "note": "广州市城镇居民全年人均值"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 43145,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1214",
+          "note": "广州市农村居民全年人均值"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=1214；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 1210,
+      "name": "深圳",
+      "province": "广东省",
+      "list_type": "china_general",
+      "focus": "以2025年全市人口、居民收入和医保参保口径为参考，进一步确认社区医疗、学校与居住负担。",
+      "tip": "深圳常住人口与城镇人口比例非常接近，但参保人数不等于医院数量和床位；年度居民收入不能当做房源价格。",
+      "source_level": "government",
+      "city_ids": [
+        1210
+      ],
+      "sources": [
+        {
+          "key": "d11_nov18_1210",
+          "title": "深圳2025年国民经济和社会发展统计公报（统计部门或政府发布）",
+          "date": "2026-05-25",
+          "url": "https://tjj.sz.gov.cn/zwgk/zfxxgkml/tjsj/tjgb/content/post_12803919.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 38731.8,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "d11_nov18_1210",
+          "note": "深圳市2025年地区生产总值统一核算"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 1824.85,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_1210",
+          "note": "深圳2025年末常住人口；与城镇常住人口1820.96万人口径不同"
+        },
+        {
+          "key": "urban_resident_population_2025_ten_thousand",
+          "label": "其中城镇常住人口",
+          "value": 1820.96,
+          "unit": "万人",
+          "category": "人口",
+          "source": "d11_nov18_1210",
+          "note": "包含于1824.85万常住人口之内，不重复加总"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 84945,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "d11_nov18_1210",
+          "note": "深圳全市居民2025年全年人均可支配收入"
+        },
+        {
+          "key": "urban_employee_medical_insurance_2025_ten_thousand",
+          "label": "城镇职工基本医疗保险参保人数",
+          "value": 1419.37,
+          "unit": "万人",
+          "category": "医疗",
+          "source": "d11_nov18_1210",
+          "note": "年末职工医保参保人数，不是全市常住人口数或医疗机构数"
+        }
+      ],
+      "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=1210；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
     }
   ]
 }

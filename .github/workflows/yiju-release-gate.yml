@@ -43,7 +43,7 @@ jobs:
       - name: D06 first-visit practical browsing and honest city fields
         run: node --test tests_js/yiju-first-visit.test.js
       - name: D07 sourced new city facts and comparison guide
-        run: node --test tests_js/yiju-d07-new-city-data.test.js tests_js/yiju-d11-siping-panjin-facts.test.js
+        run: node --test tests_js/yiju-d07-new-city-data.test.js tests_js/yiju-d11-siping-panjin-facts.test.js tests_js/yiju-d11-ten-city-facts-2025.test.js
       - name: D08 editorial provenance and rent claims guard
         run: node --test tests_js/yiju-d08-featured-trust.test.js
       - name: D10 featured rotation and visible rent-tag trust regressions
