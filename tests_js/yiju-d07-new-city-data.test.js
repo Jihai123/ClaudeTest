@@ -11,8 +11,8 @@ const { getOfficialFacts, getSummary } = require('../server/utils/officialCityFa
 test('D07 retains its four EXACT city mappings after D10 adds Miyun', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 24);
-  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 201);
+  assert.equal(dataset.cities.length, 25);
+  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 211);
   const expected = new Map([[927,['本溪市',4]],[971,['鹤壁市',9]],
                             [996,['启东市',8]],[1074,['襄阳市',16]]]);
   for (const [id, [name, count]] of expected) {
@@ -62,7 +62,7 @@ test('all facts carry provenance, honest admin-region mapping, unique keys and s
       ids.add(cityId);
     }
   }
-  assert.equal(ids.size, 26, 'original aliases plus Miyun, Ankang, Zhoushan, Shangrao');
+  assert.equal(ids.size, 27, 'original aliases plus Miyun, Ankang, Zhoushan, Shangrao, Baishan');
 });
 
 test('public city decision page compares real 2025 fields and never treats legacy rents as verified', () => {
@@ -192,4 +192,26 @@ test('all-city enrichment batch: Zhoushan 1308 and Shangrao 1365 retain accurate
   assert.ok(!c.facts.some(f=>['avg_rent','score','ranking','medical_facilities'].includes(f.key)));
   assert.equal(getSummary(e.id).count,e.total);
  }
+});
+
+
+test('Baishan 915 from吉林省统计局 government bulletin stays separate from scores',()=>{
+ const c=dataset.cities.find(x=>x.id===915);
+ assert.ok(c);
+ assert.equal(c.name,'白山市');
+ assert.equal(c.province,'吉林省');
+ assert.equal(c.list_type,'china_layflat');
+ assert.deepEqual(c.city_ids,[915]);
+ assert.equal(c.source_level,'government');
+ assert.equal(c.sources[0].url,'https://tjj.jl.gov.cn/tjsj/tjgb/ndgb/202609/t20260907_3668512.html');
+ assert.equal(c.facts.length,10);
+ assert.equal(getSummary(915).count,10);
+ const facts=Object.fromEntries(c.facts.map(x=>[x.key,x]));
+ assert.equal(facts.gdp_2025_billion_cny.value,590.17);
+ assert.equal(facts.resident_population_2025_ten_thousand.value,87.53);
+ assert.equal(facts.urban_disposable_income_2025_cny.value,33304);
+ assert.equal(facts.rural_disposable_income_2025_cny.value,18078);
+ assert.equal(facts.healthcare_beds_2025_count.value,9568);
+ assert.ok(c.facts.every(f=>f.source===c.sources[0].key && f.unit && f.note));
+ assert.ok(!c.facts.some(f=>['avg_rent','score','medical_facilities','rank'].includes(f.key)));
 });
