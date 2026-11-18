@@ -135,7 +135,12 @@ export async function checkPhotoLinks(items,{fetchFn=globalThis.fetch,baseUrl='h
    const safe=resolveSafePhotoUrl(item.raw_url,baseUrl);
    const out={id:item.id,name:item.name,kind:item.kind,list_type:item.list_type,
       alt_missing:item.alt_missing,host:null,http:null,link_status:'not_checked'};
-   if(!safe){out.link_status='external_host_review';return out;}
+   if(!safe){
+    try { const u=new URL(item.raw_url,baseUrl);out.host=u.hostname.toLowerCase();
+      out.url_scheme=u.protocol.replace(':',''); }
+    catch(_) {out.url_scheme='invalid';}
+    out.link_status='external_host_review';return out;
+   }
    out.host=new URL(safe).hostname;
    try{
     // HEAD only: never download image content or follow untrusted redirects.
