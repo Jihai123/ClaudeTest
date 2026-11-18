@@ -84,13 +84,17 @@ test('Miyun 955 uses a Commons CC BY-SA real-photo fallback without overriding a
   assert.equal(getLicensedPhoto(897), null, 'do not replace city gallery images');
 });
 
-test('sitewide photo candidates: 5 exact city IDs, real Commons place and license',()=>{
+test('sitewide photo candidates: 9 exact city IDs, real Commons place and license',()=>{
  const expected=[
   [1449,'Liuxingy',/安康水电站/,/安康市汉江瀛湖/],
   [971,'Amazingloong',/鹤壁东站/,/鹤壁东站/],
   [1063,'EditQ',/安徽黄山市街景/,/黄山市街景/],
   [1308,'Maeshima hiroki',/A_panorama_of_Zhoushan/,/舟山市新城/],
-  [1365,'Qa003qa003',/Xinzhou_District/,/上饶市信州区/]
+  [1365,'Qa003qa003',/Xinzhou_District/,/上饶市信州区/],
+  [1410,'1969社论',/Changzhi_Museum/,/长治市博物馆/],
+  [1520,'Lucas366',/Hamburg_City/,/汉堡市/],
+  [1456,'颜邯',/Zhongshan_Street/,/佳木斯市中山街/],
+  [918,'Tomskyhaha',/Scenery_in_Tieling_New_City/,/铁岭市凡河新区/]
  ];
  for(const [id,author,file,place] of expected){
   const p=getLicensedPhoto(id);
