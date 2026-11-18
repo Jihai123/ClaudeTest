@@ -2063,6 +2063,331 @@
         1449
       ],
       "source_note": "2026-11-18直接阅读安康市统计局2025年统计公报全文，精确匹配站内综合榜城市ID1449（站内名称“安康”，官方名称“安康市”）。所有2025统计值不覆盖SQLite租金、房价、评分、排行或图片审批；居民收入非迁居预算，中心城区空气统计非市域口径，公办敬老院床位非实时可申请床位。"
+    },
+    {
+      "id": 1308,
+      "name": "舟山市",
+      "province": "浙江省",
+      "list_type": "china_general",
+      "focus": "海岛交通、收入、医疗和养老服务的官方口径核查",
+      "tip": "2025年全市年均收入不能代表新迁居者收入，口岸经济或机场客流不能替代日常交通可达性；请核对具体海岛与医院、船班。",
+      "source_level": "official_bulletin_reprint",
+      "sources": [
+        {
+          "key": "zhoushan_2025_reprint",
+          "title": "舟山市2025年国民经济和社会发展统计公报（公开全文转载，原件未在本轮完整读取）",
+          "date": "2026-05-17",
+          "url": "https://tjgb.hongheiku.com/djs/71400.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 2346.1,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "zhoushan_2025_reprint",
+          "note": "2025年全市初步核算数据，不代表家庭收入"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 118.1,
+          "unit": "万人",
+          "category": "人口",
+          "source": "zhoushan_2025_reprint",
+          "note": "按2025年1%人口抽样调查推算"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "城镇常住人口占比",
+          "value": 75.9,
+          "unit": "%",
+          "category": "人口",
+          "source": "zhoushan_2025_reprint",
+          "note": "全市城镇人口占全市常住人口比例"
+        },
+        {
+          "key": "elderly_population_60_plus_share_2025_pct",
+          "label": "60岁及以上常住人口占比",
+          "value": 31.3,
+          "unit": "%",
+          "category": "养老",
+          "source": "zhoushan_2025_reprint",
+          "note": "全市60岁及以上人口36.9万人，非老年人口医疗保障结论"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "居民人均可支配收入",
+          "value": 74528,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "zhoushan_2025_reprint",
+          "note": "全体居民年度人均值，非旅居个人工资"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 82911,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "zhoushan_2025_reprint",
+          "note": "城镇居民调查口径"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 54902,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "zhoushan_2025_reprint",
+          "note": "农村居民调查口径"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 749,
+          "unit": "个",
+          "category": "医疗",
+          "source": "zhoushan_2025_reprint",
+          "note": "全市机构数量包含不同类别，不等于医院数"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 39,
+          "unit": "个",
+          "category": "医疗",
+          "source": "zhoushan_2025_reprint",
+          "note": "包含在全市749个医疗卫生机构中，不能重复相加"
+        },
+        {
+          "key": "healthcare_beds_2025_count",
+          "label": "医疗卫生机构开放床位",
+          "value": 6703,
+          "unit": "张",
+          "category": "医疗",
+          "source": "zhoushan_2025_reprint",
+          "note": "年末开放床位总量，不等于实时可用床位"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 47,
+          "unit": "家",
+          "category": "养老",
+          "source": "zhoushan_2025_reprint",
+          "note": "全市年末养老机构数量"
+        },
+        {
+          "key": "eldercare_beds_2025_count",
+          "label": "养老机构床位",
+          "value": 6188,
+          "unit": "张",
+          "category": "养老",
+          "source": "zhoushan_2025_reprint",
+          "note": "全市年末养老机构总床位，非实际可申请床位"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "PM2.5年均浓度",
+          "value": 15.5,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "zhoushan_2025_reprint",
+          "note": "2025全市统计值，非实时空气质量"
+        },
+        {
+          "key": "air_quality_good_days_2025_pct",
+          "label": "空气优良达标天数比例",
+          "value": 97,
+          "unit": "%",
+          "category": "环境",
+          "source": "zhoushan_2025_reprint",
+          "note": "2025年全市天数比例，不等于每座海岛每一天"
+        },
+        {
+          "key": "airport_passenger_trips_2025_ten_thousand",
+          "label": "普陀山机场客运吞吐量",
+          "value": 289,
+          "unit": "万人次",
+          "category": "交通",
+          "source": "zhoushan_2025_reprint",
+          "note": "2025年度机场吞吐量，不能直接推断具体航线运力"
+        }
+      ],
+      "city_ids": [
+        1308
+      ],
+      "source_note": "2026-11-18实读统计公报公开全文转载，尚未完整读取政府官网原件，因此来源级别official_bulletin_reprint。独立附加2025统计事实，不覆盖评分、房租、图像审核或数据库记录。不同统计口径不可跨城市直接当作购买力/宜居评分。"
+    },
+    {
+      "id": 1365,
+      "name": "上饶市",
+      "province": "江西省",
+      "list_type": "china_general",
+      "focus": "以居民收入、医疗、养老和环境等指标辅助实地选城",
+      "tip": "统计公报是全市范围，信州区与周边县城生活成本、医院可达性可能差异显著；未知房租请保持待核，不替换评分。",
+      "source_level": "official_bulletin_reprint",
+      "sources": [
+        {
+          "key": "shangrao_2025_reprint",
+          "title": "上饶市2025年国民经济和社会发展统计公报（公开全文转载，原件未在本轮完整读取）",
+          "date": "2026-05-17",
+          "url": "https://tjgb.hongheiku.com/xjtjgb/xj2020/71249.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 3935.9,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "shangrao_2025_reprint",
+          "note": "2025年全市初步核算，不能推断家庭收入"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 627.1,
+          "unit": "万人",
+          "category": "人口",
+          "source": "shangrao_2025_reprint",
+          "note": "上饶市域年末常住人口，不等于上饶市区人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "城镇人口比重",
+          "value": 58.86,
+          "unit": "%",
+          "category": "人口",
+          "source": "shangrao_2025_reprint",
+          "note": "2025年全市常住人口城镇化率"
+        },
+        {
+          "key": "per_capita_gdp_2025_cny",
+          "label": "人均地区生产总值",
+          "value": 62366,
+          "unit": "元",
+          "category": "经济",
+          "source": "shangrao_2025_reprint",
+          "note": "全市GDP除人口的宏观指标，并非居民收入"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "居民人均可支配收入",
+          "value": 37143,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "shangrao_2025_reprint",
+          "note": "全体居民2025年人均年度值"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 51277,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "shangrao_2025_reprint",
+          "note": "城镇居民年度口径，非月薪"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 22810,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "shangrao_2025_reprint",
+          "note": "农村居民年度口径"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 5974,
+          "unit": "个",
+          "category": "医疗",
+          "source": "shangrao_2025_reprint",
+          "note": "包括村卫生室、医院和基层机构，非医院总数"
+        },
+        {
+          "key": "hospitals_and_health_centers_2025_count",
+          "label": "医院类及卫生院",
+          "value": 395,
+          "unit": "个",
+          "category": "医疗",
+          "source": "shangrao_2025_reprint",
+          "note": "合并口径，不能单独宣传为医院395家"
+        },
+        {
+          "key": "healthcare_beds_2025_ten_thousand",
+          "label": "医院及卫生院床位",
+          "value": 3.9,
+          "unit": "万张",
+          "category": "医疗",
+          "source": "shangrao_2025_reprint",
+          "note": "医院及卫生院口径，非当前可住床位"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 174,
+          "unit": "家",
+          "category": "养老",
+          "source": "shangrao_2025_reprint",
+          "note": "全市养老机构，非全部可申请"
+        },
+        {
+          "key": "eldercare_beds_2025_count",
+          "label": "养老床位",
+          "value": 14152,
+          "unit": "张",
+          "category": "养老",
+          "source": "shangrao_2025_reprint",
+          "note": "养老机构床位总量，非空床数"
+        },
+        {
+          "key": "community_eldercare_centers_2025_count",
+          "label": "社区养老服务中心",
+          "value": 602,
+          "unit": "个",
+          "category": "养老",
+          "source": "shangrao_2025_reprint",
+          "note": "社区养老服务中心数量，不代表实际覆盖每个社区"
+        },
+        {
+          "key": "pm25_annual_mean_2025_ug_m3",
+          "label": "国考PM2.5年均浓度",
+          "value": 24.6,
+          "unit": "微克/立方米",
+          "category": "环境",
+          "source": "shangrao_2025_reprint",
+          "note": "2025年全市国考监测口径，不能代替街区实测"
+        },
+        {
+          "key": "air_quality_good_days_2025_pct",
+          "label": "空气优良天数比例",
+          "value": 97.5,
+          "unit": "%",
+          "category": "环境",
+          "source": "shangrao_2025_reprint",
+          "note": "2025年全市国考空气优良天数比率"
+        },
+        {
+          "key": "avg_temp_2025_c",
+          "label": "年平均气温",
+          "value": 19.9,
+          "unit": "℃",
+          "category": "环境",
+          "source": "shangrao_2025_reprint",
+          "note": "2025年全市年均值，不能代表夏季极端温度"
+        }
+      ],
+      "city_ids": [
+        1365
+      ],
+      "source_note": "2026-11-18实读统计公报公开全文转载，尚未完整读取政府官网原件，因此来源级别official_bulletin_reprint。独立附加2025统计事实，不覆盖评分、房租、图像审核或数据库记录。不同统计口径不可跨城市直接当作购买力/宜居评分。"
     }
   ]
 }
