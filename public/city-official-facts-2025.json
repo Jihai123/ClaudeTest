@@ -1,7 +1,7 @@
 {
   "schema_version": "yiju.city_official_facts.v2",
   "statistical_year": 2025,
-  "updated_at": "2026-11-18",
+  "updated_at": "2026-11-19",
   "policy": "本资料为独立来源事实集，按站内城市ID精确绑定；不覆盖原城市数据库、评分、排行、房租、房价及图片审核。不同统计口径不直接横向比较。",
   "cities": [
     {
@@ -200,6 +200,42 @@
           "category": "养老",
           "source": "hg",
           "note": "不能直接推断入住率或可用床位"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇常住居民人均可支配收入",
+          "value": 31582,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "hg",
+          "note": "2025年鹤岗市全市城镇常住居民年度人均；不是月薪或租金"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村常住居民人均可支配收入",
+          "value": 23775,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "hg",
+          "note": "2025年鹤岗全市农村常住居民年度人均；不代表所有居住者收入"
+        },
+        {
+          "key": "new_urban_jobs_2025_count",
+          "label": "城镇新增就业",
+          "value": 10852,
+          "unit": "人",
+          "category": "就业",
+          "source": "hg",
+          "note": "2025年年度新增就业人数；不是当前招聘岗位数量"
+        },
+        {
+          "key": "air_quality_good_days_2025_pct",
+          "label": "空气环境优良天数比例",
+          "value": 97.5,
+          "unit": "%",
+          "category": "环境",
+          "source": "hg",
+          "note": "2025年鹤岗全市统计比例；不是任意住宅区逐日空气质量"
         }
       ],
       "city_ids": [

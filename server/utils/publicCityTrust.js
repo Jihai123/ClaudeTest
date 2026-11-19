@@ -34,4 +34,29 @@ function sanitizePublicTags(tags) {
   });
 }
 
-module.exports = { EDITORIAL_HOLD_CITY_IDS, isEditoriallyHeld, sanitizePublicTags };
+function sanitizePublicCityClaims(city) {
+  if (!city || typeof city !== 'object') return city;
+  const safe = { ...city };
+  const id = Number(city.id);
+  const notices = [];
+  if (id === 1076) {
+    for (const field of ['evaluation', 'slogan']) {
+      if (typeof safe[field] === 'string' && safe[field].includes('南岳衡山')) {
+        safe[field] = null;
+        notices.push('历史介绍存在跨城市内容');
+      }
+    }
+  }
+  if (id === 1002 && safe.district === '公阳城区') {
+    safe.district = null;
+    notices.push('区域名称待来源核实');
+  }
+  if (id === 1004 && safe.district === '乌湖') {
+    safe.district = null;
+    notices.push('区域名称待来源核实');
+  }
+  if (isEditoriallyHeld(city)) notices.push('城市名称或历史统计口径尚未完成核实');
+  if (notices.length) safe.public_data_quality_note = [...new Set(notices)].join('；');
+  return safe;
+}
+module.exports = { EDITORIAL_HOLD_CITY_IDS, isEditoriallyHeld, sanitizePublicTags, sanitizePublicCityClaims };
