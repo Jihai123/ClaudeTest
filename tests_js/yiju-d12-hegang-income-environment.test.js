@@ -1,0 +1,23 @@
+'use strict';
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const {getOfficialFacts,getSummary}=require('../server/utils/officialCityFacts');
+const data=require('../public/city-official-facts-2025.json');
+test('Hegang adds four source-backed 2025 indicators without modifying price or score',()=>{
+  const city=getOfficialFacts(897),alias=getOfficialFacts(1502);
+  assert.equal(city,alias);
+  assert.equal(city.source_level,'government');
+  assert.equal(city.sources[0].url,'https://www.hegang.gov.cn/hegang/tjgb/202608/92535.shtml');
+  assert.equal(city.sources[0].date,'2026-08-06');
+  assert.equal(city.facts.length,10);
+  assert.equal(getSummary(897).count,10);
+  const values=Object.fromEntries(city.facts.map(f=>[f.key,f.value]));
+  assert.equal(values.urban_disposable_income_2025_cny,31582);
+  assert.equal(values.rural_disposable_income_2025_cny,23775);
+  assert.equal(values.new_urban_jobs_2025_count,10852);
+  assert.equal(values.air_quality_good_days_2025_pct,97.5);
+  assert.ok(city.facts.every(f=>!['avg_rent','house_price','medical_facilities','rank'].includes(f.key)));
+  assert.ok(city.facts.every(f=>f.source==='hg'&&f.note&&f.unit&&f.category));
+  assert.equal(data.cities.reduce((n,c)=>n+c.facts.length,0),290);
+  assert.equal(data.cities.length,37);
+});
