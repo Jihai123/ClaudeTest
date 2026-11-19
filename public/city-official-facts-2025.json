@@ -3488,6 +3488,137 @@
         }
       ],
       "source_note": "2026-11-18直接核验2025年地方政府或统计部门公报，精确对应既有站内city_id=1210；不覆盖生产SQLite原字段、租金、评分或图片审批。市域年末人口、年度收入和机构存量不代表社区实测与个人办理资格。"
+    },
+    {
+      "id": 1004,
+      "name": "淳安县",
+      "province": "浙江",
+      "list_type": "china_layflat",
+      "focus": "长期旅居先核对千岛湖镇医疗、人口与居住成本",
+      "tip": "千岛湖景区与淳安县长期居住的医疗和房租口径不同；租房时要核实淡旺季租期、实际通勤和就医距离，2025年县级统计不能推断房源现价。",
+      "sources": [
+        {
+          "key": "chunan2025",
+          "title": "淳安县统计局：2025年淳安县国民经济和社会发展统计公报（县融媒体中心刊载）",
+          "date": "2026-06-03",
+          "url": "https://www.qdhnews.com.cn/news/content/2026-06/03/content_9902950.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 306.1,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "chunan2025",
+          "note": "2025年淳安县全县初步核算，非千岛湖镇"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 31.7,
+          "unit": "万人",
+          "category": "人口",
+          "source": "chunan2025",
+          "note": "2025年人口变动抽样调查推算，全县口径，非户籍人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 57.1,
+          "unit": "%",
+          "category": "人口",
+          "source": "chunan2025",
+          "note": "2025年全县常住人口城镇化率，非千岛湖镇市区比率"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 61850,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "chunan2025",
+          "note": "2025年城镇居民年度人均收入，不是月薪或房租"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 31056,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "chunan2025",
+          "note": "2025年农村居民年度人均收入"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生机构",
+          "value": 323,
+          "unit": "家",
+          "category": "医疗",
+          "source": "chunan2025",
+          "note": "县域医疗卫生机构总数，包含基层站所，非医院数量"
+        },
+        {
+          "key": "county_hospital_count_2025",
+          "label": "其中县医院",
+          "value": 4,
+          "unit": "家",
+          "category": "医疗",
+          "source": "chunan2025",
+          "note": "县医院为医疗卫生机构子集，不能重复加总"
+        },
+        {
+          "key": "healthcare_beds_2025",
+          "label": "医疗卫生机构床位",
+          "value": 2775,
+          "unit": "张",
+          "category": "医疗",
+          "source": "chunan2025",
+          "note": "全县医疗卫生机构床位，不等于可立即住院床位数"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 19,
+          "unit": "家",
+          "category": "养老",
+          "source": "chunan2025",
+          "note": "全县机构数量，包括县级公办、乡镇级及民办机构"
+        },
+        {
+          "key": "elderly_canteens_2025_count",
+          "label": "老年食堂",
+          "value": 358,
+          "unit": "家",
+          "category": "养老",
+          "source": "chunan2025",
+          "note": "2025年全县老年食堂，不代表每处全年正常营业或步行可达"
+        },
+        {
+          "key": "air_quality_compliant_days_2025_count",
+          "label": "全年空气质量达标天数",
+          "value": 353,
+          "unit": "天",
+          "category": "环境",
+          "source": "chunan2025",
+          "note": "2025年淳安县县域统计，非某小区每天空气质量"
+        },
+        {
+          "key": "annual_visitors_2025_ten_thousand",
+          "label": "全域游客接待量",
+          "value": 983.5,
+          "unit": "万人次",
+          "category": "文旅",
+          "source": "chunan2025",
+          "note": "2025年全县接待人次，不等于独立访客或常住人口"
+        }
+      ],
+      "city_ids": [
+        1004
+      ],
+      "source_note": "原文署名县统计局，由淳安县融媒体中心千岛湖新闻网刊发。2025年年度初步统计；房价、租金、医院科室、交通可达性和湖泊标签需按实地与当前来源另核，不覆盖城市原始记录。",
+      "source_level": "official_bulletin_reprint"
     }
   ]
 }

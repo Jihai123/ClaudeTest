@@ -8,6 +8,8 @@ const checks = [
   ['d12-tianmen', '/api/cities?search=' + encodeURIComponent('天门市') + '&limit=20'],
   ['d12-lishui', '/api/cities?search=' + encodeURIComponent('丽水市') + '&limit=20'],
   ['d12-chunan', '/api/cities?search=' + encodeURIComponent('淳安县') + '&limit=20'],
+  ['d12-lishui-detail', '/api/cities/1002'],
+  ['d12-chunan-detail', '/api/cities/1004'],
   ['miyun', '/api/cities/955'],
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
@@ -71,6 +73,7 @@ async function inspect([label, path]) {
         miyunExists: Boolean((json.cities || []).find(c => c.id === 955)),
         ankangFactCount: (json.cities || []).find(c => c.id === 1449)?.facts?.length ?? null,
         hegangFactCount: hegang?.facts?.length ?? null,
+        chunanFactCount: (json.cities || []).find(c => c.id === 1004)?.facts?.length ?? null,
         hegang2025Evidence: {
           urbanIncomeCny: metrics.urban_disposable_income_2025_cny ?? null,
           ruralIncomeCny: metrics.rural_disposable_income_2025_cny ?? null,
@@ -78,13 +81,22 @@ async function inspect([label, path]) {
           goodAirDaysPct: metrics.air_quality_good_days_2025_pct ?? null
         } };
     }
+    if (label === 'd12-lishui-detail' || label === 'd12-chunan-detail') {
+      const city = JSON.parse(body);
+      return { label, http: response.status, id: city.id,
+        hasDisputedCoastalTag: (city.tags || []).some(t => t.tag_key === 'coastal'),
+        officialFactCount: city.official_facts?.facts?.length ?? null,
+        qualityNote: city.public_data_quality_note ?? null };
+    }
     if (label.startsWith('d12-')) {
       const targetIds = { 'd12-tianmen':1076, 'd12-lishui':1002, 'd12-chunan':1004 };
       const json = JSON.parse(body);
       const row=(json.cities || []).find(c=>c.id===targetIds[label]);
       return {label,http:response.status,targetFound:Boolean(row),id:row?.id ?? null,
         district:row?.district ?? null,evaluation:row?.evaluation ?? null,
-        slogan:row?.slogan ?? null,qualityNote:row?.public_data_quality_note ?? null};
+        slogan:row?.slogan ?? null,hasDisputedCoastalTag:(row?.tags || []).some(t=>t.tag_key==='coastal'),
+        hasLake:row?.has_lake ?? null,
+        qualityNote:row?.public_data_quality_note ?? null};
     }
     if (label === 'candidate-ankang') {
       const json = JSON.parse(body);

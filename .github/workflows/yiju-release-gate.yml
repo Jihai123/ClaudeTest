@@ -50,6 +50,8 @@ jobs:
         run: node --test tests_js/yiju-d12-import-tag-provenance.test.js
       - name: D12 cross-city public projection and source-backed Hegang metrics
         run: node --test tests_js/yiju-d12-public-claims.test.js tests_js/yiju-d12-hegang-income-environment.test.js
+      - name: D12 county-level sourced Chunan 2025 facts
+        run: node --test tests_js/yiju-d12-chunan-official-facts.test.js
       - name: D12 unresolved inland coastal tags and filter consistency
         run: node --test tests_js/yiju-d12-coastal-tag-trust.test.js
       - name: D10 featured rotation and visible rent-tag trust regressions

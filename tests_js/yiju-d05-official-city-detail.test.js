@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 37 city regions and 290 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 38 city regions and 302 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 37);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 290);
+  assert.equal(dataset.cities.length, 38);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 302);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05/D07/D10 baseline plus Xiangyang expansion: 37 city regions and 290 sou
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 39, 'add ten unique exact city IDs, preserve all existing aliases');
+  assert.equal(ids.size, 40, 'add ten unique exact city IDs, preserve all existing aliases');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {

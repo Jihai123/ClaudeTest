@@ -11,8 +11,8 @@ const { getOfficialFacts, getSummary } = require('../server/utils/officialCityFa
 test('D07 retains its four EXACT city mappings after D10 adds Miyun', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 37);
-  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 290);
+  assert.equal(dataset.cities.length, 38);
+  assert.equal(dataset.cities.reduce((acc, c) => acc + c.facts.length, 0), 302);
   const expected = new Map([[927,['本溪市',4]],[971,['鹤壁市',9]],
                             [996,['启东市',8]],[1074,['襄阳市',16]]]);
   for (const [id, [name, count]] of expected) {
@@ -62,7 +62,7 @@ test('all facts carry provenance, honest admin-region mapping, unique keys and s
       ids.add(cityId);
     }
   }
-  assert.equal(ids.size, 39, 'all original aliases plus ten new exact city source mappings');
+  assert.equal(ids.size, 40, 'all original aliases plus ten new exact city source mappings');
 });
 
 test('public city decision page compares real 2025 fields and never treats legacy rents as verified', () => {
