@@ -5,7 +5,7 @@ const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateCity, validateDimensions, validateId } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
 const { getOfficialFacts, getSummary, getLicensedPhoto } = require('../utils/officialCityFacts');
-const { isEditoriallyHeld, sanitizePublicTags } = require('../utils/publicCityTrust');
+const { isEditoriallyHeld, sanitizePublicTags, sanitizePublicCityClaims } = require('../utils/publicCityTrust');
 
 // 【新增】获取热门城市
 router.get('/hot', async (req, res) => {
@@ -119,7 +119,7 @@ router.get('/hot', async (req, res) => {
       }
     }
 
-    res.json({ cities });
+    res.json({ cities: cities.map(sanitizePublicCityClaims) });
 
   } catch (error) {
     console.error('获取热门城市失败:', error);
@@ -448,7 +448,7 @@ router.get('/', optionalAuth, async (req, res) => {
     const { total } = await db.get(countQuery, params);
 
     res.json({
-      cities,
+      cities: cities.map(sanitizePublicCityClaims),
       pagination: {
         total,
         page: parseInt(page),
@@ -621,7 +621,7 @@ router.get('/:id', validateId, async (req, res) => {
     );
 
     res.json({
-      ...city,
+      ...sanitizePublicCityClaims(city),
       review_stats: reviewStats,
       score_breakdown: scoreBreakdown,
       tags: sanitizePublicTags(tags),
