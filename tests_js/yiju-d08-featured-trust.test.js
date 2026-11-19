@@ -31,7 +31,7 @@ test('unverified rent and contradictory climate tags are not promoted, but sourc
   assert.deepEqual(sanitizePublicTags([{tag_key:'warm'},{tag_key:'coastal'}])
     .map(t=>t.tag_key),['warm','coastal']);
   assert.equal(JSON.stringify(tags),before,'raw DB records must remain unchanged');
-  assert.match(route,/city\.tags = sanitizePublicTags\(tags\);/);
+  assert.match(route,/city\.tags = sanitizePublicTags\(tags, city\.id\);/);
   assert.match(route,/tags: sanitizePublicTags\(tags\)/);
 });
 
