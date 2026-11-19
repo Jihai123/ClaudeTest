@@ -569,6 +569,7 @@
             <div class="city-header">
                 <h1 class="city-title" id="cityName"></h1>
                 <p class="city-subtitle" id="citySlogan"></p>
+                <p id="cityTrustNotice" style="display:none;color:#92400e;background:#fffbeb;border:1px solid #fde68a;padding:10px 12px;border-radius:8px;margin:12px 0;font-size:14px;" role="status"></p>
                 <div class="city-meta" id="cityMeta"></div>
                 <div class="score-badge">
                     ⭐ <span id="cityScore">0.0</span> 分
@@ -736,6 +737,9 @@
         function renderCityHeader() {
             document.getElementById('cityName').textContent = cityData.name;
             document.getElementById('citySlogan').textContent = cityData.slogan || cityData.location_intro || cityData.evaluation || '宜居之城';
+            const trustNotice = document.getElementById('cityTrustNotice');
+            trustNotice.textContent = cityData.public_data_quality_note || '';
+            trustNotice.style.display = cityData.public_data_quality_note ? 'block' : 'none';
 
             const score = cityData.layflat_score || cityData.overall_score || cityData.world_score;
             document.getElementById('cityScore').textContent =
