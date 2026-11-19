@@ -55,6 +55,20 @@ function sanitizePublicCityClaims(city) {
     safe.district = null;
     notices.push('区域名称待来源核实');
   }
+  if (id === 1004) {
+    for (const field of ['evaluation', 'slogan']) {
+      if (typeof safe[field] === 'string' && /西湖美景|灵隐寺/.test(safe[field])) {
+        safe[field] = null;
+        notices.push('历史介绍包含与本地不符的景点内容');
+      }
+    }
+    // Never assert a lake exists solely from a conflicting legacy flag.
+    if (safe.has_lake === 0 && typeof safe.standard_location === 'string' &&
+        safe.standard_location.includes('千岛湖')) {
+      safe.has_lake = null;
+      notices.push('湖泊标签与位置记录冲突，待来源核实');
+    }
+  }
   if (isEditoriallyHeld(city)) notices.push('城市名称或历史统计口径尚未完成核实');
   if (notices.length) safe.public_data_quality_note = [...new Set(notices)].join('；');
   return safe;
