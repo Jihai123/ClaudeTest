@@ -5,7 +5,9 @@ const {getOfficialFacts,getSummary}=require('../server/utils/officialCityFacts')
 const data=require('../public/city-official-facts-2025.json');
 test('Hegang adds four source-backed 2025 indicators without modifying price or score',()=>{
   const city=getOfficialFacts(897),alias=getOfficialFacts(1502);
-  assert.equal(city,alias);
+  assert.equal(alias.id,897);
+  assert.deepEqual(city.city_ids,[897,1502]);
+  assert.deepEqual(alias.facts,city.facts);
   assert.equal(city.source_level,'government');
   assert.equal(city.sources[0].url,'https://www.hegang.gov.cn/hegang/tjgb/202608/92535.shtml');
   assert.equal(city.sources[0].date,'2026-08-06');
