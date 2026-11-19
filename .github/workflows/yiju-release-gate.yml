@@ -34,6 +34,8 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Production patch reconciliation regression
         run: node tests_js/production-patch-reconciliation.test.js
+      - name: Root auto-deploy disk recovery safety regression
+        run: python3 scripts/deploy/tests/test_yiju_disk_retry.py
       - name: City data and admin regressions
         run: npm run test:city-data
       - name: Verified living checklist page and SEO regression
