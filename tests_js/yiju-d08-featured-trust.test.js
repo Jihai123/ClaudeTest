@@ -5,6 +5,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const route=fs.readFileSync(path.join(__dirname,'../server/routes/cities.js'),'utf8');
 const home=fs.readFileSync(path.join(__dirname,'../public/index.html'),'utf8');
+const probe=fs.readFileSync(path.join(__dirname,'../scripts/ops/yiju_public_api_probe.mjs'),'utf8');
 const { EDITORIAL_HOLD_CITY_IDS, isEditoriallyHeld, sanitizePublicTags } =
   require('../server/utils/publicCityTrust');
 
@@ -41,4 +42,13 @@ test('homepage no longer claims unverified rent is a monthly price or low cost',
   assert.match(fn,/租金待核实/);
   assert.doesNotMatch(fn,/toLocaleString/);
   assert.doesNotMatch(home,/tags\.push\('低成本'\)/);
+});
+
+test('independent production probe covers real featured and layflat anomalies without DB mutation',()=>{
+  assert.match(probe,/layflat-first-page/);
+  assert.match(probe,/1023, 1087, 1013, 1016, 1017/);
+  assert.match(probe,/climateConflictCityIds/);
+  assert.match(probe,/unsupportedLowRentTagCityIds/);
+  assert.match(probe,/medicalZeroNeedsSourceCheck/);
+  assert.match(probe,/method: 'GET'/);
 });

@@ -4,6 +4,7 @@ const BASE = 'https://yiju.zhibeimao.com';
 const checks = [
   ['health', '/api/health'],
   ['featured', '/api/cities/hot?type=featured&limit=9'],
+  ['layflat-first-page', '/api/cities?list_type=china_layflat&page=1&limit=12'],
   ['miyun', '/api/cities/955'],
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
@@ -29,13 +30,23 @@ async function inspect([label, path]) {
     if (!response.ok) {
       return { label, http: response.status, ok: false, bytes: body.length };
     }
-    if (['health', 'featured', 'miyun', 'facts'].includes(label)) {
+    if (['health', 'featured', 'layflat-first-page', 'miyun', 'facts'].includes(label)) {
       const json = JSON.parse(body);
       if (label === 'health') return { label, http: response.status, status: json.status };
-      if (label === 'featured') {
-        const ids = (json.cities || []).map(c => c.id);
-        return { label, http: response.status, count: ids.length,
-          heldIdsPresent: ids.filter(id => id === 1023 || id === 1087) };
+      if (label === 'featured' || label === 'layflat-first-page') {
+        const rows = Array.isArray(json.cities) ? json.cities : [];
+        const held = new Set([1023, 1087, 1013, 1016, 1017]);
+        const hasTag = (city, key) => (city.tags || []).some(t => t && t.tag_key === key);
+        return {
+          label, http: response.status, count: rows.length,
+          heldIdsPresent: label === 'featured' ? rows.filter(c => held.has(c.id)).map(c => c.id) : null,
+          climateConflictCityIds: rows.filter(c => hasTag(c, 'warm') && hasTag(c, 'cold')).map(c => c.id),
+          unsupportedLowRentTagCityIds: rows.filter(c => hasTag(c, 'low_rent')).map(c => c.id),
+          nullRents: rows.filter(c => c.avg_rent === null || c.avg_rent === undefined).length,
+          medicalZeroNeedsSourceCheck: label === 'layflat-first-page'
+            ? rows.filter(c => c.medical_facilities === 0).length : null,
+          paginationTotal: label === 'layflat-first-page' ? json.pagination?.total ?? null : null
+        };
       }
       if (label === 'miyun') {
         const city = json.city || json;
