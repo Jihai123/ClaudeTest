@@ -5,6 +5,7 @@ const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateCity, validateDimensions, validateId } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
 const { getOfficialFacts, getSummary, getLicensedPhoto } = require('../utils/officialCityFacts');
+const { isEditoriallyHeld, sanitizePublicTags } = require('../utils/publicCityTrust');
 
 // 【新增】获取热门城市
 router.get('/hot', async (req, res) => {
@@ -75,12 +76,10 @@ router.get('/hot', async (req, res) => {
       // province, then fill remaining slots when insufficient regions qualify.
       const regionCounts = new Map();
       const selected = [];
-      // Editorial quarantine only: these records have unresolved entity or
-      // rent provenance in issue #147. Keep their IDs and public records intact;
-      // do not imply deletion, administrative correction or a changed score.
-      const editorialHoldIds = new Set([1023, 1087]);
+      // Issue #147 editorial quarantine. The trust gate lives in publicCityTrust;
+      // raw records and scores remain intact pending verified source correction.
       for (const city of candidates) {
-        if (editorialHoldIds.has(city.id)) continue;
+        if (isEditoriallyHeld(city)) continue;
         const key = city.province || city.country || '未知';
         const used = regionCounts.get(key) || 0;
         if (used < 2 && selected.length < safeLimit) {
@@ -92,7 +91,7 @@ router.get('/hot', async (req, res) => {
         const seen = new Set(selected.map(c => c.id));
         for (const city of candidates) {
           if (selected.length >= safeLimit) break;
-          if (!seen.has(city.id) && !editorialHoldIds.has(city.id)) {
+          if (!seen.has(city.id) && !isEditoriallyHeld(city)) {
             selected.push(city); seen.add(city.id);
           }
         }
@@ -106,7 +105,7 @@ router.get('/hot', async (req, res) => {
         'SELECT * FROM city_tags WHERE city_id = ? AND is_primary = 1',
         [city.id]
       );
-      city.tags = tags;
+      city.tags = sanitizePublicTags(tags);
       {
         const photo = await db.get(
           `SELECT id, image_url, thumbnail_url, alt_text, is_cover
@@ -429,7 +428,7 @@ router.get('/', optionalAuth, async (req, res) => {
         'SELECT * FROM city_tags WHERE city_id = ? AND is_primary = 1',
         [city.id]
       );
-      city.tags = tags;
+      city.tags = sanitizePublicTags(tags);
 
       // 获取城市封面图片
       const coverImage = await db.get(
@@ -625,7 +624,7 @@ router.get('/:id', validateId, async (req, res) => {
       ...city,
       review_stats: reviewStats,
       score_breakdown: scoreBreakdown,
-      tags,
+      tags: sanitizePublicTags(tags),
       images,
       cover_image: coverImage,
       official_facts: getOfficialFacts(city.id),
