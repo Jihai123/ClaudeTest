@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import types
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import DEFAULT, patch
 
 RUNNER_PATH = Path(__file__).resolve().parents[1] / 'yiju_root_autodeploy.py'
 spec = importlib.util.spec_from_file_location('yiju_root_autodeploy', RUNNER_PATH)
@@ -61,9 +61,11 @@ class DiskBlockRetryTests(unittest.TestCase):
         (self.state / 'status.json').write_text(json.dumps(self.blocked()))
         def fake_git(*args, **kwargs):
             return types.SimpleNamespace(stdout=TARGET if args[0]=='rev-parse' else '')
-        with patch.multiple(runner, require_sqlite_online_backup=Mock(),
-                            checks=Mock(), ensure_node=Mock(), git=Mock(side_effect=fake_git),
-                            release_gate=Mock(return_value=True), run_deploy=Mock()) as mocks:
+        with patch.multiple(runner, require_sqlite_online_backup=DEFAULT,
+                            checks=DEFAULT, ensure_node=DEFAULT, git=DEFAULT,
+                            release_gate=DEFAULT, run_deploy=DEFAULT) as mocks:
+            mocks['git'].side_effect = fake_git
+            mocks['release_gate'].return_value = True
             runner.one_cycle()
             mocks['release_gate'].assert_called_once_with(TARGET)
             mocks['run_deploy'].assert_called_once_with(TARGET, PREVIOUS, True)
@@ -75,9 +77,11 @@ class DiskBlockRetryTests(unittest.TestCase):
         (self.state / 'status.json').write_text(json.dumps(self.blocked('Integrity failure')))
         def fake_git(*args, **kwargs):
             return types.SimpleNamespace(stdout=TARGET if args[0]=='rev-parse' else '')
-        with patch.multiple(runner, require_sqlite_online_backup=Mock(),
-                            checks=Mock(), ensure_node=Mock(), git=Mock(side_effect=fake_git),
-                            release_gate=Mock(return_value=True), run_deploy=Mock()) as mocks:
+        with patch.multiple(runner, require_sqlite_online_backup=DEFAULT,
+                            checks=DEFAULT, ensure_node=DEFAULT, git=DEFAULT,
+                            release_gate=DEFAULT, run_deploy=DEFAULT) as mocks:
+            mocks['git'].side_effect = fake_git
+            mocks['release_gate'].return_value = True
             with self.assertRaisesRegex(runner.Abort, 'BLOCKED_SHA'):
                 runner.one_cycle()
             mocks['run_deploy'].assert_not_called()
