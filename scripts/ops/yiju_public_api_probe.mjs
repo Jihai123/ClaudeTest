@@ -22,11 +22,16 @@ const checks = [
   ['recommend-html', '/recommend.html']
 ];
 async function inspect([label, path]) {
-  const url = BASE + path;
+  // Separate a stale CDN response from a not-yet-deployed origin without mutation.
+  // Only D12 exact-city and published-facts evidence uses a unique query cache key.
+  const cacheBusted = label.startsWith('d12-') || label === 'facts';
+  const url = BASE + path + (cacheBusted ? (path.includes('?') ? '&' : '?') +
+    'audit_probe=' + Date.now() : '');
   try {
     const response = await fetch(url, {
       method: 'GET',
-      headers: { Accept: 'application/json,text/plain,application/xml,*/*' },
+      headers: { Accept: 'application/json,text/plain,application/xml,*/*',
+        'Cache-Control': 'no-cache' },
       signal: AbortSignal.timeout(8000)
     });
     const body = await response.text();
