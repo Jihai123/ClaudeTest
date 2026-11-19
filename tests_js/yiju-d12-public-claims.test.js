@@ -11,7 +11,7 @@ test('only specific bad city fields are redacted; database inputs remain unchang
   const cases=[
     [{id:1076,name:'天门市',evaluation:'南岳衡山',slogan:'南岳衡山'},['evaluation','slogan']],
     [{id:1002,name:'丽水市',district:'公阳城区'},['district']],
-    [{id:1004,name:'淳安县',district:'乌湖'},['district']]
+    [{id:1004,name:'淳安县',district:'乌湖',standard_location:'千岛湖',has_lake:0,evaluation:'西湖美景五月天啊，灵隐寺济公',slogan:'西湖美景五月天啊，灵隐寺济公'},['district','has_lake','evaluation','slogan']]
   ];
   for(const [city,fields] of cases) {
     const original=JSON.stringify(city), output=sanitizePublicCityClaims(city);
