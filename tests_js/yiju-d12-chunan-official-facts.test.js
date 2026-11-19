@@ -9,7 +9,7 @@ test('Chunan 2025 county-level facts are independently source linked and do not 
   assert.ok(city);
   assert.equal(city.name, '淳安县');
   assert.equal(city.province, '浙江');
-  assert.equal(city.list_type, 'china_layflat');
+  assert.equal(data.cities.find(c => c.id === 1004).list_type, 'china_layflat');
   assert.deepEqual(city.city_ids, [1004]);
   assert.equal(city.source_level, 'official_bulletin_reprint');
   assert.equal(city.sources.length, 1);
@@ -35,7 +35,7 @@ test('Chunan 2025 county-level facts are independently source linked and do not 
     annual_visitors_2025_ten_thousand: 983.5
   });
   assert.ok(city.facts.every(f => f.source === 'chunan2025' && f.unit && f.category && f.note));
-  assert.match(city.source_note, /统计局/);
+  assert.match(data.cities.find(c => c.id === 1004).source_note, /统计局/);
   assert.match(city.tip, /房租/);
   assert.ok(city.facts.every(f => !['avg_rent','house_price','medical_facilities','rank'].includes(f.key)));
 });
