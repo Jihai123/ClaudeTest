@@ -695,6 +695,36 @@ def run_deploy(target, old, checks_done):
                 shutil.rmtree(stage.parent, ignore_errors=True)
 
 
+def recover_previous_deployed_sha_after_disk_block(latest, target):
+    """Recover only a disk-space block when rollback capacity and release identity are intact.
+
+    Other failures (including deployment rollback, changed files, bad CI) stay blocked.
+    A private reconciliation SHA, not the failed target SHA, is the last deployed
+    version passed to run_deploy; no status file rewrite or safety gate bypass.
+    """
+    if latest.get('status') != 'BLOCKED_SHA' or latest.get('sha') != target:
+        return None
+    if latest.get('error') != 'Less than 2GiB free, cannot preserve rollback':
+        return None
+    # Require 1GiB headroom above the original hard 2GiB rollback floor.
+    if shutil.disk_usage(APP).free < 3 * 1024**3:
+        return None
+    manifest = STATE / 'deployed-manifest.json'
+    marker = STATE / 'reconciliation-state.json'
+    if not manifest.is_file() or not marker.is_file():
+        return None
+    # Both files are independent from the failed status and protected by
+    # production ownership/mode checks. Corruption remains a hard error.
+    if not isinstance(private_json(manifest), dict):
+        return None
+    reconciled = private_json(marker)
+    old_sha = reconciled.get('sha')
+    if (not isinstance(old_sha, str) or len(old_sha) != 40 or
+            any(c not in '0123456789abcdef' for c in old_sha) or old_sha == target):
+        return None
+    return old_sha
+
+
 def one_cycle():
     require_sqlite_online_backup()
     checks()
@@ -708,12 +738,18 @@ def one_cycle():
         retirement_policy(target)
         repair_deployed_public_permissions()
         print('UP_TO_DATE',target[:12], 'PUBLIC_MODES_VERIFIED');return
+    old_deployed = latest.get('sha','2c34c3fc3406302514de722bd3843a97575cfdb4')
     if latest.get('status') in ('ROLLED_BACK','FAILED_ROLLBACK','BLOCKED_SHA') and latest.get('sha')==target:
-        print('BLOCKED_SHA',target[:12]);return
+        recovered = recover_previous_deployed_sha_after_disk_block(latest, target)
+        if recovered is None:
+            # Do not report success when the deployment is known to be blocked.
+            raise Abort('BLOCKED_SHA '+target[:12]+': '+str(latest.get('error','requires explicit recovery')))
+        old_deployed = recovered
+        print('DISK_SPACE_RECOVERED_RETRY',target[:12], 'previous', recovered[:12], flush=True)
     if not release_gate(target):
         print('WAITING_FOR_CI',target[:12]);return
     try:
-        run_deploy(target,latest.get('sha','2c34c3fc3406302514de722bd3843a97575cfdb4'),True)
+        run_deploy(target,old_deployed,True)
     except Exception as exc:
         current=json.loads((STATE/'status.json').read_text()) if (STATE/'status.json').exists() else {}
         if current.get('status') not in ('ROLLED_BACK','FAILED_ROLLBACK'):
