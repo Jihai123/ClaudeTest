@@ -44,6 +44,7 @@ function apiFixture() {
     if (name === '../middleware/validator') return {
       validateCity() {}, validateDimensions() {}, validateId() {} };
     if (name === '../utils/sanitize') return { sanitizeObject: x => x };
+    if (name === '../utils/publicCityTrust') return require('../server/utils/publicCityTrust');
     if (name === '../utils/officialCityFacts') return {
       getOfficialFacts: () => null, getSummary: id => ({ count: id === 1 ? 3 : 0 }),
       getLicensedPhoto: () => null };
