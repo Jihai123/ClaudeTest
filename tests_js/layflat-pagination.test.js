@@ -53,6 +53,7 @@ function harness() {
     if (name==='../middleware/auth') return {optionalAuth:(req,res,next)=>next(),verifyToken:()=>{}};
     if (name==='../middleware/validator') return {validateCity:()=>{},validateDimensions:()=>{},validateId:()=>{}};
     if (name==='../utils/sanitize') return {sanitizeObject:x=>x};
+    if (name==='../utils/publicCityTrust') return require('../server/utils/publicCityTrust');
     if (name==='../utils/officialCityFacts') return {
       getOfficialFacts:()=>null,
       getSummary:()=>null,
