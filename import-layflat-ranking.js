@@ -42,24 +42,11 @@ const tagMapping = {
 function generateTags(cityData) {
     const tags = [];
 
-    // 根据租金判断
-    if (cityData.avg_rent && cityData.avg_rent < 400) {
-        tags.push('low_rent');
-    }
-
-    // 根据省份判断
+    // 历史导入数据的租金缺采样日期、样本量及来源，不能据此打“超低房租”。
+    // 气候标签过去仅凭省份或文案“寒”字推断，可能同时产生 warm/cold；
+    // 未完成来源核验前不自动生成这三类事实性宣传标签。
     if (['黑龙江', '吉林', '辽宁'].includes(cityData.province)) {
         tags.push('northeast');
-        tags.push('cold');
-    }
-
-    if (['云南', '海南', '广东', '福建'].includes(cityData.province)) {
-        tags.push('warm');
-    }
-
-    // 根据气候描述判断
-    if (cityData.climate_desc && cityData.climate_desc.includes('寒')) {
-        tags.push('cold');
     }
 
     // 根据描述判断是否适合养老
