@@ -5,7 +5,7 @@ const { verifyToken, optionalAuth } = require('../middleware/auth');
 const { validateCity, validateDimensions, validateId } = require('../middleware/validator');
 const { sanitizeObject } = require('../utils/sanitize');
 const { getOfficialFacts, getSummary, getLicensedPhoto } = require('../utils/officialCityFacts');
-const { isEditoriallyHeld, sanitizePublicTags, sanitizePublicCityClaims } = require('../utils/publicCityTrust');
+const { isEditoriallyHeld, UNVERIFIED_COASTAL_CITY_IDS, sanitizePublicTags, sanitizePublicCityClaims } = require('../utils/publicCityTrust');
 
 // 【新增】获取热门城市
 router.get('/hot', async (req, res) => {
@@ -105,7 +105,7 @@ router.get('/hot', async (req, res) => {
         'SELECT * FROM city_tags WHERE city_id = ? AND is_primary = 1',
         [city.id]
       );
-      city.tags = sanitizePublicTags(tags);
+      city.tags = sanitizePublicTags(tags, city.id);
       {
         const photo = await db.get(
           `SELECT id, image_url, thumbnail_url, alt_text, is_cover
@@ -194,6 +194,8 @@ router.get('/', optionalAuth, async (req, res) => {
             SELECT DISTINCT city_id FROM city_tags
             WHERE tag_key = 'coastal'
           )`;
+          // #147: disputed coastal flags for inland cities must not satisfy coastal filters.
+          whereClause += ` AND c.id NOT IN (${UNVERIFIED_COASTAL_CITY_IDS.join(',')})`;
         }
 
         // Rent filter: allow only known ranges; never interpolate client values into SQL.
@@ -264,6 +266,7 @@ router.get('/', optionalAuth, async (req, res) => {
           whereClause += ` AND c.id IN (
             SELECT DISTINCT city_id FROM city_tags
             WHERE tag_key IN (${tagPlaceholders})
+              AND NOT (tag_key = 'coastal' AND city_id IN (${UNVERIFIED_COASTAL_CITY_IDS.join(',')}))
           )`;
           params.push(...features);
         }
@@ -428,7 +431,7 @@ router.get('/', optionalAuth, async (req, res) => {
         'SELECT * FROM city_tags WHERE city_id = ? AND is_primary = 1',
         [city.id]
       );
-      city.tags = sanitizePublicTags(tags);
+      city.tags = sanitizePublicTags(tags, city.id);
 
       // 获取城市封面图片
       const coverImage = await db.get(
@@ -624,7 +627,7 @@ router.get('/:id', validateId, async (req, res) => {
       ...sanitizePublicCityClaims(city),
       review_stats: reviewStats,
       score_breakdown: scoreBreakdown,
-      tags: sanitizePublicTags(tags),
+      tags: sanitizePublicTags(tags, city.id),
       images,
       cover_image: coverImage,
       official_facts: getOfficialFacts(city.id),

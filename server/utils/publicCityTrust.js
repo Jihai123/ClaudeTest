@@ -12,6 +12,10 @@
  */
 const EDITORIAL_HOLD_CITY_IDS = Object.freeze([1023, 1087, 1013, 1016, 1017]);
 const editorialHoldIds = new Set(EDITORIAL_HOLD_CITY_IDS);
+// #147: existing coastal tags for inland Lishui and Chun'an have no valid coastal basis.
+// Hide only this disputed tag, preserving other tags and the SQLite review audit.
+const UNVERIFIED_COASTAL_CITY_IDS = Object.freeze([1002, 1004]);
+const unverifiedCoastalCityIds = new Set(UNVERIFIED_COASTAL_CITY_IDS);
 
 function isEditoriallyHeld(city) {
   return Boolean(city && editorialHoldIds.has(Number(city.id)));
@@ -23,12 +27,13 @@ function isEditoriallyHeld(city) {
  * Legacy low_rent tags are derived from prices without a verified sample,
  * time period or citywide statistical basis. Keep them out of public cards.
  */
-function sanitizePublicTags(tags) {
+function sanitizePublicTags(tags, cityId) {
   if (!Array.isArray(tags)) return [];
   const warm = tags.some(tag => tag && tag.tag_key === 'warm');
   const cold = tags.some(tag => tag && tag.tag_key === 'cold');
   return tags.filter(tag => {
     if (!tag || tag.tag_key === 'low_rent') return false;
+    if (tag.tag_key === 'coastal' && unverifiedCoastalCityIds.has(Number(cityId))) return false;
     if (warm && cold && (tag.tag_key === 'warm' || tag.tag_key === 'cold')) return false;
     return true;
   });
@@ -69,8 +74,9 @@ function sanitizePublicCityClaims(city) {
       notices.push('湖泊标签与位置记录冲突，待来源核实');
     }
   }
+  if (unverifiedCoastalCityIds.has(id)) notices.push('历史沿海城市标签待核实，暂不对外展示');
   if (isEditoriallyHeld(city)) notices.push('城市名称或历史统计口径尚未完成核实');
   if (notices.length) safe.public_data_quality_note = [...new Set(notices)].join('；');
   return safe;
 }
-module.exports = { EDITORIAL_HOLD_CITY_IDS, isEditoriallyHeld, sanitizePublicTags, sanitizePublicCityClaims };
+module.exports = { EDITORIAL_HOLD_CITY_IDS, UNVERIFIED_COASTAL_CITY_IDS, isEditoriallyHeld, sanitizePublicTags, sanitizePublicCityClaims };
