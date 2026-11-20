@@ -42,7 +42,7 @@ test('Chunan 2025 county-level facts are independently source linked and do not 
 
 test('total official city facts include exactly twelve new Chunan entries', () => {
   assert.equal(data.cities.length, 38);
-  assert.equal(data.cities.reduce((n, city) => n + city.facts.length, 0), 302);
+  assert.equal(data.cities.reduce((n, city) => n + city.facts.length, 0), 310);
   const ids = data.cities.flatMap(c => c.city_ids);
   assert.equal(ids.length, new Set(ids).size, 'city ID aliases must stay unique');
 });

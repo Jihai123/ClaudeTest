@@ -13,7 +13,7 @@ const checks = [
   ['miyun', '/api/cities/955'],
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
-  ['homepage-js-fresh', '/city-evidence-explorer.js?v=20261118-d11'],
+  ['homepage-js-fresh', '/city-evidence-explorer.js?v=20261120-d13'],
   ['homepage-html', '/'],
   ['robots', '/robots.txt'],
   ['sitemap', '/sitemap.xml'],
@@ -26,7 +26,7 @@ const checks = [
 async function inspect([label, path]) {
   // Separate a stale CDN response from a not-yet-deployed origin without mutation.
   // Only D12 exact-city and published-facts evidence uses a unique query cache key.
-  const cacheBusted = label.startsWith('d12-') || label === 'facts';
+  const cacheBusted = label.startsWith('d12-') || label === 'facts' || label === 'homepage-html' || label === 'homepage-js-fresh';
   const url = BASE + path + (cacheBusted ? (path.includes('?') ? '&' : '?') +
     'audit_probe=' + Date.now() : '');
   try {
@@ -74,6 +74,9 @@ async function inspect([label, path]) {
         ankangFactCount: (json.cities || []).find(c => c.id === 1449)?.facts?.length ?? null,
         hegangFactCount: hegang?.facts?.length ?? null,
         chunanFactCount: (json.cities || []).find(c => c.id === 1004)?.facts?.length ?? null,
+        zhangyeFactCount: (json.cities || []).find(c => c.id === 951)?.facts?.length ?? null,
+        zhangyeHasNewOfficialFacts: ['hospital_count_2025', 'community_eldercare_facilities_2025_count', 'annual_precipitation_2025_mm'].every(key =>
+          (json.cities || []).find(c => c.id === 951)?.facts?.some(f => f.key === key)),
         hegang2025Evidence: {
           urbanIncomeCny: metrics.urban_disposable_income_2025_cny ?? null,
           ruralIncomeCny: metrics.rural_disposable_income_2025_cny ?? null,
@@ -127,9 +130,11 @@ async function inspect([label, path]) {
     if (label === 'homepage-js' || label === 'homepage-js-fresh') return { label, http: response.status,
       hasRotation: body.includes('rotateFeaturedCities'),
       hasChecklistDeepLink: body.includes('city-living-checklist.html?city='),
+      hasEvidenceSearch: body.includes("search.addEventListener('input'"),
       bytes: body.length };
     if (label === 'homepage-html') return { label, http: response.status,
-      hasFreshScriptVersion: body.includes('city-evidence-explorer.js?v=20261118-d11'),
+      hasFreshScriptVersion: body.includes('city-evidence-explorer.js?v=20261120-d13'),
+      hasEvidenceSearchInput: body.includes('id="evidenceExplorerSearch"'),
       bytes: body.length };
     if (label === 'robots') return { label, http: response.status,
       hasBaiduspider: body.includes('Baiduspider'), bytes: body.length };

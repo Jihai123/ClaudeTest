@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 38 city regions and 302 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 38 city regions and 310 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
   assert.equal(dataset.cities.length, 38);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 302);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 310);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -165,4 +165,30 @@ test('admin shows field-change pending count separate from pending new cities', 
   assert.match(html, /id="statFieldReviewLink"/);
   assert.match(html, /\/admin\/city-data\/changes\?status=pending/);
   assert.match(html, /document\.getElementById\('cityDataStatus'\)\.value = 'pending'/);
+});
+
+
+test('D13 Zhangye government 2025 livelihood additions are exact, sourced, and city-scoped', () => {
+  const zy = getOfficialFacts(951);
+  assert.equal(zy.name, '张掖市');
+  assert.equal(zy.facts.length, 14);
+  assert.equal(zy.sources[0].url, 'https://www.zhangye.gov.cn/sjfb/tjgb/202606/t20260602_1549566.html');
+  const newValues = {hospital_count_2025:43, medical_beds_2025_ten_thousand:1.14, registered_nurses_2025_ten_thousand:0.6, community_eldercare_facilities_2025_count:63, new_urban_jobs_2025_ten_thousand:1.96, rural_disposable_income_2025_cny:23531, urban_consumption_2025_cny:29824, annual_precipitation_2025_mm:216.9};
+  for (const [key,value] of Object.entries(newValues)) {
+    const fact = zy.facts.find(f => f.key === key);
+    assert.ok(fact, key);
+    assert.equal(fact.value, value);
+    assert.equal(fact.source, 'zy');
+  }
+  assert.equal(getOfficialFacts(1490), null, 'avoid unreviewed alias');
+});
+
+test('D13 source explorer lets visitors search city and province within existing filters', () => {
+  const homepage = read('public/index.html');
+  const js = read('public/city-evidence-explorer.js');
+  assert.match(homepage, /id="evidenceExplorerSearch"/);
+  assert.match(homepage, /city-evidence-explorer.js\?v=20261120-d13/);
+  assert.match(js, /search\.value\.trim\(\)/);
+  assert.match(js, /city\.name \+ ' ' \+ city\.province/);
+  assert.match(js, /search\.addEventListener\('input'/);
 });

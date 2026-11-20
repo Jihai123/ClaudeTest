@@ -1,7 +1,7 @@
 {
   "schema_version": "yiju.city_official_facts.v2",
   "statistical_year": 2025,
-  "updated_at": "2026-11-19",
+  "updated_at": "2026-11-20",
   "policy": "本资料为独立来源事实集，按站内城市ID精确绑定；不覆盖原城市数据库、评分、排行、房租、房价及图片审核。不同统计口径不直接横向比较。",
   "cities": [
     {
@@ -438,6 +438,78 @@
           "category": "气候",
           "source": "zy",
           "note": "仅为2025单年均温，非多年气候平均"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 43,
+          "unit": "个",
+          "category": "医疗",
+          "source": "zy",
+          "note": "2025年末张掖市全市，包含于医疗卫生机构1391个内，不应重复相加"
+        },
+        {
+          "key": "medical_beds_2025_ten_thousand",
+          "label": "医疗卫生机构床位",
+          "value": 1.14,
+          "unit": "万张",
+          "category": "医疗",
+          "source": "zy",
+          "note": "全市2025年末统计，床位数不代表即时可用床位"
+        },
+        {
+          "key": "registered_nurses_2025_ten_thousand",
+          "label": "注册护士",
+          "value": 0.6,
+          "unit": "万人",
+          "category": "医疗",
+          "source": "zy",
+          "note": "2025年末全市注册护士人数，非某家医院人员数量"
+        },
+        {
+          "key": "community_eldercare_facilities_2025_count",
+          "label": "社区养老机构和设施",
+          "value": 63,
+          "unit": "个",
+          "category": "养老",
+          "source": "zy",
+          "note": "2025年末全市各类社区养老机构和设施，需另核查服务半径"
+        },
+        {
+          "key": "new_urban_jobs_2025_ten_thousand",
+          "label": "城镇新增就业",
+          "value": 1.96,
+          "unit": "万人",
+          "category": "就业",
+          "source": "zy",
+          "note": "2025年全年新增就业人数，非当前岗位数量"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 23531,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "zy",
+          "note": "2025年全市农村居民年度人均，不是月薪或城市租金"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均消费支出",
+          "value": 29824,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "zy",
+          "note": "2025年全市城镇居民人均年度消费，非长住预算或房租"
+        },
+        {
+          "key": "annual_precipitation_2025_mm",
+          "label": "全年降水量",
+          "value": 216.9,
+          "unit": "毫米",
+          "category": "气候",
+          "source": "zy",
+          "note": "仅2025单年全市统计值，不能代表多年气候常态"
         }
       ],
       "city_ids": [

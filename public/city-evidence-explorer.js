@@ -68,6 +68,7 @@
   const counter = root.querySelector('#evidenceExplorerCounter');
   const more = root.querySelector('#evidenceExplorerMore');
   const onlySaved = root.querySelector('#evidenceExplorerSavedOnly');
+  const search = root.querySelector('#evidenceExplorerSearch');
   const savedKey = 'yiju.evidence.saved.v1';
   const groups = {
     all: [],
@@ -116,12 +117,14 @@
   };
   const sourceFor = (city, fact) => city.sources.find(s => s.key === fact.source);
   function render() {
+    const keyword = search.value.trim().toLocaleLowerCase('zh-CN');
     const filtered = data.filter(city => {
       if (onlySaved.checked && !saved.has(city.id)) return false;
+      if (keyword && !(city.name + ' ' + city.province).toLocaleLowerCase('zh-CN').includes(keyword)) return false;
       return Boolean(preferredFact(city, mode));
     }).sort((a, b) => (mode === 'all' ?
       b.facts.length - a.facts.length : 0) || a.name.localeCompare(b.name, 'zh-CN'));
-    counter.textContent = mode === 'all'
+    counter.textContent = keyword ? '找到 ' + filtered.length + ' 座匹配的有源城市，可继续按资料类型与关注状态筛选。' : mode === 'all'
       ? '已收录 ' + data.length + ' 座有原始出处的城市；请按问题选择，不按GDP推断生活质量。'
       : '找到 ' + filtered.length + ' 座具备这一类2025年公开指标的城市；没有指标不等于表现差。';
     cards.replaceChildren();
@@ -168,6 +171,7 @@
       cards.append(item);
     }
     if (!filtered.length) cards.append(node('p', 'evidence-empty',
+      keyword ? '没有找到匹配的有源城市，请检查名称或切换分类。' :
       onlySaved.checked ? '这里还没有已关注的城市，切回“全部”后点击☆关注即可。'
                         : '这一类资料尚未覆盖，不能凭空给城市打分。'));
     more.hidden = filtered.length <= visibleCount;
@@ -184,6 +188,7 @@
     });
   });
   onlySaved.addEventListener('change', () => { visibleCount = 6; render(); });
+  search.addEventListener('input', () => { visibleCount = 6; render(); });
   more.addEventListener('click', () => { visibleCount += 6; render(); });
   fetch('city-official-facts-2025.json', { cache: 'no-store' })
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
