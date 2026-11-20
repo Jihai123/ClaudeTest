@@ -15,7 +15,7 @@
     <title>宜居城市指南 - 找到你的理想城市</title>
     <meta name="description" content="探索中国宜居城市排行榜，发现最适合躺平、养老、旅居的理想城市">
     <meta name="keywords" content="宜居城市,城市排行榜,躺平城市,养老城市,低房租城市">
-    <link rel="stylesheet" href="city-evidence-explorer.css?v=20261114">
+    <link rel="stylesheet" href="city-evidence-explorer.css?v=20261120-d13">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>">
 
     <style>
@@ -1270,6 +1270,7 @@
                 </div>
                 <label class="evidence-saved-only"><input id="evidenceExplorerSavedOnly" type="checkbox"> 只看我的关注</label>
             </div>
+            <div class="evidence-search-wrap"><label for="evidenceExplorerSearch">查找有源城市</label><input id="evidenceExplorerSearch" type="search" maxlength="40" autocomplete="off" placeholder="输入城市名或省份，如张掖、甘肃" aria-describedby="evidenceExplorerCounter"></div>
             <p id="evidenceExplorerCounter" class="evidence-summary" aria-live="polite">正在加载城市原始资料...</p>
             <div id="evidenceExplorerCards" class="evidence-cards"><p class="evidence-empty">正在读取2025年统计来源...</p></div>
             <button type="button" id="evidenceExplorerMore" class="evidence-more" hidden>再看6座城市</button>
@@ -2134,6 +2135,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
-    <script src="city-evidence-explorer.js?v=20261118-d11" defer></script>
+    <script src="city-evidence-explorer.js?v=20261120-d13" defer></script>
 </body>
 </html>
