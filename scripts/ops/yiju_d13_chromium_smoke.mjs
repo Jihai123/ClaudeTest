@@ -78,9 +78,17 @@ async function main(){
   await call('Input.insertText',{text:'宝鸡'});
   const baoji=await until(async()=>{const s=await summary();return s.names.length===1&&s.names[0]==='宝鸡市'?s:null;},'Baoji sourced city search');
   check(baoji.names.length===1,'desktop Chrome typed 宝鸡',{names:baoji.names,count:baoji.count});
+  const linkProbe=await evalJs('(()=>{const a=document.querySelector("#evidenceExplorerCards .evidence-city-name");const r=a?.getBoundingClientRect();return {href:a?.href,target:a?.target,html:a?.outerHTML.slice(0,260),atPoint:r?document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.outerHTML.slice(0,200):null}})()');
+  console.log('YIJU_BROWSER_BAOJI_LINK '+JSON.stringify(linkProbe));
   await click('#evidenceExplorerCards .evidence-city-name');
   const visible=()=>evalJs('(()=>({id:new URL(location.href).searchParams.get("id"),count:document.querySelectorAll("#officialFactsBody .official-fact-card").length,source:[...document.querySelectorAll("#officialFactsBody .official-fact-source")].map(x=>x.href),title:document.querySelector("#officialFactsCount")?.textContent}))()');
-  const b970=await until(async()=>{const x=await visible();return x.id==='970'&&x.count===13?x:null;},'Baoji 970 real city detail');
+  let b970;
+  try{b970=await until(async()=>{const x=await visible();return x.id==='970'&&x.count===13?x:null;},'Baoji 970 real city detail');}
+  catch(err){
+   const diagnostic=await evalJs('(()=>({url:location.href,state:document.readyState,title:document.title,cards:document.querySelectorAll("#officialFactsBody .official-fact-card").length,section:document.querySelector("#officialFactsSection")?.style.display,source:document.querySelector("#officialFactsCount")?.textContent,searchCount:document.querySelector("#evidenceExplorerCounter")?.textContent}))()');
+   console.log('YIJU_BROWSER_BAOJI_DETAIL_DIAGNOSTIC '+JSON.stringify({linkProbe,diagnostic}));
+   throw err;
+  }
   check(b970.count===13,'desktop Baoji layflat ID970 visible 13 facts',{id:b970.id,count:b970.count,officialSource:b970.source.some(x=>x.includes('tjj.baoji.gov.cn'))});
   const nav1343=await call('Page.navigate',{url:ROOT+'city-detail.html?id=1343'});
   if(nav1343.errorText)throw Error('Baoji general detail navigation: '+nav1343.errorText);
