@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 38 city regions and 310 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 39 city regions and 323 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 38);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 310);
+  assert.equal(dataset.cities.length, 39);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 323);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05/D07/D10 baseline plus Xiangyang expansion: 38 city regions and 310 sou
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 40, 'add ten unique exact city IDs, preserve all existing aliases');
+  assert.equal(ids.size, 42, 'add ten unique exact city IDs, preserve all existing aliases');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
@@ -191,4 +191,17 @@ test('D13 source explorer lets visitors search city and province within existing
   assert.match(js, /search\.value\.trim\(\)/);
   assert.match(js, /city\.name \+ ' ' \+ city\.province/);
   assert.match(js, /search\.addEventListener\('input'/);
+});
+
+
+test('D13 Baoji 2025 government facts map two confirmed original city IDs exactly', () => {
+  const city = getOfficialFacts(970);
+  assert.equal(city.name, '宝鸡市');
+  assert.deepEqual(getOfficialFacts(1343), city, 'both existing Baoji IDs inherit the same scoped official source');
+  assert.equal(city.facts.length, 13);
+  assert.equal(city.sources[0].url, 'https://tjj.baoji.gov.cn/zzzb/tjgb/202606/t20260605_1275705.html');
+  assert.equal(city.facts.find(f => f.key === 'hospital_count_2025').value, 103);
+  assert.equal(city.facts.find(f => f.key === 'urban_disposable_income_2025_cny').value, 46553);
+  assert.equal(city.facts.find(f => f.key === 'eldercare_beds_2025_count').value, 12364);
+  assert.equal(city.facts.find(f => f.key === 'urban_good_air_days_2025_count').note.includes('市区'), true);
 });

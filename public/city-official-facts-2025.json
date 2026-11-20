@@ -3691,6 +3691,147 @@
       ],
       "source_note": "原文署名县统计局，由淳安县融媒体中心千岛湖新闻网刊发。2025年年度初步统计；房价、租金、医院科室、交通可达性和湖泊标签需按实地与当前来源另核，不覆盖城市原始记录。",
       "source_level": "official_bulletin_reprint"
+    },
+    {
+      "id": 970,
+      "name": "宝鸡市",
+      "province": "陕西",
+      "list_type": "china_layflat",
+      "focus": "看实际居住地的医疗养老可达性和家庭年度支出",
+      "tip": "市级年度统计不能替代陈仓、金台、渭滨等具体片区的医院科室、交通与长期租房实测；2025收入和消费不是当前租金或本站评分。",
+      "sources": [
+        {
+          "key": "bj",
+          "title": "宝鸡市统计局2025年国民经济和社会发展统计公报",
+          "date": "2026-06-05",
+          "url": "https://tjj.baoji.gov.cn/zzzb/tjgb/202606/t20260605_1275705.html"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 2648.87,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "bj",
+          "note": "宝鸡市2025年初步核算全市口径"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 321.56,
+          "unit": "万人",
+          "category": "人口",
+          "source": "bj",
+          "note": "2025年末宝鸡市全市，不等于中心城区人口"
+        },
+        {
+          "key": "new_urban_jobs_2025_ten_thousand",
+          "label": "城镇新增就业",
+          "value": 4.41,
+          "unit": "万人",
+          "category": "就业",
+          "source": "bj",
+          "note": "2025全年城镇新增就业人数，非当前招聘岗位数"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 46553,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "bj",
+          "note": "2025年宝鸡市城镇居民年度人均，不等于个人工资"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 20588,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "bj",
+          "note": "2025年宝鸡市农村居民年度人均"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均生活消费支出",
+          "value": 27795,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "bj",
+          "note": "2025年宝鸡市城镇居民人均年度消费，不是租房预算"
+        },
+        {
+          "key": "rural_consumption_2025_cny",
+          "label": "农村居民人均生活消费支出",
+          "value": 17129,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "bj",
+          "note": "2025年宝鸡市农村居民人均年度消费"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "医疗卫生健康机构",
+          "value": 2825,
+          "unit": "个",
+          "category": "医疗",
+          "source": "bj",
+          "note": "全市2025年末医疗卫生健康机构总数，含基层机构；不是0—10评分"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 103,
+          "unit": "个",
+          "category": "医疗",
+          "source": "bj",
+          "note": "2025年末医院数包含在2825个医疗卫生机构中，勿重复加总"
+        },
+        {
+          "key": "healthcare_beds_2025_count",
+          "label": "医疗卫生机构实有床位",
+          "value": 30166,
+          "unit": "张",
+          "category": "医疗",
+          "source": "bj",
+          "note": "全市2025年末床位数，不代表当前闲置床位"
+        },
+        {
+          "key": "eldercare_institutions_2025_count",
+          "label": "养老机构",
+          "value": 59,
+          "unit": "所",
+          "category": "养老",
+          "source": "bj",
+          "note": "宝鸡市2025年末养老机构数，需另查具体区县机构及服务范围"
+        },
+        {
+          "key": "eldercare_beds_2025_count",
+          "label": "养老机构床位",
+          "value": 12364,
+          "unit": "张",
+          "category": "养老",
+          "source": "bj",
+          "note": "全市养老机构床位总量，不能推算就近空余床位"
+        },
+        {
+          "key": "urban_good_air_days_2025_count",
+          "label": "市区空气质量优良天数",
+          "value": 313,
+          "unit": "天",
+          "category": "环境",
+          "source": "bj",
+          "note": "仅2025年宝鸡市区二级及以上优良天数，不代表全部县区或未来天气"
+        }
+      ],
+      "city_ids": [
+        970,
+        1343
+      ],
+      "source_note": "2025年市级统计公报；宝鸡市（躺平榜970）和同一行政市宝鸡（综合榜1343）分别沿用原ID绑定，同源事实不在实体层重复计数。旧房租/评分/房价均未修改。",
+      "source_level": "government"
     }
   ]
 }
