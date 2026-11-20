@@ -76,6 +76,25 @@ async function main(){
    const rotated=await until(async()=>{const s=await summary();return s.featured[0]!==prev.featured[0]?s:null;},'featured carousel click');
    check(true,'desktop featured rotation real click',{before:prev.featured[0],after:rotated.featured[0]});
   }else check(false,'featured rotation coverage',{cardCount:prev.featured.length});
+  // D13 same-day continued evidence: follow the production Baoji card as a user.
+  const back=await call('Page.navigate',{url:ROOT});
+  if(back.errorText)throw Error('Return to production homepage: '+back.errorText);
+  await settled();
+  await click('#evidenceExplorerSearch');
+  await call('Input.insertText',{text:'宝鸡'});
+  const baoji=await until(async()=>{const s=await summary();return s.names.length===1&&s.names[0]==='宝鸡市'?s:null;},'Baoji sourced city search');
+  check(baoji.names.length===1,'desktop Chrome typed 宝鸡',{names:baoji.names,count:baoji.count});
+  await click('#evidenceExplorerCards .evidence-city-name');
+  const visible=()=>evalJs('(()=>({id:new URL(location.href).searchParams.get("id"),count:document.querySelectorAll("#officialFactsBody .official-fact-card").length,source:[...document.querySelectorAll("#officialFactsBody .official-fact-source")].map(x=>x.href),title:document.querySelector("#officialFactsCount")?.textContent}))()');
+  const b970=await until(async()=>{const x=await visible();return x.id==='970'&&x.count===13?x:null;},'Baoji 970 real city detail');
+  check(b970.count===13,'desktop Baoji layflat ID970 visible 13 facts',{id:b970.id,count:b970.count,officialSource:b970.source.some(x=>x.includes('tjj.baoji.gov.cn'))});
+  const nav1343=await call('Page.navigate',{url:ROOT+'city-detail.html?id=1343'});
+  if(nav1343.errorText)throw Error('Baoji general detail navigation: '+nav1343.errorText);
+  const b1343=await until(async()=>{const x=await visible();return x.id==='1343'&&x.count===13?x:null;},'Baoji 1343 real city detail');
+  check(b1343.count===13,'desktop Baoji general ID1343 visible 13 facts',{id:b1343.id,count:b1343.count,officialSource:b1343.source.some(x=>x.includes('tjj.baoji.gov.cn'))});
+  const navMobile=await call('Page.navigate',{url:ROOT});
+  if(navMobile.errorText)throw Error('Return to production homepage for mobile: '+navMobile.errorText);
+  await settled();
   await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
   await call('Page.reload',{ignoreCache:true});
   await settled();
