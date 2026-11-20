@@ -50,8 +50,17 @@ async function main(){
    return r.result?.value;
   };
   async function click(selector){
-   const p=await evalJs('(()=>{const e=document.querySelector('+JSON.stringify(selector)+');if(!e)return null;e.scrollIntoView({block:"center"});const r=e.getBoundingClientRect();return r.width&&r.height?{x:r.x+r.width/2,y:r.y+r.height/2}:null})()');
-   if(!p)throw Error('Element absent or hidden: '+selector);
+   // Production has html { scroll-behavior:smooth }. Do not compute a mouse
+   // coordinate before scrolling completes: that can click a DIV instead of the link.
+   const exists=await evalJs('(()=>{const e=document.querySelector('+JSON.stringify(selector)+');if(!e)return false;e.scrollIntoView({block:"center",behavior:"instant"});return true})()');
+   if(!exists)throw Error('Element absent: '+selector);
+   let p;
+   for(let attempt=0;attempt<5;attempt++){
+    await sleep(attempt?260:160);
+    p=await evalJs('(()=>{const e=document.querySelector('+JSON.stringify(selector)+');if(!e)return null;const r=e.getBoundingClientRect();const x=r.x+r.width/2,y=r.y+r.height/2;const hit=document.elementFromPoint(x,y);return {x,y,visible:r.width>0&&r.height>0,hit:hit===e||e.contains(hit),hitTag:hit?.tagName||null,hitClass:hit?.className||null}})()');
+    if(p?.visible&&p.hit)break;
+   }
+   if(!p?.visible||!p.hit)throw Error('Click target not hit by pointer: '+selector+' '+JSON.stringify(p));
    for(const type of ['mouseMoved','mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,x:p.x,y:p.y,button:type==='mouseMoved'?'none':'left',clickCount:1});
   }
   const summary=()=>evalJs('(()=>({names:[...document.querySelectorAll("#evidenceExplorerCards .evidence-city-name")].map(x=>x.textContent.trim()),labels:[...document.querySelectorAll("#evidenceExplorerCards .evidence-metric-label")].map(x=>x.textContent.trim()),count:document.querySelector("#evidenceExplorerCounter")?.textContent||"",saved:document.querySelector(".evidence-card .evidence-save")?.getAttribute("aria-pressed"),inputRight:document.querySelector("#evidenceExplorerSearch")?.getBoundingClientRect().right,viewport:innerWidth,featured:[...document.querySelectorAll("#carouselTrack .featured-card")].map(x=>x.dataset.cityId)}))()');
