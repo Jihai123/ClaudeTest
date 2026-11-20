@@ -80,12 +80,13 @@ async function main(){
   check(baoji.names.length===1,'desktop Chrome typed 宝鸡',{names:baoji.names,count:baoji.count});
   const linkProbe=await evalJs('(()=>{const a=document.querySelector("#evidenceExplorerCards .evidence-city-name");const r=a?.getBoundingClientRect();return {href:a?.href,target:a?.target,html:a?.outerHTML.slice(0,260),atPoint:r?document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.outerHTML.slice(0,200):null}})()');
   console.log('YIJU_BROWSER_BAOJI_LINK '+JSON.stringify(linkProbe));
+  await evalJs('(()=>{window.__yijuClickTrace=[];for(const type of ["pointerdown","pointerup","mousedown","mouseup","click"]){document.addEventListener(type,e=>{window.__yijuClickTrace.push({type,tag:e.target?.tagName,href:e.target?.href||"",defaultPrevented:e.defaultPrevented,isTrusted:e.isTrusted,active:document.activeElement?.tagName||""});},true);}return true})()');
   await click('#evidenceExplorerCards .evidence-city-name');
   const visible=()=>evalJs('(()=>({id:new URL(location.href).searchParams.get("id"),count:document.querySelectorAll("#officialFactsBody .official-fact-card").length,source:[...document.querySelectorAll("#officialFactsBody .official-fact-source")].map(x=>x.href),title:document.querySelector("#officialFactsCount")?.textContent}))()');
   let b970;
   try{b970=await until(async()=>{const x=await visible();return x.id==='970'&&x.count===13?x:null;},'Baoji 970 real city detail');}
   catch(err){
-   const diagnostic=await evalJs('(()=>({url:location.href,state:document.readyState,title:document.title,cards:document.querySelectorAll("#officialFactsBody .official-fact-card").length,section:document.querySelector("#officialFactsSection")?.style.display,source:document.querySelector("#officialFactsCount")?.textContent,searchCount:document.querySelector("#evidenceExplorerCounter")?.textContent}))()');
+   const diagnostic=await evalJs('(()=>({url:location.href,state:document.readyState,title:document.title,cards:document.querySelectorAll("#officialFactsBody .official-fact-card").length,section:document.querySelector("#officialFactsSection")?.style.display,source:document.querySelector("#officialFactsCount")?.textContent,searchCount:document.querySelector("#evidenceExplorerCounter")?.textContent,clickTrace:window.__yijuClickTrace||null}))()');
    console.log('YIJU_BROWSER_BAOJI_DETAIL_DIAGNOSTIC '+JSON.stringify({linkProbe,diagnostic}));
    throw err;
   }
