@@ -70,12 +70,6 @@ async function main(){
   await click('[data-evidence-group="care"]');
   const medical=await until(async()=>{const s=await summary();return s.labels.some(x=>x.includes('医院'))?s:null;},'care category');
   check(medical.names.length===1,'desktop medical category real click',{labels:medical.labels});
-  const prev=await summary();
-  if(prev.featured.length>3){
-   await click('#rotateFeaturedCities');
-   const rotated=await until(async()=>{const s=await summary();return s.featured[0]!==prev.featured[0]?s:null;},'featured carousel click');
-   check(true,'desktop featured rotation real click',{before:prev.featured[0],after:rotated.featured[0]});
-  }else check(false,'featured rotation coverage',{cardCount:prev.featured.length});
   // D13 same-day continued evidence: follow the production Baoji card as a user.
   const back=await call('Page.navigate',{url:ROOT});
   if(back.errorText)throw Error('Return to production homepage: '+back.errorText);
@@ -95,6 +89,22 @@ async function main(){
   const navMobile=await call('Page.navigate',{url:ROOT});
   if(navMobile.errorText)throw Error('Return to production homepage for mobile: '+navMobile.errorText);
   await settled();
+
+  await until(async()=>evalJs('(()=>{const b=document.querySelector("#rotateFeaturedCities");return !!(b&&!b.disabled&&document.querySelectorAll("#carouselTrack .featured-card").length>3)})()'),'featured carousel ready',15000);
+  await sleep(600);
+  const prev=await summary();
+  if(prev.featured.length>3){
+   const initial=await evalJs('(()=>({aria:document.querySelector("#rotateFeaturedCities")?.getAttribute("aria-label"),disabled:document.querySelector("#rotateFeaturedCities")?.disabled,cards:[...document.querySelectorAll("#carouselTrack .featured-card")].map(x=>x.dataset.cityId)}))()');
+   await click('#rotateFeaturedCities');
+   let rotated;
+   try{rotated=await until(async()=>{const s=await summary();return s.featured[0]!==prev.featured[0]?s:null;},'featured carousel click');}
+   catch(err){
+    const after=await evalJs('(()=>({aria:document.querySelector("#rotateFeaturedCities")?.getAttribute("aria-label"),disabled:document.querySelector("#rotateFeaturedCities")?.disabled,cards:[...document.querySelectorAll("#carouselTrack .featured-card")].map(x=>x.dataset.cityId)}))()');
+    console.log('YIJU_BROWSER_CAROUSEL_DIAGNOSTIC '+JSON.stringify({initial,after}));
+    throw err;
+   }
+   check(true,'desktop featured rotation real click',{before:prev.featured[0],after:rotated.featured[0]});
+  }else check(false,'featured rotation coverage',{cardCount:prev.featured.length});
   await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
   await call('Page.reload',{ignoreCache:true});
   await settled();
