@@ -11,6 +11,8 @@ const checks = [
   ['d12-lishui-detail', '/api/cities/1002'],
   ['d12-chunan-detail', '/api/cities/1004'],
   ['miyun', '/api/cities/955'],
+  ['d13-baoji-layflat', '/api/cities/970'],
+  ['d13-baoji-general', '/api/cities/1343'],
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
   ['homepage-js-fresh', '/city-evidence-explorer.js?v=20261120-d13'],
@@ -26,7 +28,7 @@ const checks = [
 async function inspect([label, path]) {
   // Separate a stale CDN response from a not-yet-deployed origin without mutation.
   // Only D12 exact-city and published-facts evidence uses a unique query cache key.
-  const cacheBusted = label.startsWith('d12-') || label === 'facts' || label === 'homepage-html' || label === 'homepage-js-fresh';
+  const cacheBusted = label.startsWith('d12-') || label.startsWith('d13-') || label === 'facts' || label === 'homepage-html' || label === 'homepage-js-fresh';
   const url = BASE + path + (cacheBusted ? (path.includes('?') ? '&' : '?') +
     'audit_probe=' + Date.now() : '');
   try {
@@ -75,6 +77,8 @@ async function inspect([label, path]) {
         hegangFactCount: hegang?.facts?.length ?? null,
         chunanFactCount: (json.cities || []).find(c => c.id === 1004)?.facts?.length ?? null,
         zhangyeFactCount: (json.cities || []).find(c => c.id === 951)?.facts?.length ?? null,
+        baojiFactCount: (json.cities || []).find(c => c.id === 970)?.facts?.length ?? null,
+        baojiAliasIds: (json.cities || []).find(c => c.id === 970)?.city_ids ?? null,
         zhangyeHasNewOfficialFacts: ['hospital_count_2025', 'community_eldercare_facilities_2025_count', 'annual_precipitation_2025_mm'].every(key =>
           (json.cities || []).find(c => c.id === 951)?.facts?.some(f => f.key === key)),
         hegang2025Evidence: {
@@ -83,6 +87,17 @@ async function inspect([label, path]) {
           newJobs: metrics.new_urban_jobs_2025_count ?? null,
           goodAirDaysPct: metrics.air_quality_good_days_2025_pct ?? null
         } };
+    }
+    if (label.startsWith('d13-baoji-')) {
+      const city = JSON.parse(body);
+      const facts = city.official_facts;
+      const metric = key => facts?.facts?.find(f => f.key === key)?.value ?? null;
+      return {label, http: response.status, id: city.id, name: city.name,
+        officialFactCount: facts?.facts?.length ?? null,
+        sourceURL: facts?.sources?.[0]?.url ?? null,
+        hospitalCount: metric('hospital_count_2025'),
+        eldercareBeds: metric('eldercare_beds_2025_count'),
+        airQualityGoodDays: metric('urban_good_air_days_2025_count')};
     }
     if (label === 'd12-lishui-detail' || label === 'd12-chunan-detail') {
       const city = JSON.parse(body);
