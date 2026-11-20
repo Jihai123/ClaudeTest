@@ -197,7 +197,7 @@ test('D13 source explorer lets visitors search city and province within existing
 test('D13 Baoji 2025 government facts map two confirmed original city IDs exactly', () => {
   const city = getOfficialFacts(970);
   assert.equal(city.name, '宝鸡市');
-  assert.equal(getOfficialFacts(1343), city);
+  assert.deepEqual(getOfficialFacts(1343), city, 'both existing Baoji IDs inherit the same scoped official source');
   assert.equal(city.facts.length, 13);
   assert.equal(city.sources[0].url, 'https://tjj.baoji.gov.cn/zzzb/tjgb/202606/t20260605_1275705.html');
   assert.equal(city.facts.find(f => f.key === 'hospital_count_2025').value, 103);
