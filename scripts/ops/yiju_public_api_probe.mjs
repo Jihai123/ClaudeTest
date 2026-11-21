@@ -20,6 +20,7 @@ const checks = [
   ['homepage-html', '/'],
   ['robots', '/robots.txt'],
   ['sitemap', '/sitemap.xml'],
+  ['sitemap-fresh', '/sitemap.xml'],
   ['candidate-ankang', '/api/cities?search=' + encodeURIComponent('安康') + '&limit=20'],
   ['candidate-weihai', '/api/cities?search=' + encodeURIComponent('威海') + '&limit=30'],
   ['candidate-weihai-detail', '/api/cities/9'],
@@ -33,7 +34,7 @@ const checks = [
 async function inspect([label, path]) {
   // Separate a stale CDN response from a not-yet-deployed origin without mutation.
   // Only D12 exact-city and published-facts evidence uses a unique query cache key.
-  const cacheBusted = label.startsWith('d12-') || label.startsWith('d13-') || label.startsWith('d14-') || label === 'facts' || label === 'homepage-html' || label === 'homepage-js-fresh';
+  const cacheBusted = label.startsWith('d12-') || label.startsWith('d13-') || label.startsWith('d14-') || label === 'facts' || label === 'homepage-html' || label === 'homepage-js-fresh' || label === 'sitemap-fresh';
   const url = BASE + path + (cacheBusted ? (path.includes('?') ? '&' : '?') +
     'audit_probe=' + Date.now() : '');
   try {
@@ -52,6 +53,7 @@ async function inspect([label, path]) {
       if (label === 'health') return { label, http: response.status, status: json.status,
         serverTimestamp: json.timestamp ?? null,
         measuredAt: new Date().toISOString(),
+        hasReleaseShaField: Object.prototype.hasOwnProperty.call(json, 'release_sha'),
         releaseSha: json.release_sha ?? null,
         shaIs40Hex: typeof json.release_sha === 'string' && json.release_sha.length === 40 &&
           [...json.release_sha].every(ch => '0123456789abcdef'.includes(ch)) };
@@ -194,7 +196,7 @@ async function inspect([label, path]) {
         hasCorrectSitemap: body.includes('Sitemap: https://yiju.zhibeimao.com/sitemap.xml'),
         firstLines: lines.slice(0, 24).join(' | ').slice(0, 700), bytes: body.length };
     }
-    if (label === 'sitemap') {
+    if (label === 'sitemap' || label === 'sitemap-fresh') {
       const after = body.split('city-detail.html?id=951</loc>')[1] || '';
       const lastmod = after.split('<lastmod>')[1]?.split('</lastmod>')[0]?.trim() || null;
       const afterWeihai = body.split('city-detail.html?id=9</loc>')[1] || '';
