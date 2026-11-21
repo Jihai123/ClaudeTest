@@ -83,7 +83,10 @@
       'community_service_facilities_2025_count', 'eldercare_beds_2025_count',
       'eldercare_beds_2025_ten_thousand', 'eldercare_institutions_2025_count',
       'eldercare_institutions_2025_count', 'community_daycare_centers_2025_count'],
-    mobility: ['airport_passenger_trips_2025_ten_thousand', 'airport_passenger_traffic_2025_ten_thousand',\n      'rail_passenger_trips_2025_ten_thousand', 'rail_transit_length_2025_km',\n      'urban_rail_transit_length_2025_km', 'public_transport_passenger_2025_ten_thousand'],\n    environment: ['urban_good_air_days_2025_pct', 'good_air_days_excluding_dust_2025_pct',
+    mobility: ['airport_passenger_trips_2025_ten_thousand', 'airport_passenger_traffic_2025_ten_thousand',
+      'rail_passenger_trips_2025_ten_thousand', 'rail_transit_length_2025_km',
+      'urban_rail_transit_length_2025_km', 'public_transport_passenger_2025_ten_thousand'],
+    environment: ['urban_good_air_days_2025_pct', 'good_air_days_excluding_dust_2025_pct',
       'pm25_annual_mean_2025_ug_m3', 'annual_avg_temperature_2025_c',
       'urban_rail_transit_length_2025_km', 'rail_transit_length_2025_km',
       'rail_passenger_trips_2025_ten_thousand', 'park_green_area_per_capita_2025_m2']
