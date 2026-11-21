@@ -5,8 +5,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const db = require('./server/models/database');
-const {getCheckedOutSha} = require('./server/utils/releaseFingerprint');
-const LIVE_RELEASE_SHA = getCheckedOutSha();
+const {getDeployedSha} = require('./server/utils/releaseFingerprint');
 
 // 创建Express应用
 const app = express();
@@ -80,7 +79,7 @@ app.use(`${BASE_PATH}/api`, require('./server/routes/upload')); // 图片上传
 
 // 健康检查
 app.get(`${BASE_PATH}/api/health`, (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), release_sha: LIVE_RELEASE_SHA });
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), release_sha: getDeployedSha() });
 });
 
 // 404处理
