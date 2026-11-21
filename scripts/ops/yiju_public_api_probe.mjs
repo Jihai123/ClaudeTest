@@ -145,11 +145,13 @@ async function inspect([label, path]) {
     if (label === 'homepage-js' || label === 'homepage-js-fresh') return { label, http: response.status,
       hasRotation: body.includes('rotateFeaturedCities'),
       hasChecklistDeepLink: body.includes('city-living-checklist.html?city='),
-      hasEvidenceSearch: body.includes("search.addEventListener('input'"),\n      hasMobilityFilter: body.includes('mobility: ['),
+      hasEvidenceSearch: body.includes("search.addEventListener('input'"),
+      hasMobilityFilter: body.includes('mobility: ['),
       bytes: body.length };
     if (label === 'homepage-html') return { label, http: response.status,
       hasFreshScriptVersion: body.includes('city-evidence-explorer.js?v=20261121-d14'),
-      hasEvidenceSearchInput: body.includes('id="evidenceExplorerSearch"'),\n      hasMobilityTab: body.includes('data-evidence-group="mobility"'),
+      hasEvidenceSearchInput: body.includes('id="evidenceExplorerSearch"'),
+      hasMobilityTab: body.includes('data-evidence-group="mobility"'),
       bytes: body.length };
     if (label === 'robots') return { label, http: response.status,
       hasBaiduspider: body.includes('Baiduspider'), bytes: body.length };
