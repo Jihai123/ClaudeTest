@@ -49,7 +49,10 @@ async function inspect([label, path]) {
     }
     if (['health', 'featured', 'layflat-first-page', 'miyun', 'facts'].includes(label)) {
       const json = JSON.parse(body);
-      if (label === 'health') return { label, http: response.status, status: json.status };
+      if (label === 'health') return { label, http: response.status, status: json.status,
+        releaseSha: json.release_sha ?? null,
+        shaIs40Hex: typeof json.release_sha === 'string' && json.release_sha.length === 40 &&
+          [...json.release_sha].every(ch => '0123456789abcdef'.includes(ch)) };
       if (label === 'featured' || label === 'layflat-first-page') {
         const rows = Array.isArray(json.cities) ? json.cities : [];
         const held = new Set([1023, 1087, 1013, 1016, 1017]);
