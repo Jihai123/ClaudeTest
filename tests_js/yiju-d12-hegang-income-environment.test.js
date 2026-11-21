@@ -20,6 +20,6 @@ test('Hegang adds four source-backed 2025 indicators without modifying price or 
   assert.equal(values.air_quality_good_days_2025_pct,97.5);
   assert.ok(city.facts.every(f=>!['avg_rent','house_price','medical_facilities','rank'].includes(f.key)));
   assert.ok(city.facts.every(f=>f.source==='hg'&&f.note&&f.unit&&f.category));
-  assert.equal(data.cities.reduce((n,c)=>n+c.facts.length,0),323);
+  assert.equal(data.cities.reduce((n,c)=>n+c.facts.length,0),328);
   assert.equal(data.cities.length,39);
 });
