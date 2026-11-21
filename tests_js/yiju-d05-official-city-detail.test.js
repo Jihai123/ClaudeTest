@@ -226,3 +226,10 @@ test('D14 public API probe JavaScript compiles under Node without network', () =
   const result = cp.spawnSync(process.execPath, ['--check', path.join(root, 'scripts/ops/yiju_public_api_probe.mjs')], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
+
+// D14 production browser probe must parse even when the new feature is not yet deployed.
+test('D14 public Chromium diagnostic compiles without network', () => {
+  const cp = require('node:child_process');
+  const result = cp.spawnSync(process.execPath, ['--check', path.join(root, 'scripts/ops/yiju_d13_chromium_smoke.mjs')], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});
