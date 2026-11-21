@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 39 city regions and 323 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 39 city regions and 328 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
   assert.equal(dataset.cities.length, 39);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 323);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 328);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -204,4 +204,18 @@ test('D13 Baoji 2025 government facts map two confirmed original city IDs exactl
   assert.equal(city.facts.find(f => f.key === 'urban_disposable_income_2025_cny').value, 46553);
   assert.equal(city.facts.find(f => f.key === 'eldercare_beds_2025_count').value, 12364);
   assert.equal(city.facts.find(f => f.key === 'urban_good_air_days_2025_count').note.includes('市区'), true);
+});
+
+// D14 same-day official-source supplement: exact city ID, five nonduplicated metrics.
+test('D14 Zhangye 951 has 19 sourced facts and correct public decision metrics', () => {
+  const z = getOfficialFacts(951);
+  assert.equal(z.facts.length, 19);
+  assert.deepEqual(z.city_ids, [951]);
+  const value = key => z.facts.find(f => f.key === key)?.value;
+  assert.equal(value('urbanization_rate_2025_pct'), 58.03);
+  assert.equal(value('rural_consumption_2025_cny'), 20199);
+  assert.equal(value('medical_insurance_insured_2025_ten_thousand'), 115.09);
+  assert.equal(value('airport_passenger_trips_2025_ten_thousand'), 29.7);
+  assert.equal(value('annual_sunshine_hours_2025_h'), 2947.1);
+  assert.equal(z.sources[0].url, 'https://www.zhangye.gov.cn/sjfb/tjgb/202606/t20260602_1549566.html');
 });
