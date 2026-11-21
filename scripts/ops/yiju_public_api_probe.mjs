@@ -169,15 +169,24 @@ async function inspect([label, path]) {
       hasEvidenceSearchInput: body.includes('id="evidenceExplorerSearch"'),
       hasMobilityTab: body.includes('data-evidence-group="mobility"'),
       bytes: body.length };
-    if (label === 'robots') return { label, http: response.status,
-      hasBaiduspider: body.includes('Baiduspider'),
-      managedBaiduDisallow: /User-agent:\\s*Baiduspider\\s*\\r?\\n\\s*Disallow:\\s*\\/(?:\\r?\\n|$)/i.test(body),
-      hasCorrectSitemap: body.includes('Sitemap: https://yiju.zhibeimao.com/sitemap.xml'),
-      firstLines: body.split(/\\r?\\n/).slice(0,24).join(' | ').slice(0,700), bytes: body.length };
-    if (label === 'sitemap') return {label, http: response.status,
-      hasCityDetail: body.includes('city-detail.html?id='),
-      zhangye951Lastmod: (body.match(/<loc>https:\\/\\/yiju\\.zhibeimao\\.com\\/city-detail\\.html\\?id=951<\\/loc>\\s*<lastmod>([^<]+)<\\/lastmod>/)||[])[1] || null,
-      bytes: body.length };
+    if (label === 'robots') {
+      const lines = body.replaceAll(String.fromCharCode(13), '').split(String.fromCharCode(10));
+      const baiduIndex = lines.findIndex(x => x.trim().toLowerCase() === 'user-agent: baiduspider');
+      return { label, http: response.status,
+        hasBaiduspider: baiduIndex >= 0,
+        managedBaiduDisallow: baiduIndex >= 0 &&
+          lines.slice(baiduIndex + 1, baiduIndex + 4).some(x => x.trim() === 'Disallow: /'),
+        hasCorrectSitemap: body.includes('Sitemap: https://yiju.zhibeimao.com/sitemap.xml'),
+        firstLines: lines.slice(0, 24).join(' | ').slice(0, 700), bytes: body.length };
+    }
+    if (label === 'sitemap') {
+      const after = body.split('city-detail.html?id=951</loc>')[1] || '';
+      const lastmod = after.split('<lastmod>')[1]?.split('</lastmod>')[0]?.trim() || null;
+      return {label, http: response.status,
+        hasCityDetail: body.includes('city-detail.html?id='),
+        zhangye951Lastmod: lastmod,
+        bytes: body.length };
+    }
     return { label, http: response.status,
       hasCityDetail: body.includes('city-detail.html?id='), bytes: body.length };
   } catch (error) {
