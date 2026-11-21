@@ -13,6 +13,7 @@ const checks = [
   ['miyun', '/api/cities/955'],
   ['d13-baoji-layflat', '/api/cities/970'],
   ['d13-baoji-general', '/api/cities/1343'],
+  ['d14-zhangye-detail', '/api/cities/951'],
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
   ['homepage-js-fresh', '/city-evidence-explorer.js?v=20261121-d14'],
@@ -28,7 +29,7 @@ const checks = [
 async function inspect([label, path]) {
   // Separate a stale CDN response from a not-yet-deployed origin without mutation.
   // Only D12 exact-city and published-facts evidence uses a unique query cache key.
-  const cacheBusted = label.startsWith('d12-') || label.startsWith('d13-') || label === 'facts' || label === 'homepage-html' || label === 'homepage-js-fresh';
+  const cacheBusted = label.startsWith('d12-') || label.startsWith('d13-') || label.startsWith('d14-') || label === 'facts' || label === 'homepage-html' || label === 'homepage-js-fresh';
   const url = BASE + path + (cacheBusted ? (path.includes('?') ? '&' : '?') +
     'audit_probe=' + Date.now() : '');
   try {
@@ -87,6 +88,19 @@ async function inspect([label, path]) {
           newJobs: metrics.new_urban_jobs_2025_count ?? null,
           goodAirDaysPct: metrics.air_quality_good_days_2025_pct ?? null
         } };
+    }
+    if (label === 'd14-zhangye-detail') {
+      const city = JSON.parse(body);
+      const facts = city.official_facts;
+      const metric = key => facts?.facts?.find(f => f.key === key)?.value ?? null;
+      return { label, http: response.status, id: city.id, name: city.name,
+        officialFactCount: facts?.facts?.length ?? null,
+        sourceURL: facts?.sources?.[0]?.url ?? null,
+        urbanizationRate2025: metric('urbanization_rate_2025_pct'),
+        ruralConsumption2025: metric('rural_consumption_2025_cny'),
+        insuredMedical2025: metric('medical_insurance_insured_2025_ten_thousand'),
+        airportPassenger2025: metric('airport_passenger_trips_2025_ten_thousand'),
+        sunshineHours2025: metric('annual_sunshine_hours_2025_h') };
     }
     if (label.startsWith('d13-baoji-')) {
       const city = JSON.parse(body);
