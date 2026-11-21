@@ -15,7 +15,7 @@ const checks = [
   ['d13-baoji-general', '/api/cities/1343'],
   ['facts', '/city-official-facts-2025.json'],
   ['homepage-js', '/city-evidence-explorer.js'],
-  ['homepage-js-fresh', '/city-evidence-explorer.js?v=20261120-d13'],
+  ['homepage-js-fresh', '/city-evidence-explorer.js?v=20261121-d14'],
   ['homepage-html', '/'],
   ['robots', '/robots.txt'],
   ['sitemap', '/sitemap.xml'],
@@ -145,11 +145,11 @@ async function inspect([label, path]) {
     if (label === 'homepage-js' || label === 'homepage-js-fresh') return { label, http: response.status,
       hasRotation: body.includes('rotateFeaturedCities'),
       hasChecklistDeepLink: body.includes('city-living-checklist.html?city='),
-      hasEvidenceSearch: body.includes("search.addEventListener('input'"),
+      hasEvidenceSearch: body.includes("search.addEventListener('input'"),\n      hasMobilityFilter: body.includes('mobility: ['),
       bytes: body.length };
     if (label === 'homepage-html') return { label, http: response.status,
-      hasFreshScriptVersion: body.includes('city-evidence-explorer.js?v=20261120-d13'),
-      hasEvidenceSearchInput: body.includes('id="evidenceExplorerSearch"'),
+      hasFreshScriptVersion: body.includes('city-evidence-explorer.js?v=20261121-d14'),
+      hasEvidenceSearchInput: body.includes('id="evidenceExplorerSearch"'),\n      hasMobilityTab: body.includes('data-evidence-group="mobility"'),
       bytes: body.length };
     if (label === 'robots') return { label, http: response.status,
       hasBaiduspider: body.includes('Baiduspider'), bytes: body.length };

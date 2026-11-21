@@ -108,11 +108,11 @@ test('sourced fact card links to a per-city checklist without mixing saved progr
 });
 
 
-test('D13 homepage uses the new source explorer version and preserves checklist links',()=>{
+test('D14 homepage uses the new source explorer version and preserves checklist links',()=>{
  const page=fs.readFileSync(path.join(__dirname,'../public/index.html'),'utf8');
  const source=fs.readFileSync(path.join(__dirname,'../public/city-evidence-explorer.js'),'utf8');
  const probe=fs.readFileSync(path.join(__dirname,'../scripts/ops/yiju_public_api_probe.mjs'),'utf8');
- assert.match(page,/<script src="city-evidence-explorer\.js\?v=20261120-d13" defer><\/script>/);
+ assert.match(page,/<script src="city-evidence-explorer\.js\?v=20261121-d14" defer><\/script>/);
  assert.match(source,/city-living-checklist\.html\?city=/);
  assert.match(probe,/homepage-js-fresh/);
  assert.match(probe,/hasChecklistDeepLink/);
