@@ -3877,6 +3877,173 @@
       ],
       "source_note": "2025年市级统计公报；宝鸡市（躺平榜970）和同一行政市宝鸡（综合榜1343）分别沿用原ID绑定，同源事实不在实体层重复计数。旧房租/评分/房价均未修改。",
       "source_level": "government"
+    },
+    {
+      "id": 9,
+      "name": "威海市",
+      "province": "山东",
+      "list_type": "china_general",
+      "focus": "从城镇与农村收入、医疗床位和实际生活配套判断长期居住可行性",
+      "tip": "威海市级统计涵盖环翠区、文登区、荣成市、乳山市等行政区域；看房需核对具体片区、供暖费用、医院就诊科室及真实房源。收入和年度消费不能当月租金。",
+      "sources": [
+        {
+          "key": "wh",
+          "title": "2025年威海市国民经济和社会发展统计公报（威海市统计局）",
+          "date": "2026-04-17",
+          "url": "https://tjj.weihai.gov.cn/attach/0/5fa352b1c0c64abd8c1e15e87944966b.pdf"
+        }
+      ],
+      "facts": [
+        {
+          "key": "gdp_2025_billion_cny",
+          "label": "地区生产总值",
+          "value": 3896.09,
+          "unit": "亿元",
+          "category": "经济",
+          "source": "wh",
+          "note": "威海市2025年全市初步核算值，不代表居民财富"
+        },
+        {
+          "key": "resident_population_2025_ten_thousand",
+          "label": "年末常住人口",
+          "value": 291.16,
+          "unit": "万人",
+          "category": "人口",
+          "source": "wh",
+          "note": "威海全市年末常住人口，不是某城区人口"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 74.41,
+          "unit": "%",
+          "category": "人口",
+          "source": "wh",
+          "note": "全市2025年末常住人口统计口径"
+        },
+        {
+          "key": "all_resident_disposable_income_2025_cny",
+          "label": "全体居民人均可支配收入",
+          "value": 54748,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "wh",
+          "note": "2025年度全体居民人均，不是工资或游客收入"
+        },
+        {
+          "key": "urban_disposable_income_2025_cny",
+          "label": "城镇居民人均可支配收入",
+          "value": 64590,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "wh",
+          "note": "2025年度城镇居民统计口径，不是月薪"
+        },
+        {
+          "key": "rural_disposable_income_2025_cny",
+          "label": "农村居民人均可支配收入",
+          "value": 32619,
+          "unit": "元/年",
+          "category": "收入",
+          "source": "wh",
+          "note": "2025年度农村居民统计口径"
+        },
+        {
+          "key": "all_resident_consumption_2025_cny",
+          "label": "全体居民人均消费支出",
+          "value": 32088,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "wh",
+          "note": "2025全体居民年度人均，不是旅居者预算或房租"
+        },
+        {
+          "key": "urban_consumption_2025_cny",
+          "label": "城镇居民人均消费支出",
+          "value": 37737,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "wh",
+          "note": "2025年度城镇居民人均，房租并未单独核实"
+        },
+        {
+          "key": "rural_consumption_2025_cny",
+          "label": "农村居民人均消费支出",
+          "value": 19387,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "wh",
+          "note": "2025年度农村居民人均，不是月租"
+        },
+        {
+          "key": "health_institutions_2025_count",
+          "label": "各类医疗卫生机构",
+          "value": 2757,
+          "unit": "个",
+          "category": "医疗",
+          "source": "wh",
+          "note": "2025年末全市各类机构数，含基层机构与医院；不等于医院数或宜居评分"
+        },
+        {
+          "key": "hospital_count_2025",
+          "label": "其中医院",
+          "value": 81,
+          "unit": "个",
+          "category": "医疗",
+          "source": "wh",
+          "note": "2025年末全市医院数，包含在医疗卫生机构2757个之内"
+        },
+        {
+          "key": "healthcare_beds_2025_count",
+          "label": "医疗卫生机构实有床位",
+          "value": 21403,
+          "unit": "张",
+          "category": "医疗",
+          "source": "wh",
+          "note": "2025年末全市医疗卫生机构实有床位，并非即时空床"
+        },
+        {
+          "key": "registered_nurses_2025_count",
+          "label": "注册护士",
+          "value": 12153,
+          "unit": "人",
+          "category": "医疗",
+          "source": "wh",
+          "note": "2025年末全市注册护士数"
+        },
+        {
+          "key": "air_quality_good_days_2025_pct",
+          "label": "空气质量优良率",
+          "value": 91,
+          "unit": "%",
+          "category": "环境",
+          "source": "wh",
+          "note": "威海市2025年全年环境质量优良率，非住宅区实时监测"
+        },
+        {
+          "key": "park_green_area_per_capita_2025_m2",
+          "label": "建成区人均公园绿地面积",
+          "value": 25.06,
+          "unit": "平方米",
+          "category": "环境",
+          "source": "wh",
+          "note": "2025年末全市建成区口径，市区单独口径为25.51平方米"
+        },
+        {
+          "key": "public_transport_passenger_2025_ten_thousand",
+          "label": "公交客运总量",
+          "value": 12411.73,
+          "unit": "万人次",
+          "category": "交通",
+          "source": "wh",
+          "note": "2025年度全市公交客运人次，并非独立出行人数"
+        }
+      ],
+      "city_ids": [
+        9
+      ],
+      "source_note": "政府2025年威海市级统计公报；站内综合榜原城市ID9显示为“威海”，来源实体全称为威海市。所有统计事实按市级口径绑定，不扩展未核的别名，不覆盖原数据库评分、房价、租金和图片。",
+      "source_level": "government"
     }
   ]
 }
