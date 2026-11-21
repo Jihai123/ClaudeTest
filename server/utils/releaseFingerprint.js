@@ -17,9 +17,10 @@ function getDeployedSha(statusFile = STATE) {
     // Require the same protected rollback archive the original root deployer
     // creates and verifies before writing the final DEPLOYED status.
     const backup = obj.backup;
+    const root = path.dirname(statusFile);
     if (typeof backup !== 'string' ||
-        !backup.startsWith('/root/yiju-autodeploy/backup-') ||
-        path.dirname(backup) !== '/root/yiju-autodeploy') return null;
+        !backup.startsWith(path.join(root, 'backup-')) ||
+        path.dirname(backup) !== root) return null;
     if (!fs.statSync(path.join(backup, 'database.sqlite')).isFile() ||
         !fs.statSync(path.join(backup, 'tracked-old.tar.gz')).isFile()) return null;
     return obj.sha;
