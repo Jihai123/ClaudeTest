@@ -91,3 +91,11 @@ test('explicit staging sitemap host can be configured without editing public rob
   assert.match(response.body, /https:\/\/staging\.example\.org\//);
   assert.equal((response.body.match(/<url>/g) || []).length, 10);
 });
+
+// D14: the exact, genuinely updated Zhangye city URL gets a precise lastmod;
+// do not falsely advertise all 561 city pages as newly modified.
+test('D14 static sitemap dates only the sourced Zhangye update correctly', () => {
+  const xml = fs.readFileSync(path.join(__dirname, '../public/sitemap.xml'), 'utf8');
+  assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/city-detail\.html\?id=951<\/loc><lastmod>2026-11-21<\/lastmod>/);
+  assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/city-detail\.html\?id=950<\/loc><lastmod>2025-11-30<\/lastmod>/);
+});
