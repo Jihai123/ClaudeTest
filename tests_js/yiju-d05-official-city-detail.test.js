@@ -219,3 +219,10 @@ test('D14 Zhangye 951 has 19 sourced facts and correct public decision metrics',
   assert.equal(value('annual_sunshine_hours_2025_h'), 2947.1);
   assert.equal(z.sources[0].url, 'https://www.zhangye.gov.cn/sjfb/tjgb/202606/t20260602_1549566.html');
 });
+
+// Release-gate free production probe must parse; a continue-on-error step must not hide syntax faults.
+test('D14 public API probe JavaScript compiles under Node without network', () => {
+  const cp = require('node:child_process');
+  const result = cp.spawnSync(process.execPath, ['--check', path.join(root, 'scripts/ops/yiju_public_api_probe.mjs')], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});
