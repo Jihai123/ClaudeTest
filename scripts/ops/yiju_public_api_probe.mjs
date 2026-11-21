@@ -50,6 +50,8 @@ async function inspect([label, path]) {
     if (['health', 'featured', 'layflat-first-page', 'miyun', 'facts'].includes(label)) {
       const json = JSON.parse(body);
       if (label === 'health') return { label, http: response.status, status: json.status,
+        serverTimestamp: json.timestamp ?? null,
+        measuredAt: new Date().toISOString(),
         releaseSha: json.release_sha ?? null,
         shaIs40Hex: typeof json.release_sha === 'string' && json.release_sha.length === 40 &&
           [...json.release_sha].every(ch => '0123456789abcdef'.includes(ch)) };
@@ -195,8 +197,11 @@ async function inspect([label, path]) {
     if (label === 'sitemap') {
       const after = body.split('city-detail.html?id=951</loc>')[1] || '';
       const lastmod = after.split('<lastmod>')[1]?.split('</lastmod>')[0]?.trim() || null;
+      const afterWeihai = body.split('city-detail.html?id=9</loc>')[1] || '';
+      const weihaiLastmod = afterWeihai.split('<lastmod>')[1]?.split('</lastmod>')[0]?.trim() || null;
       return {label, http: response.status,
         hasCityDetail: body.includes('city-detail.html?id='),
+        weihai9Lastmod: weihaiLastmod,
         zhangye951Lastmod: lastmod,
         bytes: body.length };
     }
