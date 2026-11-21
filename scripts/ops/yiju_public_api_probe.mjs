@@ -24,6 +24,7 @@ const checks = [
   ['candidate-weihai', '/api/cities?search=' + encodeURIComponent('威海') + '&limit=30'],
   ['candidate-weihai-detail', '/api/cities/9'],
   ['candidate-shuangyashan', '/api/cities?search=' + encodeURIComponent('双鸭山市') + '&limit=30'],
+  ['candidate-shuangyashan-detail', '/api/cities/898'],
   ['checklist-html', '/city-living-checklist.html'],
   ['detail-html', '/city-detail.html'],
   ['compare-html', '/city-compare.html'],
@@ -92,7 +93,7 @@ async function inspect([label, path]) {
           goodAirDaysPct: metrics.air_quality_good_days_2025_pct ?? null
         } };
     }
-    if (label === 'candidate-weihai-detail') {
+    if (label === 'candidate-weihai-detail' || label === 'candidate-shuangyashan-detail') {
       const city = JSON.parse(body);
       return {label, http: response.status, id: city.id, name: city.name,
         imagesCount: Array.isArray(city.images) ? city.images.length : null,
