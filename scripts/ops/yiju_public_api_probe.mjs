@@ -21,6 +21,8 @@ const checks = [
   ['robots', '/robots.txt'],
   ['sitemap', '/sitemap.xml'],
   ['candidate-ankang', '/api/cities?search=' + encodeURIComponent('安康') + '&limit=20'],
+  ['candidate-weihai', '/api/cities?search=' + encodeURIComponent('威海') + '&limit=30'],
+  ['candidate-shuangyashan', '/api/cities?search=' + encodeURIComponent('双鸭山市') + '&limit=30'],
   ['checklist-html', '/city-living-checklist.html'],
   ['detail-html', '/city-detail.html'],
   ['compare-html', '/city-compare.html'],
@@ -130,7 +132,7 @@ async function inspect([label, path]) {
         hasLake:row?.has_lake ?? null,
         qualityNote:row?.public_data_quality_note ?? null};
     }
-    if (label === 'candidate-ankang') {
+    if (label === 'candidate-ankang' || label === 'candidate-weihai' || label === 'candidate-shuangyashan') {
       const json = JSON.parse(body);
       const rows = (json.cities || []).map(c => ({
         id: c.id, name: c.name, province: c.province, list_type: c.list_type,
@@ -168,7 +170,14 @@ async function inspect([label, path]) {
       hasMobilityTab: body.includes('data-evidence-group="mobility"'),
       bytes: body.length };
     if (label === 'robots') return { label, http: response.status,
-      hasBaiduspider: body.includes('Baiduspider'), bytes: body.length };
+      hasBaiduspider: body.includes('Baiduspider'),
+      managedBaiduDisallow: /User-agent:\\s*Baiduspider\\s*\\r?\\n\\s*Disallow:\\s*\\/(?:\\r?\\n|$)/i.test(body),
+      hasCorrectSitemap: body.includes('Sitemap: https://yiju.zhibeimao.com/sitemap.xml'),
+      firstLines: body.split(/\\r?\\n/).slice(0,24).join(' | ').slice(0,700), bytes: body.length };
+    if (label === 'sitemap') return {label, http: response.status,
+      hasCityDetail: body.includes('city-detail.html?id='),
+      zhangye951Lastmod: (body.match(/<loc>https:\\/\\/yiju\\.zhibeimao\\.com\\/city-detail\\.html\\?id=951<\\/loc>\\s*<lastmod>([^<]+)<\\/lastmod>/)||[])[1] || null,
+      bytes: body.length };
     return { label, http: response.status,
       hasCityDetail: body.includes('city-detail.html?id='), bytes: body.length };
   } catch (error) {
