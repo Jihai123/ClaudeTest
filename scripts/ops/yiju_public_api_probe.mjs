@@ -22,6 +22,7 @@ const checks = [
   ['sitemap', '/sitemap.xml'],
   ['candidate-ankang', '/api/cities?search=' + encodeURIComponent('安康') + '&limit=20'],
   ['candidate-weihai', '/api/cities?search=' + encodeURIComponent('威海') + '&limit=30'],
+  ['candidate-weihai-detail', '/api/cities/9'],
   ['candidate-shuangyashan', '/api/cities?search=' + encodeURIComponent('双鸭山市') + '&limit=30'],
   ['checklist-html', '/city-living-checklist.html'],
   ['detail-html', '/city-detail.html'],
@@ -90,6 +91,14 @@ async function inspect([label, path]) {
           newJobs: metrics.new_urban_jobs_2025_count ?? null,
           goodAirDaysPct: metrics.air_quality_good_days_2025_pct ?? null
         } };
+    }
+    if (label === 'candidate-weihai-detail') {
+      const city = JSON.parse(body);
+      return {label, http: response.status, id: city.id, name: city.name,
+        imagesCount: Array.isArray(city.images) ? city.images.length : null,
+        approvedPhotoCount: Array.isArray(city.images) ? city.images.filter(x => x.status === 'approved').length : null,
+        licensedFallback: Boolean(city.licensed_photo),
+        officialFactCount: city.official_facts?.facts?.length ?? null};
     }
     if (label === 'd14-zhangye-detail') {
       const city = JSON.parse(body);
