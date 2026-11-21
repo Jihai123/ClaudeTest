@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 39 city regions and 328 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 40 city regions and 344 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 39);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 328);
+  assert.equal(dataset.cities.length, 40);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 344);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05/D07/D10 baseline plus Xiangyang expansion: 39 city regions and 328 sou
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 42, 'add ten unique exact city IDs, preserve all existing aliases');
+  assert.equal(ids.size, 43, 'source city 9 adds one unique exact binding without changing aliases');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
@@ -232,4 +232,23 @@ test('D14 public Chromium diagnostic compiles without network', () => {
   const cp = require('node:child_process');
   const result = cp.spawnSync(process.execPath, ['--check', path.join(root, 'scripts/ops/yiju_d13_chromium_smoke.mjs')], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);
+});
+
+test('D14 Weihai original site city ID9 maps 16 city-level 2025 statistical facts with precise provenance', () => {
+  const c = getOfficialFacts(9);
+  assert.equal(c.name, '威海市');
+  assert.deepEqual(c.city_ids, [9]);
+  assert.equal(c.facts.length, 16);
+  assert.equal(c.sources[0].url, 'https://tjj.weihai.gov.cn/attach/0/5fa352b1c0c64abd8c1e15e87944966b.pdf');
+  const val = key => c.facts.find(x => x.key === key)?.value;
+  assert.equal(val('gdp_2025_billion_cny'), 3896.09);
+  assert.equal(val('resident_population_2025_ten_thousand'), 291.16);
+  assert.equal(val('urbanization_rate_2025_pct'), 74.41);
+  assert.equal(val('all_resident_disposable_income_2025_cny'), 54748);
+  assert.equal(val('urban_disposable_income_2025_cny'), 64590);
+  assert.equal(val('hospital_count_2025'), 81);
+  assert.equal(val('healthcare_beds_2025_count'), 21403);
+  assert.equal(val('air_quality_good_days_2025_pct'), 91);
+  assert.equal(getOfficialFacts(900009), null);
+  assert.equal(getLicensedPhoto(9), null, 'preserve 4 existing approved Weihai images; no fallback needed');
 });
