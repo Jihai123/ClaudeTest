@@ -1,7 +1,7 @@
 {
   "schema_version": "yiju.city_official_facts.v2",
   "statistical_year": 2025,
-  "updated_at": "2026-11-20",
+  "updated_at": "2026-11-21",
   "policy": "本资料为独立来源事实集，按站内城市ID精确绑定；不覆盖原城市数据库、评分、排行、房租、房价及图片审核。不同统计口径不直接横向比较。",
   "cities": [
     {
@@ -510,6 +510,51 @@
           "category": "气候",
           "source": "zy",
           "note": "仅2025单年全市统计值，不能代表多年气候常态"
+        },
+        {
+          "key": "urbanization_rate_2025_pct",
+          "label": "常住人口城镇化率",
+          "value": 58.03,
+          "unit": "%",
+          "category": "人口",
+          "source": "zy",
+          "note": "2025年末张掖全市常住人口口径，不等于甘州区城区占比"
+        },
+        {
+          "key": "rural_consumption_2025_cny",
+          "label": "农村居民人均消费支出",
+          "value": 20199,
+          "unit": "元/年",
+          "category": "消费",
+          "source": "zy",
+          "note": "2025年张掖全市农村居民年度人均消费，不是每月旅居开销"
+        },
+        {
+          "key": "medical_insurance_insured_2025_ten_thousand",
+          "label": "参加基本医疗保险人数",
+          "value": 115.09,
+          "unit": "万人",
+          "category": "医疗",
+          "source": "zy",
+          "note": "2025年末全市参保人数，包含职工与城乡居民，不代表本地医院可立即接诊"
+        },
+        {
+          "key": "airport_passenger_trips_2025_ten_thousand",
+          "label": "张掖机场旅客吞吐量",
+          "value": 29.7,
+          "unit": "万人次",
+          "category": "交通",
+          "source": "zy",
+          "note": "2025年机场全年旅客吞吐量，不等于航班班次或居民出行人数"
+        },
+        {
+          "key": "annual_sunshine_hours_2025_h",
+          "label": "全年日照时数",
+          "value": 2947.1,
+          "unit": "小时",
+          "category": "气候",
+          "source": "zy",
+          "note": "张掖全市2025年单年日照数据，非多年气候平均"
         }
       ],
       "city_ids": [
