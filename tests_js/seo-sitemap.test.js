@@ -99,3 +99,9 @@ test('D14 static sitemap dates only the sourced Zhangye update correctly', () =>
   assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/city-detail\.html\?id=951<\/loc><lastmod>2026-11-21<\/lastmod>/);
   assert.match(xml, /<loc>https:\/\/yiju\.zhibeimao\.com\/city-detail\.html\?id=950<\/loc><lastmod>2025-11-30<\/lastmod>/);
 });
+
+test('D14 Weihai sourced city detail lastmod reflects real official-statistics update only', () => {
+  const xml = fs.readFileSync(path.join(__dirname, '../public/sitemap.xml'), 'utf8');
+  assert.match(xml, /id=9<\\/loc><lastmod>2026-11-21<\\/lastmod>/);
+  assert.match(xml, /id=8<\\/loc><lastmod>2026-01-25<\\/lastmod>/);
+});
