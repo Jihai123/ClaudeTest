@@ -79,6 +79,18 @@ async function main(){
   await click('[data-evidence-group="care"]');
   const medical=await until(async()=>{const s=await summary();return s.labels.some(x=>x.includes('医院'))?s:null;},'care category');
   check(medical.names.length===1,'desktop medical category real click',{labels:medical.labels});
+  // D14: execute a real pointer click ONLY if the newer button has reached production.
+  // The original release gate tests historical production before the protected cron publishes,
+  // so absent features must be recorded as PENDING, never a fake browser PASS.
+  const mobilityPresent=await evalJs('!!document.querySelector(\'[data-evidence-group="mobility"]\')');
+  if(mobilityPresent){
+    await click('[data-evidence-group="mobility"]');
+    const m=await until(async()=>{const v=await summary();return v.names.length===1&&v.labels.some(x=>x.includes('机场旅客'))?v:null;},'D14 mobility real click');
+    check(m.names.length===1,'D14 desktop mobility filter real click',{labels:m.labels});
+    console.log('YIJU_D14_MOBILITY_PROBE '+JSON.stringify({state:'PASS',names:m.names,labels:m.labels}));
+  } else {
+    console.log('YIJU_D14_MOBILITY_PROBE '+JSON.stringify({state:'PENDING_NOT_DEPLOYED',noBrowserPass:true}));
+  }
   // D13 same-day continued evidence: follow the production Baoji card as a user.
   const back=await call('Page.navigate',{url:ROOT});
   if(back.errorText)throw Error('Return to production homepage: '+back.errorText);
