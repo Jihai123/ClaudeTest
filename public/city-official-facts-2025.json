@@ -1,7 +1,7 @@
 {
   "schema_version": "yiju.city_official_facts.v2",
   "statistical_year": 2025,
-  "updated_at": "2026-11-21",
+  "updated_at": "2026-11-23",
   "policy": "本资料为独立来源事实集，按站内城市ID精确绑定；不覆盖原城市数据库、评分、排行、房租、房价及图片审核。不同统计口径不直接横向比较。",
   "cities": [
     {
@@ -4043,6 +4043,89 @@
         9
       ],
       "source_note": "政府2025年威海市级统计公报；站内综合榜原城市ID9显示为“威海”，来源实体全称为威海市。所有统计事实按市级口径绑定，不扩展未核的别名，不覆盖原数据库评分、房价、租金和图片。",
+      "source_level": "government"
+    },
+    {
+      "id": 898,
+      "name": "双鸭山市",
+      "province": "黑龙江",
+      "list_type": "china_layflat",
+      "focus": "核对就业、交通建设与公共服务，再评估实际居住片区",
+      "tip": "市级年度就业和交通工程统计不是个人求职成功率，也不能代替具体房源、交通班次、医院可达性及冬季采暖成本核实。",
+      "sources": [
+        {
+          "key": "sys-employment",
+          "title": "黑龙江省政府转载双鸭山市政府：用心用情用力办好民生实事",
+          "date": "2026-01-28",
+          "url": "https://www.hlj.gov.cn/hlj/c107858/202601/c00_31909427.shtml"
+        },
+        {
+          "key": "sys-transport",
+          "title": "黑龙江省政府转载双鸭山市政府：双鸭山市加速构建现代化综合立体交通体系",
+          "date": "2026-01-27",
+          "url": "https://www.hlj.gov.cn/hlj/c107858/202601/c00_31909052.shtml"
+        }
+      ],
+      "facts": [
+        {
+          "key": "new_urban_jobs_2025_approx_ten_thousand",
+          "label": "城镇新增就业（约）",
+          "value": 1.6,
+          "unit": "万人",
+          "category": "就业",
+          "source": "sys-employment",
+          "note": "政府新闻使用约数1.6万人，不等于精确就业人数或当地岗位空缺"
+        },
+        {
+          "key": "public_livelihood_fiscal_share_2025_pct",
+          "label": "财政支出用于民生比例",
+          "value": 82,
+          "unit": "%",
+          "category": "民生",
+          "source": "sys-employment",
+          "note": "政府2026年1月回顾2025年民生工作所述财政支出占比；非个人福利覆盖率"
+        },
+        {
+          "key": "transport_projects_started_2025_count",
+          "label": "全年开工交通基础设施项目",
+          "value": 36,
+          "unit": "项",
+          "category": "交通",
+          "source": "sys-transport",
+          "note": "2025年全年开工项目数，不代表全部完工"
+        },
+        {
+          "key": "transport_projects_construction_length_2025_km",
+          "label": "交通项目建设里程",
+          "value": 323.9,
+          "unit": "公里",
+          "category": "交通",
+          "source": "sys-transport",
+          "note": "2025年项目建设里程，不代表新增通车里程"
+        },
+        {
+          "key": "rural_road_bridge_projects_2025_count",
+          "label": "农村公路及危桥改造项目",
+          "value": 59,
+          "unit": "项",
+          "category": "交通",
+          "source": "sys-transport",
+          "note": "2025年农村公路、危桥改造项目总数，不等于新增公交线路"
+        },
+        {
+          "key": "rural_road_bridge_construction_2025_km",
+          "label": "农村公路及危桥改造建设里程",
+          "value": 179.1,
+          "unit": "公里",
+          "category": "交通",
+          "source": "sys-transport",
+          "note": "2025年建设里程，不等于全部新建道路"
+        }
+      ],
+      "city_ids": [
+        898
+      ],
+      "source_note": "2025年度双鸭山市政府回顾性公开新闻，由黑龙江省政府转载；就业为原文约数、交通为项目口径，不作为2025统计公报替代、不覆盖数据库租金评分图片。",
       "source_level": "government"
     }
   ]
