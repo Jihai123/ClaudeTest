@@ -8,11 +8,11 @@ const dataset = JSON.parse(read('public/city-official-facts-2025.json'));
 const { getOfficialFacts, getSummary, getLicensedPhoto } =
   require('../server/utils/officialCityFacts');
 
-test('D05/D07/D10 baseline plus Xiangyang expansion: 40 city regions and 344 sourced 2025 facts', () => {
+test('D05/D07/D10 baseline plus Xiangyang expansion: 41 city regions and 350 sourced 2025 facts', () => {
   assert.equal(dataset.schema_version, 'yiju.city_official_facts.v2');
   assert.equal(dataset.statistical_year, 2025);
-  assert.equal(dataset.cities.length, 40);
-  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 344);
+  assert.equal(dataset.cities.length, 41);
+  assert.equal(dataset.cities.reduce((sum, c) => sum + c.facts.length, 0), 350);
   const ids = new Set();
   for (const city of dataset.cities) {
     assert.ok(city.focus && city.tip && city.province);
@@ -39,7 +39,7 @@ test('D05/D07/D10 baseline plus Xiangyang expansion: 40 city regions and 344 sou
       metrics.add(f.key);
     }
   }
-  assert.equal(ids.size, 43, 'source city 9 adds one unique exact binding without changing aliases');
+  assert.equal(ids.size, 44, 'Shuangyashan 898 adds one unique city binding without changing aliases');
 });
 
 test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () => {
@@ -53,6 +53,9 @@ test('original city IDs and cross-ranking alias maps are exact, not fuzzy', () =
   assert.equal(getOfficialFacts(1232).source_level, 'official_bulletin_reprint');
   assert.equal(getOfficialFacts(1236).facts.length, 10, 'Jinan sourced transit and environment');
 
+  assert.equal(getOfficialFacts(898).name, '双鸭山市');
+  assert.equal(getOfficialFacts(898).facts.length, 6);
+  assert.equal(getOfficialFacts(898).facts.find(x => x.key === 'transport_projects_started_2025_count').value, 36);
   assert.equal(getOfficialFacts(951).name, '张掖市');
   assert.equal(getOfficialFacts(1490), null, 'unverified Zhangye alias cannot inherit facts');
   assert.equal(getOfficialFacts(999999), null);

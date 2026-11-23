@@ -40,9 +40,9 @@ test('Chunan 2025 county-level facts are independently source linked and do not 
   assert.ok(city.facts.every(f => !['avg_rent','house_price','medical_facilities','rank'].includes(f.key)));
 });
 
-test('total official city facts include exactly twelve new Chunan entries', () => {
-  assert.equal(data.cities.length, 40);
-  assert.equal(data.cities.reduce((n, city) => n + city.facts.length, 0), 344);
+test('Chunan twelve facts remain intact as sourced city coverage grows', () => {
+  assert.equal(data.cities.length, 41);
+  assert.equal(data.cities.reduce((n, city) => n + city.facts.length, 0), 350);
   const ids = data.cities.flatMap(c => c.city_ids);
   assert.equal(ids.length, new Set(ids).size, 'city ID aliases must stay unique');
 });

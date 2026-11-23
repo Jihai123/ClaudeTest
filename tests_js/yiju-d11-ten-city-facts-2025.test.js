@@ -130,8 +130,8 @@ test('D11 10 existing city IDs map to 10 government 2025 bulletins with exactly 
  assert.equal(Object.values(expected).reduce((a,c)=>a+Object.keys(c.vals).length,0),50);
  const ids=data.cities.flatMap(c=>c.city_ids);
  assert.equal(ids.length,new Set(ids).size,'no duplicate city ID binding');
- assert.equal(data.cities.length,40);
- assert.equal(data.cities.reduce((a,c)=>a+c.facts.length,0),344);
+ assert.equal(data.cities.length,41);
+ assert.equal(data.cities.reduce((a,c)=>a+c.facts.length,0),350);
  for(const [id,check] of Object.entries(expected)){
   const c=getOfficialFacts(Number(id));
   assert.ok(c,'missing mapping '+id);
