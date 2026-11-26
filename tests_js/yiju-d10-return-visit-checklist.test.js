@@ -119,3 +119,22 @@ test('D14 homepage uses the new source explorer version and preserves checklist 
  assert.match(probe,/hasFreshScriptVersion/);
  assert.match(probe,/hasCityLinkPrefill/);
 });
+
+
+test('WB01 homepage canonical and city detail checklist deep link are present',()=>{
+ const home=fs.readFileSync(path.join(__dirname,'../public/index.html'),'utf8');
+ const detail=fs.readFileSync(path.join(__dirname,'../public/city-detail.html'),'utf8');
+ assert.match(home,/<link rel="canonical" href="https:\/\/yiju\.zhibeimao\.com\/">/);
+ assert.equal((home.match(/rel="canonical"/g)||[]).length,1);
+ assert.match(detail,/<a id="cityChecklistLink"[^>]*hidden>/);
+ const start=detail.indexOf("const checklistLink = document.getElementById('cityChecklistLink');");
+ const end=detail.indexOf("document.getElementById('citySlogan')",start);
+ assert.ok(start>=0&&end>start);
+ const link={hidden:true,href:'city-living-checklist.html'};
+ new vm.Script(detail.slice(start,end)).runInNewContext({document:{getElementById:()=>link},cityData:{name:'  张掖市  '},encodeURIComponent});
+ assert.equal(link.hidden,false);
+ const url=new URL(link.href,'https://yiju.zhibeimao.com/');
+ assert.equal(url.pathname,'/city-living-checklist.html');
+ const page=makePage(new Map(),{search:url.search});
+ assert.equal(page.items.get('targetCity').value,'张掖市');
+});

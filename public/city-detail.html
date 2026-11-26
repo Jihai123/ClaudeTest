@@ -544,7 +544,8 @@
         .licensed-photo figcaption { font-size:.8rem; color:#50667a; margin-top:8px; line-height:1.7; }
         .licensed-photo a { color:#205c96; text-decoration:underline; }
         @media(max-width:560px) { .official-facts-grid{grid-template-columns:1fr;} .official-fact-card{padding:14px;} }
-    </style>
+        #cityChecklistLink[hidden] { display: none !important; }
+</style>
 </head>
 <body>
     <!-- 顶部导航 -->
@@ -575,6 +576,7 @@
                     ⭐ <span id="cityScore">0.0</span> 分
                 </div>
                 <div class="city-tags" id="cityTags"></div>
+                <div style="margin-top:16px;"><a id="cityChecklistLink" class="btn btn-primary" href="city-living-checklist.html" hidden>查看6项实地核查清单</a></div>
             </div>
 
              <!-- 可溯源资料不是原有评分，不绕过编辑审批 -->
@@ -736,6 +738,11 @@
         // 渲染城市头部
         function renderCityHeader() {
             document.getElementById('cityName').textContent = cityData.name;
+            const checklistLink = document.getElementById('cityChecklistLink');
+            if (typeof cityData.name === 'string' && cityData.name.trim()) {
+                checklistLink.href = 'city-living-checklist.html?city=' + encodeURIComponent(cityData.name.trim());
+                checklistLink.hidden = false;
+            }
             document.getElementById('citySlogan').textContent = cityData.slogan || cityData.location_intro || cityData.evaluation || '宜居之城';
             const trustNotice = document.getElementById('cityTrustNotice');
             trustNotice.textContent = cityData.public_data_quality_note || '';
