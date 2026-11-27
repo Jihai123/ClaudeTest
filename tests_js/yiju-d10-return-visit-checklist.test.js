@@ -21,7 +21,7 @@ function makePage(store=new Map(),{clipboard=true,storageBlocked=false,search=''
   el.nextElementSibling={textContent:'核查事项'+(i+1)};
   return el;
  });
- for(const name of ['bar','count','progress','targetCity','savedState','pendingOutput','reset','copyPending']) element(name);
+ for(const name of ['bar','count','progress','targetCity','cityContext','savedState','pendingOutput','reset','copyPending']) element(name);
  const localStorage={
   getItem(k){if(storageBlocked)throw Error('storage blocked');return store.has(k)?store.get(k):null},
   setItem(k,v){if(storageBlocked)throw Error('storage blocked');store.set(k,String(v));},
@@ -30,6 +30,7 @@ function makePage(store=new Map(),{clipboard=true,storageBlocked=false,search=''
  const writes=[];
  const navigator=clipboard?{clipboard:{writeText:async v=>{writes.push(v)}}}:{};
  const document={
+  title:'通用选城核查清单',
   querySelectorAll(s){assert.equal(s,'input[type="checkbox"]');return inputs},
   getElementById(id){return items.get(id)}
  };
@@ -39,7 +40,7 @@ function makePage(store=new Map(),{clipboard=true,storageBlocked=false,search=''
  new vm.Script(source,{filename:'city-living-checklist.html'}).runInNewContext(
   {document,localStorage,navigator,encodeURIComponent,Set,Date,location:{search},URLSearchParams}
  );
- return {items,inputs,writes,store};
+ return {items,inputs,writes,store,document};
 }
 
 test('checklist progress persists per city and returns after reload',()=>{
@@ -137,4 +138,25 @@ test('WB01 homepage canonical and city detail checklist deep link are present',(
  assert.equal(url.pathname,'/city-living-checklist.html');
  const page=makePage(new Map(),{search:url.search});
  assert.equal(page.items.get('targetCity').value,'张掖市');
+});
+
+
+test('WB02 city-linked checklist shows correct context without changing generic canonical or saved progress',()=>{
+ const store=new Map();
+ const generic=makePage(store);
+ assert.equal(generic.items.get('cityContext').hidden,true);
+ assert.equal(generic.document.title,'通用选城核查清单');
+ const linked=makePage(store,{search:'?city='+encodeURIComponent('琼海市')});
+ assert.equal(linked.items.get('cityContext').hidden,false);
+ assert.match(linked.items.get('cityContext').textContent,/当前考察城市：琼海市/);
+ assert.match(linked.document.title,/琼海市/);
+ linked.inputs[0].checked=true;linked.inputs[0].fire('change');
+ assert.equal(makePage(store,{search:'?city='+encodeURIComponent('琼海市')}).inputs[0].checked,true);
+ linked.items.get('targetCity').value='张掖市';linked.items.get('targetCity').fire('change');
+ assert.match(linked.items.get('cityContext').textContent,/张掖市/);
+ assert.equal(linked.inputs[0].checked,false);
+ const bad=makePage(store,{search:'?city=%3Cscript%3E'});
+ assert.equal(bad.items.get('cityContext').hidden,true);
+ assert.equal(bad.document.title,'通用选城核查清单');
+ assert.match(html,/<link rel="canonical" href="https:\/\/yiju\.zhibeimao\.com\/city-living-checklist\.html">/);
 });

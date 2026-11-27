@@ -34,7 +34,8 @@ footer{font-size:.9rem;color:#59667a}
 <header><nav><a href="/">易居城市指南</a><a href="/city-compare.html">城市对比工具</a><a href="/verified-city-facts.html">政府数据核验</a></nav></header>
 <main>
 <h1>旅居、养老选城市，先核实这六件事</h1>
-<p class="lead">西安、鹤岗和张掖的公开统计资料各有侧重。这里不做没有依据的“哪个城市最好”排名，而是把已核对的政府数据、适用范围和需要实地确认的问题放在一起。六项核查进度仅保存在当前浏览器，可按城市续做，不上传任何个人信息。</p>
+<p id="cityContext" class="note" hidden aria-live="polite"></p>
+<p class="lead">下方西安、鹤岗和张掖是核查方法示例，不代表其他考察城市的数据。这里不做没有依据的“哪个城市最好”排名，而是把已核对的政府数据、适用范围和需要实地确认的问题放在一起。六项核查进度仅保存在当前浏览器，可按城市续做，不上传任何个人信息。</p>
 <p class="muted">数据统计期：2025年；资料核对：2026年11月13日。数字是全市统计口径，不能直接当作某个社区或房源的实际情况。</p>
 <div class="cards">
 <article class="card">
@@ -101,6 +102,7 @@ footer{font-size:.9rem;color:#59667a}
  const bar=document.getElementById('bar'),count=document.getElementById('count'),progress=document.getElementById('progress');
  const cityInput=document.getElementById('targetCity'),state=document.getElementById('savedState');
  const output=document.getElementById('pendingOutput');
+ const cityContext=document.getElementById('cityContext'),genericTitle=document.title;
  const activeKey='yiju.checklist.active-city.v2';
  const key=()=> 'yiju.checklist.items.v2:'+encodeURIComponent(cityInput.value.trim() || '通用');
  function update(){
@@ -110,6 +112,7 @@ footer{font-size:.9rem;color:#59667a}
   progress.setAttribute('aria-valuenow',String(n));
  }
  function restore(){
+  updateCityContext();
   checks.forEach(c=>{c.checked=false});
   try{
    const saved=JSON.parse(localStorage.getItem(key())||'null');
@@ -134,16 +137,23 @@ footer{font-size:.9rem;color:#59667a}
  }
  // Only a bounded, plain city name may enter through a shareable link.
  // URL parameters never write to server and do not erase saved progress.
+ const validCityName=name=>name.length>0 && name.length<=24 && /^[\u4e00-\u9fa5A-Za-z0-9·（）()-]+$/.test(name);
  let cityFromLink='';
  try{
   if(typeof location!=='undefined' && typeof URLSearchParams!=='undefined'){
    const requested=new URLSearchParams(location.search).get('city');
-   if(requested && requested.trim().length<=24 &&
-      /^[\u4e00-\u9fa5A-Za-z0-9·（）()-]+$/.test(requested.trim())){
+   if(requested && validCityName(requested.trim())){
     cityFromLink=requested.trim();
    }
   }
  }catch(_){}
+ function updateCityContext(){
+  const name=cityInput.value.trim();
+  const show=Boolean(cityFromLink && validCityName(name));
+  cityContext.hidden=!show;
+  cityContext.textContent=show?'当前考察城市：'+name+'。下方三城资料为核查示例。':'';
+  document.title=show?name+'｜六项实地选城核查清单｜易居':genericTitle;
+ }
  if(cityFromLink){cityInput.value=cityFromLink;}
  else try{cityInput.value=localStorage.getItem(activeKey)||'';}catch(_){}
  restore();
